@@ -45,6 +45,7 @@ public class Master
                         // Start the thread
                     } catch (Exception e)
                     {
+                        System.out.println("Could not accept client connection");
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
@@ -70,6 +71,7 @@ public class Master
 
                     } catch (Exception e)
                     {
+                        System.out.println("Could not accept worker connection");
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
