@@ -4,9 +4,9 @@ import java.net.Socket;
 public class Master
 {
     // This will be the port that the client will connect to
-    private static final int CLIENT_PORT = 4321;
+    public static final int CLIENT_PORT = 4321;
     // This will be the port that the worker will connect to
-    private static final int WORKER_PORT = 4322;
+    public static final int WORKER_PORT = 4322;
 
     private ServerSocket clientSocket;
     private ServerSocket workerSocket;
@@ -42,7 +42,10 @@ public class Master
                         Socket client = clientSocket.accept();
                         System.out.println("Client connected");
                         // Create a new thread to handle the client
-                        // Start the thread
+                        ClientHandler clientHandler = new ClientHandler(client);
+                        Thread clientThread = new Thread(clientHandler);
+                        clientThread.start();
+
                     } catch (Exception e)
                     {
                         System.out.println("Could not accept client connection");
