@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -51,6 +52,18 @@ public class Master
                         System.out.println("Could not accept client connection");
                         System.out.println("Error: " + e.getMessage());
                     }
+                    finally
+                    {
+                        System.out.println("Client connection closed");
+                        try
+                        {
+                            clientSocket.close();
+
+                        } catch (IOException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    }
                 }
             }
         });
@@ -76,6 +89,18 @@ public class Master
                     {
                         System.out.println("Could not accept worker connection");
                         System.out.println("Error: " + e.getMessage());
+                    }
+                    finally
+                    {
+                        System.out.println("Worker connection closed");
+                        try
+                        {
+                            workerSocket.close();
+
+                        } catch (IOException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
             }
