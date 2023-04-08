@@ -17,7 +17,7 @@ public class WorkerHandler implements Runnable
     private ObjectOutputStream out;
 
     // This is the socket that the worker is connected to
-    private Socket workerSocket;
+    private final Socket workerSocket;
 
     public WorkerHandler(Socket workerSocket)
     {
@@ -26,10 +26,57 @@ public class WorkerHandler implements Runnable
         // Add the worker to the queue
         workers.add(this);
     }
+
     // This is where the worker will be handled
     public void run()
     {
 
+        while (workerSocket.isConnected())
+        {
+            try
+            {
+                in = new ObjectInputStream(workerSocket.getInputStream());
+                out = new ObjectOutputStream(workerSocket.getOutputStream());
+
+            }
+            catch (Exception e)
+            {
+                System.out.println("Connection to worker lost");
+                e.printStackTrace();
+            }
+            finally
+            {
+                close();
+            }
+
+        }
+
+
+    }
+
+    // This method will close the connection to the worker
+    // and clean up the resources
+    private void close()
+    {
+        try
+        {
+            if (in != null)
+            {
+                in.close();
+            }
+            if (out != null)
+            {
+                out.close();
+            }
+            if (workerSocket != null)
+            {
+                workerSocket.close();
+            }
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
 
     }
 

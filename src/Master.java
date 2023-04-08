@@ -1,13 +1,18 @@
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Queue;
 
 public class Master
 {
+
     // This will be the port that the client will connect to
     public static final int CLIENT_PORT = 4321;
     // This will be the port that the worker will connect to
     public static final int WORKER_PORT = 4322;
+
+    private Queue<File> filesFromClient;
 
     private ServerSocket clientSocket;
     private ServerSocket workerSocket;
@@ -43,7 +48,7 @@ public class Master
                         Socket client = clientSocket.accept();
                         System.out.println("Client connected");
                         // Create a new thread to handle the client
-                        ClientHandler clientHandler = new ClientHandler(client);
+                        ClientHandler clientHandler = new ClientHandler(client, filesFromClient);
                         Thread clientThread = new Thread(clientHandler);
                         clientThread.start();
 
@@ -111,13 +116,10 @@ public class Master
 
     }
 
-
     public static void main(String[] args)
     {
         Master master = new Master();
         master.start();
     }
-
-
 
 }
