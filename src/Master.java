@@ -50,19 +50,18 @@ public class Master
                     } catch (Exception e)
                     {
                         System.out.println("Could not accept client connection");
-                        System.out.println("Error: " + e.getMessage());
-                    }
-                    finally
-                    {
-                        System.out.println("Client connection closed");
                         try
                         {
+
                             clientSocket.close();
 
-                        } catch (IOException e)
+                        } catch (IOException ex)
                         {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException(ex);
                         }
+                        System.out.println("Client connection closed");
+
+                        System.out.println("Error: " + e.getMessage());
                     }
                 }
             }
@@ -88,19 +87,16 @@ public class Master
                     } catch (Exception e)
                     {
                         System.out.println("Could not accept worker connection");
-                        System.out.println("Error: " + e.getMessage());
-                    }
-                    finally
-                    {
-                        System.out.println("Worker connection closed");
-                        try
-                        {
+                        e.printStackTrace();
+                        try {
+
                             workerSocket.close();
 
-                        } catch (IOException e)
-                        {
-                            throw new RuntimeException(e);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
                         }
+                        System.out.println("Worker connection closed");
+                        System.out.println("Error: " + e.getMessage());
                     }
                 }
             }
@@ -109,6 +105,12 @@ public class Master
         handleClient.start();
         handleWorker.start();
     }
+
+    private void closeConnection()
+    {
+
+    }
+
 
     public static void main(String[] args)
     {

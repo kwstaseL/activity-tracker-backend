@@ -3,13 +3,12 @@ import java.net.Socket;
 
 public class Worker
 {
+
     public static void main(String[] args)
     {
         try
         {
-
             Socket socket = new Socket("localhost", Master.WORKER_PORT);
-
         }
         catch (Exception e)
         {
