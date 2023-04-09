@@ -17,7 +17,7 @@ public class ClientHandler implements Runnable
 
     private Queue<File> filesFromClient;
 
-    public static ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+    public static ArrayList<ClientHandler> clients = new ArrayList<>();
 
     public ClientHandler(Socket clientSocket, Queue<File> filesFromClient)
     {
@@ -101,8 +101,6 @@ public class ClientHandler implements Runnable
         }
 
     }
-
-
 
 
 }
