@@ -2,7 +2,7 @@ public class ActivityStats
 {
     private double distance;
     private double speed;
-    private int elevation;
+    private double elevation;
     private double time;
 
     ActivityStats()
@@ -20,7 +20,7 @@ public class ActivityStats
         this.speed = speed;
     }
 
-    public void setElevation(int elevation)
+    public void setElevation(double elevation)
     {
         this.elevation = elevation;
     }
@@ -40,7 +40,7 @@ public class ActivityStats
         return speed;
     }
 
-    public int getElevation()
+    public double getElevation()
     {
         return elevation;
     }
