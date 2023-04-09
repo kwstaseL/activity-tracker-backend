@@ -57,8 +57,8 @@ public class ClientHandler implements Runnable
 
         } catch (IOException | ClassNotFoundException e)
         {
-                System.out.println("Connection to client lost");
-                e.printStackTrace();
+            System.out.println("Connection to client lost");
+            e.printStackTrace();
         }
         finally
         {

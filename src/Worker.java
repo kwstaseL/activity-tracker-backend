@@ -22,12 +22,13 @@ public class Worker
         catch (Exception e)
         {
             System.out.println("Could not connect to master");
+            close();
             System.out.println("Error: " + e.getMessage());
         }
 
     }
 
-    private void start()
+    public void start()
     {
         while (!connection.isClosed())
         {
@@ -38,10 +39,49 @@ public class Worker
             } catch (IOException | ClassNotFoundException e)
             {
                 System.out.println("Could not receive object");
+                close();
                 System.out.println("Error: " + e.getMessage());
             }
         }
     }
+
+    private void close()
+    {
+        if (connection != null)
+        {
+            try
+            {
+                connection.close();
+
+            } catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        if (in != null)
+        {
+            try
+            {
+                in.close();
+
+            } catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        if (out != null)
+        {
+            try
+            {
+                out.close();
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 
     public static void main(String[] args)
     {
