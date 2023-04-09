@@ -10,7 +10,7 @@ public class GPXParser
 {
     public ArrayList<Waypoint> parse(File file)
     {
-        ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
+        ArrayList<Waypoint> waypoints = new ArrayList<>();
         try
         {
             // Parsing the GPX file
@@ -85,19 +85,6 @@ public class GPXParser
             totalElevation += elevation;
             w1 = waypoints.get(i);
         }
-
-        // TODO: Code cleanup
-        /*
-        for (int i = 0; i < waypoints.size() - 1; i++) {
-            Waypoint w1 = waypoints.get(i);
-            Waypoint w2 = waypoints.get(i+1);
-            ActivityStats stats = calculator.calculateStats(w1, w2);
-            totalDistance += stats.getDistance();
-            totalElevation += stats.getElevation();
-            averageSpeed += stats.getSpeed();
-            totalTime += stats.getTime();
-        }
-         */
 
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
 

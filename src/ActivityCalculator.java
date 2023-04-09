@@ -1,7 +1,6 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class ActivityCalculator
 {
@@ -44,8 +43,7 @@ public class ActivityCalculator
         LocalDateTime t2 = LocalDateTime.parse(w2.getTimestamp(), formatter);
         Duration duration = Duration.between(t1, t2);
         double timeInSeconds = duration.getSeconds();
-        double timeInHours = timeInSeconds / 60.0f;
-        return timeInHours;
+        return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
     }
 
 
@@ -56,7 +54,7 @@ public class ActivityCalculator
 
     }
 
-    private double calculateElevation(Waypoint w1, Waypoint w2, double currentHighestElevation)
+    private double calculateElevation(Waypoint w2, double currentHighestElevation)
     {
         // if w2 is above the current highest elevation recorded, we return w2.getElevation - currentHighestElevation
         if (w2.getElevation() > currentHighestElevation) {
@@ -73,7 +71,7 @@ public class ActivityCalculator
         double distance = calculateDistance(w1, w2);
         double time = calculateTime(w1, w2);
         double speed = calculateSpeed(distance, time);
-        double elevation = calculateElevation(w1, w2, currentHighestElevation);
+        double elevation = calculateElevation(w2, currentHighestElevation);
 
         stats.setDistance(distance);
         stats.setSpeed(speed);
