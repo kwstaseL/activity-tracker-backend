@@ -40,7 +40,7 @@ public class Client
             {
                 if (!fileSent)
                 {
-                    File filetoSend = new File("/Users/kwstasel/IdeaProjects/Activity Tracker/data/route1.gpx");
+                    File filetoSend = new File("./gpxs/route1.gpx");
                     out.writeObject(filetoSend);
                     out.flush();
                     fileSent = true;
