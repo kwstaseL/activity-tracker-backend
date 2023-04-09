@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -14,6 +15,7 @@ public class Master
     private Queue<File> filesFromClient;
     private ServerSocket clientSocket;
     private ServerSocket workerSocket;
+    private GPXParser parser;
 
     public Master()
     {
@@ -22,6 +24,7 @@ public class Master
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
             filesFromClient = new LinkedList<>();
+            parser = new GPXParser();
         }
         catch (Exception e)
         {
@@ -135,8 +138,11 @@ public class Master
 
                         // Get the first file from the list
                         File file = filesFromClient.poll();
+                        ArrayList<Waypoint> waypoints = parser.parse(file);
 
                         // Send the file to the worker
+
+
                         System.out.println("Sending file to worker: " + file.getName());
                     }
                 }

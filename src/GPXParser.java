@@ -54,7 +54,7 @@ public class GPXParser
         GPXParser parser = new GPXParser();
         ActivityCalculator calculator = new ActivityCalculator();
 
-        ArrayList<Waypoint> waypoints = parser.parse(new File("./gpxs/route3.gpx"));
+        ArrayList<Waypoint> waypoints = parser.parse(new File("./gpxs/route2.gpx"));
 
         if (waypoints.size() == 0) {
             throw new RuntimeException("Found no waypoints.");

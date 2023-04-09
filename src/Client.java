@@ -16,10 +16,11 @@ public class Client
 
     boolean fileSent = false;
 
-    public Client()
+    public Client(File file)
     {
         try
         {
+            this.file = file;
             connection = new Socket("localhost", Master.CLIENT_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
@@ -40,8 +41,7 @@ public class Client
             {
                 if (!fileSent)
                 {
-                    File filetoSend = new File("./gpxs/route1.gpx");
-                    out.writeObject(filetoSend);
+                    out.writeObject(file);
                     out.flush();
                     fileSent = true;
                 }
@@ -103,8 +103,8 @@ public class Client
 
     public static void main(String[] args)
     {
-        Client client = new Client();
+        File file = new File("./gpxs/route1.gpx");
+        Client client = new Client(file);
         client.sendFile();
     }
-
 }

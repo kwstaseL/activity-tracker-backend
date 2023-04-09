@@ -4,7 +4,6 @@ import java.time.format.DateTimeFormatter;
 
 public class ActivityCalculator
 {
-
     private double calculateDistance(Waypoint w1, Waypoint w2) {
         // Convert degrees to radians
         double lat1 = w1.getLatitude();
@@ -16,7 +15,7 @@ public class ActivityCalculator
         lat2 = lat2 * Math.PI / 180.0;
         lon2 = lon2 * Math.PI / 180.0;
         // radius of earth in metres
-        double r = 6378100;
+        final double r = 6378100;
         // P
         double rho1 = r * Math.cos(lat1);
         double z1 = r * Math.sin(lat1);
@@ -30,7 +29,7 @@ public class ActivityCalculator
         // Dot product
         double dot = (x1 * x2 + y1 * y2 + z1 * z2);
         double cos_theta = dot / (r * r);
-        double theta = Math.acos(cos_theta);
+        final double theta = Math.acos(cos_theta);
         // Distance in Metres
         double d_meters = r * theta;
         return d_meters/1000;
@@ -57,7 +56,8 @@ public class ActivityCalculator
     private double calculateElevation(Waypoint w2, double currentHighestElevation)
     {
         // if w2 is above the current highest elevation recorded, we return w2.getElevation - currentHighestElevation
-        if (w2.getElevation() > currentHighestElevation) {
+        if (w2.getElevation() > currentHighestElevation)
+        {
             return w2.getElevation() - currentHighestElevation;
         }
 
