@@ -34,8 +34,6 @@ public class ClientHandler implements Runnable
             System.out.println("Could not create input and output streams");
             System.out.println("Error: " + e.getMessage());
         }
-
-
         clients.add(this);
     }
 
