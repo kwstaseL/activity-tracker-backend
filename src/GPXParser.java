@@ -54,7 +54,7 @@ public class GPXParser
         GPXParser parser = new GPXParser();
         ActivityCalculator calculator = new ActivityCalculator();
 
-        ArrayList<Waypoint> waypoints = parser.parse(new File("/Users/kwstasel/IdeaProjects/Activity Tracker/data/route3.gpx"));
+        ArrayList<Waypoint> waypoints = parser.parse(new File("./gpxs/route3.gpx"));
 
         double totalDistance = 0.0;
         double totalElevation = 0.0;

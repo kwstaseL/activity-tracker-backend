@@ -37,7 +37,8 @@ public class ActivityCalculator
         return d_meters/1000;
     }
 
-    private double calculateTime(Waypoint w1, Waypoint w2) {
+    private double calculateTime(Waypoint w1, Waypoint w2)
+    {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
         LocalDateTime t1 = LocalDateTime.parse(w1.getTimestamp(), formatter);
         LocalDateTime t2 = LocalDateTime.parse(w2.getTimestamp(), formatter);
