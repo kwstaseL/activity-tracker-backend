@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Queue;
 
 
@@ -16,41 +17,54 @@ public class ClientHandler implements Runnable
 
     private Queue<File> filesFromClient;
 
+    public static ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+
     public ClientHandler(Socket clientSocket, Queue<File> filesFromClient)
     {
         this.clientSocket = clientSocket;
         this.filesFromClient = filesFromClient;
+
+        try
+        {
+            this.in = new ObjectInputStream(clientSocket.getInputStream());
+            this.out = new ObjectOutputStream(clientSocket.getOutputStream());
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not create input and output streams");
+            System.out.println("Error: " + e.getMessage());
+        }
+
+
+        clients.add(this);
     }
 
 
     // This is where the client will be handled
     public void run()
     {
-        while (!clientSocket.isClosed())
+        try
         {
-            try {
-
-                in = new ObjectInputStream(clientSocket.getInputStream());
-                out = new ObjectOutputStream(clientSocket.getOutputStream());
-
+            while (!clientSocket.isClosed())
+            {
                 // Receive the file object from the client
                 Object receivedObject = in.readObject();
 
-                if (receivedObject instanceof File receivedFile)
-                {
+                if (receivedObject instanceof File receivedFile) {
                     System.out.println("Received file: " + receivedFile.getName());
                 }
+            }
 
-            } catch (IOException | ClassNotFoundException e)
-            {
+        } catch (IOException | ClassNotFoundException e)
+        {
                 System.out.println("Connection to client lost");
                 e.printStackTrace();
-            }
-            finally
-            {
-                close();
-            }
         }
+        finally
+        {
+            close();
+        }
+
 
     }
 
@@ -73,6 +87,8 @@ public class ClientHandler implements Runnable
                 clientSocket.close();
             }
 
+            clients.remove(this);
+            System.out.println("Client disconnected");
         }
         catch  (IOException e)
         {
