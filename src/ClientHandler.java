@@ -51,7 +51,12 @@ public class ClientHandler implements Runnable
                 Object receivedObject = in.readObject();
 
                 if (receivedObject instanceof File receivedFile) {
-                    System.out.println("Received file: " + receivedFile.getName());
+                    System.out.println("Received file (ClientHandler): " + receivedFile.getName());
+                    synchronized (filesFromClient)
+                    {
+                        filesFromClient.add(receivedFile);
+                        filesFromClient.notify();
+                    }
                 }
             }
 

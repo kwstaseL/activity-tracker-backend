@@ -37,6 +37,8 @@ public class WorkerHandler implements Runnable
 
             while (!workerSocket.isClosed())
             {
+                // Receive the file object from the worker
+                Object receivedObject = in.readObject();
 
             }
 
