@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -19,9 +20,12 @@ public class WorkerHandler implements Runnable
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
 
-    public WorkerHandler(Socket workerSocket)
+    private Queue<ArrayList<Waypoint>> filesToWorker;
+
+    public WorkerHandler(Socket workerSocket,Queue<ArrayList<Waypoint>> filesToWorker)
     {
         this.workerSocket = workerSocket;
+        this.filesToWorker = filesToWorker;
 
         // Add the worker to the queue
         workers.add(this);
@@ -30,6 +34,62 @@ public class WorkerHandler implements Runnable
     // This is where the worker will be handled
     public void run()
     {
+        Thread readWorker = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                readFromWorker();
+            }
+        });
+
+        Thread readMaster = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                readFromMaster();
+            }
+        });
+
+        readWorker.start();
+        readMaster.start();
+    }
+
+    private void readFromMaster()
+    {
+        // TODO : Read from master from the shared queue
+        try
+        {
+            System.out.println("Waiting for waypoints");
+            while (!workerSocket.isClosed())
+            {
+                synchronized (filesToWorker)
+                {
+                    while (filesToWorker.isEmpty())
+                    {
+                        filesToWorker.wait();
+                    }
+                    // get the arraylist of waypoints from the queue
+                    ArrayList<Waypoint> waypoints = filesToWorker.poll();
+                    System.out.println("Sending waypoints to worker");
+                    // send the waypoints to the worker
+                    out.writeObject(waypoints);
+                    out.flush();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+
+
+    }
+
+    private void readFromWorker()
+    {
+        System.out.println("Waiting for worker");
         try
         {
             in = new ObjectInputStream(workerSocket.getInputStream());
@@ -37,11 +97,10 @@ public class WorkerHandler implements Runnable
 
             while (!workerSocket.isClosed())
             {
-                // Receive the file object from the worker
+                // Receive the file object from the worker this will be the results from the worker
                 Object receivedObject = in.readObject();
 
             }
-
         }
         catch (Exception e)
         {
@@ -49,11 +108,8 @@ public class WorkerHandler implements Runnable
             close();
             e.printStackTrace();
         }
-
-
-
-
     }
+
 
     // This method will close the connection to the worker
     // and clean up the resources

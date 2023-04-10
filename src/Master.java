@@ -13,6 +13,7 @@ public class Master
     // This will be the port that the worker will connect to
     public static final int WORKER_PORT = 4322;
     private Queue<File> filesFromClient;
+    private Queue<ArrayList<Waypoint>> filesToWorker;
     private ServerSocket clientSocket;
     private ServerSocket workerSocket;
     private GPXParser parser;
@@ -24,6 +25,7 @@ public class Master
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
             filesFromClient = new LinkedList<>();
+            filesToWorker = new LinkedList<>();
             parser = new GPXParser();
         }
         catch (Exception e)
@@ -87,7 +89,7 @@ public class Master
                         Socket worker = workerSocket.accept();
                         System.out.println("Worker connected");
                         // Create a new thread to handle the worker
-                        WorkerHandler workerHandler = new WorkerHandler(worker);
+                        WorkerHandler workerHandler = new WorkerHandler(worker, filesToWorker);
                         Thread workerThread = new Thread(workerHandler);
                         workerThread.start();
 
@@ -140,8 +142,13 @@ public class Master
                         File file = filesFromClient.poll();
                         ArrayList<Waypoint> waypoints = parser.parse(file);
 
-                        // Send the file to the worker
-
+                        // Add the file to the list of files to send to the worker
+                        synchronized (filesToWorker)
+                        {
+                            filesToWorker.add(waypoints);
+                            filesToWorker.notify();
+                            System.out.println("added!");
+                        }
 
                         System.out.println("Sending file to worker: " + file.getName());
                     }

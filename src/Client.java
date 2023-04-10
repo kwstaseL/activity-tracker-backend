@@ -104,7 +104,29 @@ public class Client
     public static void main(String[] args)
     {
         File file = new File("./gpxs/route1.gpx");
+        File file2 = new File("./gpxs/route2.gpx");
         Client client = new Client(file);
-        client.sendFile();
+        Client client2 = new Client(file2);
+        Thread c1 = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+                client.sendFile();
+            }
+
+        });
+
+        Thread c2 = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+                client2.sendFile();
+            }
+
+        });
+
+        c1.start();
+        c2.start();
+
     }
 }
