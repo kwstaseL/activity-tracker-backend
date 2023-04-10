@@ -54,7 +54,7 @@ public class GPXParser
         GPXParser parser = new GPXParser();
         ActivityCalculator calculator = new ActivityCalculator();
 
-        ArrayList<Waypoint> waypoints = parser.parse(new File("./gpxs/route3.gpx"));
+        ArrayList<Waypoint> waypoints = parser.parse(new File("./gpxs/route2.gpx"));
 
         if (waypoints.size() == 0) {
             throw new RuntimeException("Found no waypoints.");
@@ -92,7 +92,7 @@ public class GPXParser
         System.out.println("Total Distance: " + String.format("%.2f", totalDistance) + " km");
         System.out.println("Average Speed: " + String.format("%.2f", averageSpeed) + " km/h");
         System.out.println("Total Elevation: " + String.format("%.2f", totalElevation) + " m");
-        System.out.println("Total Time: " + totalTime + " minutes");
+        System.out.println("Total Time: " + String.format("%.2f", totalTime) + " minutes");
 
     }
 

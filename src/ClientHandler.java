@@ -85,14 +85,13 @@ public class ClientHandler implements Runnable
 
         } catch (IOException | ClassNotFoundException e)
         {
-            System.out.println("Connection to client lost");
+            System.out.println("ClientHandler: Connection to client lost");
             e.printStackTrace();
         }
         finally
         {
             close();
         }
-
 
     }
 
@@ -101,6 +100,7 @@ public class ClientHandler implements Runnable
         while (!clientSocket.isClosed())
         {
             // TODO - Receive results from master and send to client
+
         }
 
     }

@@ -58,7 +58,6 @@ public class WorkerHandler implements Runnable
 
     private void readFromMaster()
     {
-        // TODO : Read from master from the shared queue
         try
         {
             System.out.println("WorkerHandler: Waiting for waypoints");
@@ -72,6 +71,7 @@ public class WorkerHandler implements Runnable
                     }
                     // get the arraylist of waypoints from the queue
                     ArrayList<Waypoint> waypoints = filesToWorker.poll();
+
                     System.out.println("WorkerHandler: Sending waypoints to worker");
                     // send the waypoints to the worker
                     out.writeObject(waypoints);
@@ -81,10 +81,9 @@ public class WorkerHandler implements Runnable
         }
         catch (Exception e)
         {
-
+            System.out.println("WorkerHandler: Connection to master lost");
+            close();
         }
-
-
     }
 
     private void readFromWorker()
@@ -99,12 +98,11 @@ public class WorkerHandler implements Runnable
             {
                 // Receive the file object from the worker this will be the results from the worker
                 Object receivedObject = in.readObject();
-
             }
         }
         catch (Exception e)
         {
-            System.out.println("Connection to worker lost");
+            System.out.println("WorkerHandler: Connection to worker lost");
             close();
             e.printStackTrace();
         }

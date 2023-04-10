@@ -37,23 +37,13 @@ public class Client
     {
         try
         {
-            while (!connection.isClosed())
+            if (!fileSent)
             {
-                if (!fileSent)
-                {
-                    out.writeObject(file);
-                    out.flush();
-                    fileSent = true;
-                }
-                else // here this if statement is just for testing purposes to see if the file is sent to the master, it will be removed later
-                {
-                    Object receivedObject = in.readObject();
-                    if (receivedObject instanceof File receivedFile)
-                    {
-                        System.out.println("Received file: " + receivedFile.getName());
-                    }
-                }
+                out.writeObject(file);
+                out.flush();
+                fileSent = true;
             }
+
         }
         catch (Exception e)
         {
@@ -61,6 +51,36 @@ public class Client
             close();
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    public void listenForMessages()
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while (!connection.isClosed())
+                {
+                    try
+                    {
+                        Object receivedObject = in.readObject();
+                        if (receivedObject instanceof File receivedFile)
+                        {
+                            System.out.println("Received file: " + receivedFile.getName());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println("Could not receive object");
+                        close();
+                        System.out.println("Error: " + e.getMessage());
+                    }
+
+                }
+            }
+        }).start();
+
     }
 
     private void close()
@@ -105,8 +125,10 @@ public class Client
     {
         File file = new File("./gpxs/route1.gpx");
         File file2 = new File("./gpxs/route2.gpx");
+        File file3 = new File("./gpxs/route3.gpx");
         Client client = new Client(file);
         Client client2 = new Client(file2);
+        Client client3 = new Client(file3);
         Thread c1 = new Thread(new Runnable()
         {
             @Override
@@ -125,8 +147,21 @@ public class Client
 
         });
 
+        Thread c3 = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+                client3.sendFile();
+            }
+
+        });
         c1.start();
         c2.start();
+        c3.start();
+
+        client.listenForMessages();
+        client2.listenForMessages();
+        client3.listenForMessages();
 
     }
 }

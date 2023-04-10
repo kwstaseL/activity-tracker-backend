@@ -5,11 +5,6 @@ public class ActivityStats
     private double elevation;
     private double time;
 
-    ActivityStats()
-    {
-
-    }
-
     public void setDistance(double distance)
     {
         this.distance = distance;
@@ -49,8 +44,6 @@ public class ActivityStats
     {
         return time;
     }
-
-
 
     public String toString()
     {
