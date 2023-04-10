@@ -41,6 +41,30 @@ public class ClientHandler implements Runnable
     // This is where the client will be handled
     public void run()
     {
+        Thread readFromClient = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                readFromClient();
+            }
+        });
+
+        Thread readFromMaster = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                readFromMaster();
+            }
+        });
+
+        readFromClient.start();
+        readFromMaster.start();
+    }
+
+    private void readFromClient()
+    {
         try
         {
             while (!clientSocket.isClosed())
@@ -71,6 +95,16 @@ public class ClientHandler implements Runnable
 
 
     }
+
+    private void readFromMaster()
+    {
+        while (!clientSocket.isClosed())
+        {
+            // TODO - Receive results from master and send to client
+        }
+
+    }
+
 
     // This method will close the connection to the client
     // and clean up the resources

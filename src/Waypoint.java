@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 // A class that
-public class Waypoint
+public class Waypoint implements Serializable
 {
     final private double latitude;
     final private double longitude;

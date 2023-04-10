@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,11 +29,26 @@ public class Worker
 
     public void start()
     {
+        Thread readMaster = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                readFromMaster();
+            }
+        });
+
+        readMaster.start();
+    }
+
+    private void readFromMaster()
+    {
         while (!connection.isClosed())
         {
             try
             {
                 Object receivedObject = in.readObject();
+                System.out.println("Received object from master" + receivedObject.toString());
 
             } catch (IOException | ClassNotFoundException e)
             {
@@ -43,6 +57,7 @@ public class Worker
                 System.out.println("Error: " + e.getMessage());
             }
         }
+
     }
 
     private void close()
