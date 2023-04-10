@@ -61,7 +61,7 @@ public class WorkerHandler implements Runnable
         // TODO : Read from master from the shared queue
         try
         {
-            System.out.println("Waiting for waypoints");
+            System.out.println("WorkerHandler: Waiting for waypoints");
             while (!workerSocket.isClosed())
             {
                 synchronized (filesToWorker)
@@ -72,7 +72,7 @@ public class WorkerHandler implements Runnable
                     }
                     // get the arraylist of waypoints from the queue
                     ArrayList<Waypoint> waypoints = filesToWorker.poll();
-                    System.out.println("Sending waypoints to worker");
+                    System.out.println("WorkerHandler: Sending waypoints to worker");
                     // send the waypoints to the worker
                     out.writeObject(waypoints);
                     out.flush();
@@ -89,7 +89,7 @@ public class WorkerHandler implements Runnable
 
     private void readFromWorker()
     {
-        System.out.println("Waiting for worker");
+        System.out.println("WorkerHandler: Waiting for worker");
         try
         {
             in = new ObjectInputStream(workerSocket.getInputStream());
