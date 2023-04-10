@@ -8,9 +8,10 @@ import java.util.ArrayList;
 
 public class GPXParser
 {
-    public ArrayList<Waypoint> parse(File file)
+    public Route parse(File file)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
+        Route route = null;
         try
         {
             // Parsing the GPX file
@@ -25,11 +26,13 @@ public class GPXParser
             // This will return all the <wpt> tags
             NodeList nodeList = doc.getElementsByTagName("wpt");
 
+            String creator = null;
+
             // Iterate through all the <wpt> tags
             for (int i = 0; i < nodeList.getLength(); i++) {
                 // Get the <wpt> tag we are currently processing
                 Element element = (Element) nodeList.item(i);
-                String creator = doc.getDocumentElement().getAttribute("creator");
+                creator = doc.getDocumentElement().getAttribute("creator");
                 String latitude = element.getAttribute("lat");
                 String longitude = element.getAttribute("lon");
                 String elevation = element.getElementsByTagName("ele").item(0).getTextContent();
@@ -41,12 +44,15 @@ public class GPXParser
 
             }
 
+            route = new Route(waypoints, creator);
+
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return waypoints;
+
+        return route;
     }
 
     public static void main(String[] args)
@@ -54,7 +60,7 @@ public class GPXParser
         GPXParser parser = new GPXParser();
         ActivityCalculator calculator = new ActivityCalculator();
 
-        ArrayList<Waypoint> waypoints = parser.parse(new File("./gpxs/route2.gpx"));
+        ArrayList<Waypoint> waypoints = parser.parse(new File("./gpxs/route2.gpx")).waypoints();
 
         if (waypoints.size() == 0) {
             throw new RuntimeException("Found no waypoints.");
