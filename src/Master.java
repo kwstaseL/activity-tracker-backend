@@ -47,10 +47,10 @@ public class Master
                 {
                     try
                     {
-                        System.out.println("Waiting for client connection");
+                        System.out.println("MASTER: Waiting for client connection");
                         // Accept a client connection
                         Socket client = clientSocket.accept();
-                        System.out.println("Client connected");
+                        System.out.println("MASTER: Client connected");
                         // Create a new thread to handle the client
                         ClientHandler clientHandler = new ClientHandler(client, filesFromClient);
                         Thread clientThread = new Thread(clientHandler);
@@ -84,10 +84,10 @@ public class Master
                 {
                     try
                     {
-                        System.out.println("Waiting for worker connection");
+                        System.out.println("MASTER: Waiting for worker connection");
                         // Accept a worker connection
                         Socket worker = workerSocket.accept();
-                        System.out.println("Worker connected");
+                        System.out.println("MASTER: Worker connected");
                         // Create a new thread to handle the worker
                         WorkerHandler workerHandler = new WorkerHandler(worker, filesToWorker);
                         Thread workerThread = new Thread(workerHandler);
@@ -124,7 +124,7 @@ public class Master
                         // Check if there are any files in the list
                         while (filesFromClient.isEmpty())
                         {
-                            System.out.println("Waiting for files from client");
+                            System.out.println("MASTER: Waiting for files from client");
                             try
                             {
                                 // Wait for a file to be added to the list
@@ -147,10 +147,9 @@ public class Master
                         {
                             filesToWorker.add(waypoints);
                             filesToWorker.notify();
-                            System.out.println("added!");
                         }
 
-                        System.out.println("Sending file to worker: " + file.getName());
+                        System.out.println("MASTER: Sending file to worker: " + file.getName());
                     }
                 }
 

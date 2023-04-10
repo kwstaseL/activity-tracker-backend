@@ -70,11 +70,11 @@ public class ClientHandler implements Runnable
             while (!clientSocket.isClosed())
             {
                 // Receive the file object from the client
-                System.out.println("Waiting for file from client");
+                System.out.println("ClientHandler: Waiting for file from client");
                 Object receivedObject = in.readObject();
 
                 if (receivedObject instanceof File receivedFile) {
-                    System.out.println("Received file (ClientHandler): " + receivedFile.getName());
+                    System.out.println("ClientHandler: Received file from client  " + receivedFile.getName());
                     synchronized (filesFromClient)
                     {
                         filesFromClient.add(receivedFile);

@@ -48,7 +48,7 @@ public class Worker
             try
             {
                 Object receivedObject = in.readObject();
-                System.out.println("Received object from master" + receivedObject.toString());
+                System.out.println("WORKER: Received object from master" + receivedObject.toString());
 
             } catch (IOException | ClassNotFoundException e)
             {
