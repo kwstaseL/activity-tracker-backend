@@ -4,7 +4,8 @@ import java.time.format.DateTimeFormatter;
 
 public class ActivityCalculator
 {
-    private double calculateDistance(Waypoint w1, Waypoint w2) {
+    private double calculateDistance(Waypoint w1, Waypoint w2)
+    {
         // Convert degrees to radians
         double lat1 = w1.getLatitude();
         double lon1 = w1.getLongitude();
@@ -48,9 +49,7 @@ public class ActivityCalculator
 
     private double calculateSpeed(double distance, double time)
     {
-
         return distance / time;
-
     }
 
     private double calculateElevation(Waypoint w2, double currentHighestElevation)

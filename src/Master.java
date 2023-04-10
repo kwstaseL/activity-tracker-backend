@@ -18,10 +18,13 @@ public class Master
     private ServerSocket workerSocket;
     private GPXParser parser;
 
-    public Master()
+    private int num_of_workers;
+
+    public Master(int num_of_workers)
     {
         try
         {
+            this.num_of_workers = num_of_workers;
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
             filesFromClient = new LinkedList<>();
@@ -38,6 +41,22 @@ public class Master
     // This method will start the master server and listen for connections
     private void start()
     {
+        Thread initializeWorkers = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                for (int i = 0; i < num_of_workers; i++)
+                {
+                    Worker w = new Worker();
+                    try {
+                        Socket connection = new Socket("localhost", Master.WORKER_PORT);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
         Thread handleClient = new Thread(new Runnable()
         {
             @Override
@@ -55,7 +74,6 @@ public class Master
                         ClientHandler clientHandler = new ClientHandler(client, filesFromClient);
                         Thread clientThread = new Thread(clientHandler);
                         clientThread.start();
-
                     } catch (Exception e)
                     {
                         System.out.println("Could not accept client connection");
@@ -141,7 +159,7 @@ public class Master
                         // Get the first file from the list
                         File file = filesFromClient.poll();
                         ArrayList<Waypoint> waypoints = parser.parse(file);
-
+                        System.out.println("MASTER: Sending file to worker: " + file.getName());
                         // Add the file to the list of files to send to the worker
                         synchronized (filesToWorker)
                         {
@@ -149,17 +167,16 @@ public class Master
                             filesToWorker.notify();
                         }
 
-                        System.out.println("MASTER: Sending file to worker: " + file.getName());
                     }
                 }
 
             }
 
         });
-
-        handleClient.start();
         handleWorker.start();
+        handleClient.start();
         handleFiles.start();
+        initializeWorkers.start();
     }
 
     private void closeConnection()
@@ -169,7 +186,7 @@ public class Master
 
     public static void main(String[] args)
     {
-        Master master = new Master();
+        Master master = new Master(5);
         master.start();
     }
 
