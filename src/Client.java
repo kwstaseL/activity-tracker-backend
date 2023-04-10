@@ -6,7 +6,6 @@ import java.io.File;
 
 public class Client
 {
-
     private Socket connection;
 
     private ObjectOutputStream out;

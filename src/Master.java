@@ -41,6 +41,17 @@ public class Master
     // This method will start the master server and listen for connections
     private void start()
     {
+        Thread initializeWorkers = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                for (int i = 0; i < numOfWorkers; i++)
+                {
+                    Worker worker = new Worker();
+                }
+            }
+        });
         Thread handleClient = new Thread(new Runnable()
         {
             @Override
@@ -162,6 +173,7 @@ public class Master
         handleClient.start();
         handleWorker.start();
         handleFiles.start();
+        initializeWorkers.start();
     }
 
     private void closeConnection()

@@ -37,7 +37,6 @@ public class ClientHandler implements Runnable
         clients.add(this);
     }
 
-
     // This is where the client will be handled
     public void run()
     {
@@ -49,7 +48,6 @@ public class ClientHandler implements Runnable
                 readFromClient();
             }
         });
-
         Thread readFromMaster = new Thread(new Runnable()
         {
             @Override
@@ -104,7 +102,6 @@ public class ClientHandler implements Runnable
         }
 
     }
-
 
     // This method will close the connection to the client
     // and clean up the resources
