@@ -1,3 +1,5 @@
+package activity.calculations;
+
 public class ActivityStats
 {
     private double distance;

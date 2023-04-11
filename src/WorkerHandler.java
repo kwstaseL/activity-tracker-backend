@@ -1,11 +1,9 @@
+import activity.parser.Route;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 // This class will handle the worker connection
 public class WorkerHandler implements Runnable

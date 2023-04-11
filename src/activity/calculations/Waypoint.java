@@ -1,3 +1,5 @@
+package activity.calculations;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

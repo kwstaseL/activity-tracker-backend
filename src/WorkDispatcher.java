@@ -1,3 +1,6 @@
+import activity.calculations.Waypoint;
+import activity.parser.Route;
+
 import java.util.ArrayList;
 import java.util.Queue;
 
