@@ -2,8 +2,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-
 
 public class Worker
 {
@@ -30,7 +28,7 @@ public class Worker
 
     public void start()
     {
-        Thread readMaster = new Thread(new Runnable()
+        Thread readData = new Thread(new Runnable()
         {
             @Override
             public void run()
@@ -39,7 +37,7 @@ public class Worker
             }
         });
 
-        readMaster.start();
+        readData.start();
     }
 
     private void readForData()
@@ -50,7 +48,7 @@ public class Worker
             {
                 System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
-                Route data = (Route) receivedObject;
+                Route route = (Route) receivedObject;
                 System.out.println("WORKER: Received object from master" + receivedObject.toString());
 
             } catch (IOException | ClassNotFoundException e)
@@ -59,10 +57,7 @@ public class Worker
                 close();
                 System.out.println("Error: " + e.getMessage());
             }
-
-
         }
-
     }
 
     private void close()

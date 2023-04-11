@@ -3,8 +3,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Queue;
+import java.util.UUID;
 
 
 // This class will handle the client connection
@@ -14,7 +14,9 @@ public class ClientHandler implements Runnable
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    public static ArrayList<ClientHandler> clients = new ArrayList<>();
+
+    // This is the unique ID of the client so we can
+    private String clientID;
 
     GPXParser parser;
     private Queue<Route> routes;
@@ -29,13 +31,13 @@ public class ClientHandler implements Runnable
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
             this.parser = new GPXParser();
             this.routes = routes;
+            this.clientID = UUID.randomUUID().toString();
         }
         catch (IOException e)
         {
             System.out.println("Could not create input and output streams");
             System.out.println("Error: " + e.getMessage());
         }
-        clients.add(this);
     }
 
     // This is where the client will be handled
@@ -69,6 +71,7 @@ public class ClientHandler implements Runnable
                     // Dispatching the file to the workers
                     // Parse the file
                     Route route = parser.parse(receivedFile);
+                    route.setClientID(clientID);
                     // Add the route to the queue
                     synchronized (routes)
                     {
@@ -110,7 +113,6 @@ public class ClientHandler implements Runnable
                 clientSocket.close();
             }
 
-            clients.remove(this);
             System.out.println("Client disconnected");
         }
         catch  (IOException e)

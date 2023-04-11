@@ -10,6 +10,10 @@ public class Waypoint implements Serializable
     final private String timestamp;
     final private String username;
 
+    private String userID;
+
+    private int routeID;
+
     public Waypoint(double latitude, double longitude,
                     double elevation, String timestamp,String username)
     {
