@@ -1,3 +1,5 @@
+package activity.main;
+
 import activity.calculations.Waypoint;
 import activity.parser.Route;
 
@@ -42,9 +44,11 @@ public class WorkDispatcher implements Runnable
                 final int n = 4;
 
                 ArrayList<Waypoint> chunk = new ArrayList<Waypoint>();
+
                 for (int i = 0; i < waypoints.size(); i++)
                 {
                     chunk.add(waypoints.get(i));
+
                     if ((i + 1) % n == 0 || i == waypoints.size() - 1)
                     {
                         WorkerHandler worker = workers.poll();

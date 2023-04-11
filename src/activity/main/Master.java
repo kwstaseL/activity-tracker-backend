@@ -1,3 +1,5 @@
+package activity.main;
+
 import activity.parser.Route;
 
 import java.io.IOException;
@@ -16,10 +18,9 @@ public class Master
     private ServerSocket workerSocket;
     private Queue<WorkerHandler> workerHandlers;
     private Queue<ClientHandler> clientHandlers;
-
     private Queue<Route> routes;
-
     private int numOfWorkers;
+
 
     public Master(int numOfWorkers)
     {

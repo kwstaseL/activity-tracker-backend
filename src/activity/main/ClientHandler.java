@@ -1,3 +1,5 @@
+package activity.main;
+
 import activity.parser.GPXParser;
 import activity.parser.Route;
 
@@ -13,6 +15,7 @@ import java.util.UUID;
 // This class will handle the client connection
 public class ClientHandler implements Runnable
 {
+
     // This is the socket that the client is connected to
     private Socket clientSocket;
     private ObjectInputStream in;
@@ -20,7 +23,6 @@ public class ClientHandler implements Runnable
 
     // This is the unique ID of the client so we can
     private String clientID;
-
     GPXParser parser;
     private Queue<Route> routes;
 
@@ -53,6 +55,7 @@ public class ClientHandler implements Runnable
             {
                 readFromClient();
             }
+
         });
 
         readFromClient.start();
@@ -95,7 +98,6 @@ public class ClientHandler implements Runnable
         }
 
     }
-
 
     // This method will close the connection to the client
     // and clean up the resources

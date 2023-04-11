@@ -1,3 +1,5 @@
+package activity.main;
+
 import activity.parser.Route;
 
 import java.io.IOException;
@@ -51,6 +53,7 @@ public class Worker
                 System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
                 Route route = (Route) receivedObject;
+
                 System.out.println("WORKER: Received object from master" + receivedObject.toString());
 
             } catch (IOException | ClassNotFoundException e)
