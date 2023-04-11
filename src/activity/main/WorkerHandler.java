@@ -20,7 +20,6 @@ public class WorkerHandler implements Runnable
 
     private HashMap<String,ClientHandler> clients;
 
-
     public WorkerHandler(Socket workerSocket,HashMap<String,ClientHandler> clients)
     {
         this.workerSocket = workerSocket;

@@ -36,6 +36,7 @@ public class WorkDispatcher implements Runnable
                 }
 
                 Route route = filesToWorker.poll();
+                System.out.println("WorkerDispatcher: About to process route: " + route.toString());
                 ArrayList<Waypoint> waypoints = route.waypoints();
 
                 int routeID = route.getRouteID();
@@ -43,16 +44,15 @@ public class WorkDispatcher implements Runnable
 
                 // set n to the desired number of waypoints per chunk
                 final int n = 4;
-
                 ArrayList<Waypoint> chunk = new ArrayList<Waypoint>();
 
                 for (int i = 0; i < waypoints.size(); i++)
                 {
                     chunk.add(waypoints.get(i));
+                    waypoints.remove(i);
 
                     if ((i + 1) % n == 0 || i == waypoints.size() - 1)
                     {
-
                         WorkerHandler worker = workers.poll();
                         assert worker != null;
                         Route route_ = new Route(chunk, routeID, clientID);

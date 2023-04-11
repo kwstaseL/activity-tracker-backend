@@ -17,7 +17,7 @@ public class Map
         calculator = new ActivityCalculator();
     }
 
-    public HashMap<String, ActivityStats> map(String clientID, Route route)
+    public synchronized HashMap<String, ActivityStats> map(String clientID, Route route)
     {
         System.out.println("Started mapping phase..");
         HashMap<String, ActivityStats> intermediate_results = new HashMap<>();
@@ -25,6 +25,7 @@ public class Map
         // TODO: Add the stats to the intermediate_results hashmap
 
         ArrayList<Waypoint> waypoints = route.waypoints();
+        System.out.println("Waypoints size: " + waypoints.size());
 
         Waypoint w1 = waypoints.get(0);
         double currentHighestElevation = w1.getElevation();   // initialising currentHighestElevation with the first waypoint's elevation
@@ -33,7 +34,8 @@ public class Map
         double totalTime = 0.0;
         double averageSpeed = 0.0;
 
-        ActivityStats stats = null;
+        ActivityStats stats = new ActivityStats();
+        ActivityStats finalStats = new ActivityStats();
 
         for (int i = 1; i < waypoints.size(); ++i)
         {
@@ -53,15 +55,18 @@ public class Map
             totalElevation += elevation;
             w1 = waypoints.get(i);
         }
-
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
+        finalStats.setDistance(totalDistance);
+        finalStats.setSpeed(averageSpeed);
+        finalStats.setElevation(totalElevation);
+        finalStats.setTime(totalTime);
 
-        System.out.println("Total Distance: " + String.format("%.2f", totalDistance) + " km");
-        System.out.println("Average Speed: " + String.format("%.2f", averageSpeed) + " km/h");
-        System.out.println("Total Elevation: " + String.format("%.2f", totalElevation) + " m");
-        System.out.println("Total Time: " + String.format("%.2f", totalTime) + " minutes");
-
-        intermediate_results.put(clientID, stats);
+        System.out.println("Total Distance: " + String.format("%.2f", finalStats.getDistance()) + " km");
+        System.out.println("Average Speed: " + String.format("%.2f", finalStats.getSpeed()) + " km/h");
+        System.out.println("Total Elevation: " + String.format("%.2f", finalStats.getElevation()) + " m");
+        System.out.println("Total Time: " + String.format("%.2f", finalStats.getTime()) + " minutes");
+        System.out.println("Finished mapping phase.. for client: " + clientID);
+        intermediate_results.put(clientID, finalStats);
 
         return intermediate_results;
     }

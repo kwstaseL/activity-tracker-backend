@@ -67,7 +67,7 @@ public class Client
                     catch (Exception e)
                     {
                         System.out.println("Could not receive object");
-                        close();
+                        shutdown();
                         System.out.println("Error: " + e.getMessage());
                     }
 

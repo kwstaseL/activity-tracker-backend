@@ -16,10 +16,10 @@ public class Worker
     private Socket connection;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-
     private Queue<HashMap<String, ActivityStats>> results;
-
     private Map mapFunction;
+
+    private final Object writeLock = new Object();
 
     public Worker()
     {
@@ -62,19 +62,14 @@ public class Worker
                 System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
                 Route route = (Route) receivedObject;
+                System.out.println("WORKER: Received route from master " + route);
 
                 // Implements the mapping phase of the MapReduce algorithm
                 /*
-                new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        results.add(mapFunction.map(route.getClientID(),route));
-                    }
+                new Thread(() -> {
+                        handleMapping(route);
                 }).start();
                 */
-                // TODO: Send the results to the worker-handler
 
                 System.out.println("WORKER: Received object from master" + receivedObject.toString());
 
@@ -84,6 +79,25 @@ public class Worker
                 close();
                 System.out.println("Error: " + e.getMessage());
             }
+        }
+    }
+
+    private void handleMapping(Route route)
+    {
+        HashMap<String, ActivityStats> result = mapFunction.map(route.getClientID(), route);
+
+        try
+        {
+            // Send the result back to the master
+            synchronized (writeLock)
+            {
+                out.writeObject(result);
+                out.flush();
+            }
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

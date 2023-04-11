@@ -1,6 +1,8 @@
 package activity.calculations;
 
-public class ActivityStats
+import java.io.Serializable;
+
+public class ActivityStats implements Serializable
 {
     private double distance;
     private double speed;

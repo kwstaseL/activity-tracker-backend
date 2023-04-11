@@ -37,5 +37,10 @@ public class Route implements Serializable
 
     public void setClientID(String clientID) { this.clientID = clientID; }
 
+    public String toString()
+    {
+        return "Route ID: " + routeID + " Username: " + username + " Waypoints: " + waypoints.toString();
+    }
+
 
 }
