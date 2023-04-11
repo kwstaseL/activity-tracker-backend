@@ -4,7 +4,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Queue;
 
 
 // This class will handle the client connection
@@ -14,15 +13,11 @@ public class ClientHandler implements Runnable
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-
-    private Queue<File> filesFromClient;
-
     public static ArrayList<ClientHandler> clients = new ArrayList<>();
 
-    public ClientHandler(Socket clientSocket, Queue<File> filesFromClient)
+    public ClientHandler(Socket clientSocket)
     {
         this.clientSocket = clientSocket;
-        this.filesFromClient = filesFromClient;
 
         try
         {
@@ -48,17 +43,8 @@ public class ClientHandler implements Runnable
                 readFromClient();
             }
         });
-        Thread readFromMaster = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                readFromMaster();
-            }
-        });
 
         readFromClient.start();
-        readFromMaster.start();
     }
 
     private void readFromClient()
@@ -73,11 +59,8 @@ public class ClientHandler implements Runnable
 
                 if (receivedObject instanceof File receivedFile) {
                     System.out.println("ClientHandler: Received file from client  " + receivedFile.getName());
-                    synchronized (filesFromClient)
-                    {
-                        filesFromClient.add(receivedFile);
-                        filesFromClient.notify();
-                    }
+                    // Dispatching the file to the workers
+
                 }
             }
 
@@ -93,15 +76,6 @@ public class ClientHandler implements Runnable
 
     }
 
-    private void readFromMaster()
-    {
-        while (!clientSocket.isClosed())
-        {
-            // TODO - Receive results from master and send to client
-
-        }
-
-    }
 
     // This method will close the connection to the client
     // and clean up the resources

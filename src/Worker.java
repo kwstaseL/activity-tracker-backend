@@ -35,14 +35,14 @@ public class Worker
             @Override
             public void run()
             {
-                readFromMaster();
+                readForData();
             }
         });
 
         readMaster.start();
     }
 
-    private void readFromMaster()
+    private void readForData()
     {
         while (!connection.isClosed())
         {
@@ -50,7 +50,7 @@ public class Worker
             {
                 System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
-                ArrayList<Waypoint> data = (ArrayList<Waypoint>) receivedObject;
+                Route data = (Route) receivedObject;
                 System.out.println("WORKER: Received object from master" + receivedObject.toString());
 
             } catch (IOException | ClassNotFoundException e)
@@ -59,6 +59,8 @@ public class Worker
                 close();
                 System.out.println("Error: " + e.getMessage());
             }
+
+
         }
 
     }

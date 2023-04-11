@@ -12,11 +12,10 @@ public class Master
     public static final int CLIENT_PORT = 4321;
     // This will be the port that the worker will connect to
     public static final int WORKER_PORT = 4322;
-    private Queue<File> filesFromClient;
-    private Queue<ArrayList<Waypoint>> filesToWorker;
     private ServerSocket clientSocket;
     private ServerSocket workerSocket;
-    private GPXParser parser;
+    private ArrayList<WorkerHandler> workerHandlers;
+    private ArrayList<ClientHandler> clientHandlers;
 
     private int numOfWorkers;
 
@@ -24,12 +23,11 @@ public class Master
     {
         try
         {
+            this.numOfWorkers = numOfWorkers;
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
-            filesFromClient = new LinkedList<>();
-            filesToWorker = new LinkedList<>();
-            parser = new GPXParser();
-            this.numOfWorkers = numOfWorkers;
+            workerHandlers = new ArrayList<>();
+            clientHandlers = new ArrayList<>();
         }
         catch (Exception e)
         {
@@ -52,6 +50,7 @@ public class Master
                 }
             }
         });
+
         Thread handleClient = new Thread(new Runnable()
         {
             @Override
@@ -66,7 +65,8 @@ public class Master
                         Socket client = clientSocket.accept();
                         System.out.println("MASTER: Client connected");
                         // Create a new thread to handle the client
-                        ClientHandler clientHandler = new ClientHandler(client, filesFromClient);
+                        ClientHandler clientHandler = new ClientHandler(client);
+                        clientHandlers.add(clientHandler);
                         Thread clientThread = new Thread(clientHandler);
                         clientThread.start();
 
@@ -102,7 +102,8 @@ public class Master
                         Socket worker = workerSocket.accept();
                         System.out.println("MASTER: Worker connected");
                         // Create a new thread to handle the worker
-                        WorkerHandler workerHandler = new WorkerHandler(worker, filesToWorker);
+                        WorkerHandler workerHandler = new WorkerHandler(worker);
+                        workerHandlers.add(workerHandler);
                         Thread workerThread = new Thread(workerHandler);
                         workerThread.start();
 
@@ -125,60 +126,9 @@ public class Master
             }
         });
 
-        Thread handleFiles = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                while (!clientSocket.isClosed())
-                {
-                    synchronized (filesFromClient)
-                    {
-                        // Check if there are any files in the list
-                        while (filesFromClient.isEmpty())
-                        {
-                            System.out.println("MASTER: Waiting for files from client");
-                            try
-                            {
-                                // Wait for a file to be added to the list
-                                filesFromClient.wait();
-                            }
-                            catch (InterruptedException e)
-                            {
-                                Thread.currentThread().interrupt();
-                                System.out.println("Interrupted while waiting for files from client");
-                                return;
-                            }
-                        }
-
-                        // Get the first file from the list
-                        File file = filesFromClient.poll();
-                        ArrayList<Waypoint> waypoints = parser.parse(file).waypoints();
-
-                        // Add the file to the list of files to send to the worker
-                        synchronized (filesToWorker)
-                        {
-                            filesToWorker.add(waypoints);
-                            filesToWorker.notify();
-                        }
-
-                        System.out.println("MASTER: Sending file to worker: " + file.getName());
-                    }
-                }
-
-            }
-
-        });
-
         handleClient.start();
         handleWorker.start();
-        handleFiles.start();
         initializeWorkers.start();
-    }
-
-    private void closeConnection()
-    {
-
     }
 
     public static void main(String[] args)

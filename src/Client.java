@@ -13,8 +13,6 @@ public class Client
 
     private File file;
 
-    boolean fileSent = false;
-
     public Client(File file)
     {
         try
@@ -36,13 +34,8 @@ public class Client
     {
         try
         {
-            if (!fileSent)
-            {
-                out.writeObject(file);
-                out.flush();
-                fileSent = true;
-            }
-
+            out.writeObject(file);
+            out.flush();
         }
         catch (Exception e)
         {
