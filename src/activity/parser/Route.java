@@ -13,7 +13,8 @@ public class Route implements Serializable
     private String clientID;
     private static int idGenerator = 0;
 
-    public Route(ArrayList<Waypoint> waypoints, String username) {
+    public Route(ArrayList<Waypoint> waypoints, String username)
+    {
         this.waypoints = waypoints;
         this.username = username;
         this.routeID = idGenerator++;
@@ -41,6 +42,4 @@ public class Route implements Serializable
     {
         return "Route ID: " + routeID + " Username: " + username + " Waypoints: " + waypoints.toString();
     }
-
-
 }

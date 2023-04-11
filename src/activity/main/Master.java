@@ -20,7 +20,6 @@ public class Master
     private Queue<WorkerHandler> workerHandlers;
     private Queue<ClientHandler> clientHandlers;
     private Queue<Route> routes;
-
     private HashMap<String,ClientHandler> clientMap;
     private int numOfWorkers;
 

@@ -1,5 +1,6 @@
 package activity.mapreduce;
 
+import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -55,6 +56,7 @@ public class Map
             totalElevation += elevation;
             w1 = waypoints.get(i);
         }
+
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
         finalStats.setDistance(totalDistance);
         finalStats.setSpeed(averageSpeed);
@@ -66,6 +68,7 @@ public class Map
         System.out.println("Total Elevation: " + String.format("%.2f", finalStats.getElevation()) + " m");
         System.out.println("Total Time: " + String.format("%.2f", finalStats.getTime()) + " minutes");
         System.out.println("Finished mapping phase.. for client: " + clientID);
+
         intermediate_results.put(clientID, finalStats);
 
         return intermediate_results;

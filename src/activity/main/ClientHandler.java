@@ -29,7 +29,6 @@ public class ClientHandler implements Runnable
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
         this.clientSocket = clientSocket;
-
         try
         {
             this.in = new ObjectInputStream(clientSocket.getInputStream());

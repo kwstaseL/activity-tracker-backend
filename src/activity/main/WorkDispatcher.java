@@ -49,9 +49,8 @@ public class WorkDispatcher implements Runnable
                 for (int i = 0; i < waypoints.size(); i++)
                 {
                     chunk.add(waypoints.get(i));
-                    waypoints.remove(i);
 
-                    if ((i + 1) % n == 0 || i == waypoints.size() - 1)
+                    if (chunk.size() == n || waypoints.isEmpty())
                     {
                         WorkerHandler worker = workers.poll();
                         assert worker != null;

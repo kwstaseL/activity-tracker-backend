@@ -103,7 +103,6 @@ public class GPXParser
 
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
 
-
         System.out.println("Total Distance: " + String.format("%.2f", totalDistance) + " km");
         System.out.println("Average Speed: " + String.format("%.2f", averageSpeed) + " km/h");
         System.out.println("Total Elevation: " + String.format("%.2f", totalElevation) + " m");

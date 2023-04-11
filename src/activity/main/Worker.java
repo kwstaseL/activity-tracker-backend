@@ -62,16 +62,11 @@ public class Worker
                 System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
                 Route route = (Route) receivedObject;
-                System.out.println("WORKER: Received route from master " + route);
 
-                // Implements the mapping phase of the MapReduce algorithm
-                /*
+
                 new Thread(() -> {
                         handleMapping(route);
                 }).start();
-                */
-
-                System.out.println("WORKER: Received object from master" + receivedObject.toString());
 
             } catch (IOException | ClassNotFoundException e)
             {
@@ -84,8 +79,8 @@ public class Worker
 
     private void handleMapping(Route route)
     {
+        System.out.println("WORKER: Received route from master " + route);
         HashMap<String, ActivityStats> result = mapFunction.map(route.getClientID(), route);
-
         try
         {
             // Send the result back to the master
