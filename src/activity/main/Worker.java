@@ -18,6 +18,8 @@ public class Worker
     private ObjectOutputStream out;
     private Queue<HashMap<String, ActivityStats>> results;
     private Map mapFunction;
+    private int workerID;
+    private static int idGenerator = 0;
 
     private final Object writeLock = new Object();
 
@@ -25,6 +27,7 @@ public class Worker
     {
         try
         {
+            workerID = idGenerator++;
             connection = new Socket("localhost", Master.WORKER_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
