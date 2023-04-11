@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
 // This class will handle the worker connection
 public class WorkerHandler implements Runnable
@@ -17,12 +18,16 @@ public class WorkerHandler implements Runnable
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
 
-    public WorkerHandler(Socket workerSocket)
+    private HashMap<String,ClientHandler> clients;
+
+
+    public WorkerHandler(Socket workerSocket,HashMap<String,ClientHandler> clients)
     {
         this.workerSocket = workerSocket;
         // Add the worker to the queue
         try
         {
+            this.clients = clients;
             this.in = new ObjectInputStream(workerSocket.getInputStream());
             this.out = new ObjectOutputStream(workerSocket.getOutputStream());
         }
@@ -56,18 +61,27 @@ public class WorkerHandler implements Runnable
                 // Receive message from worker
                 System.out.println("WorkerHandler: Waiting for message from worker");
                 Object receivedObject = in.readObject();
+                System.out.println("WorkerHandler: Received message from worker");
+                // TODO: Get the intermediate results from the worker and send them to the client handler
 
-                if (receivedObject instanceof String receivedMessage)
-                {
-                    System.out.println("WorkerHandler: Received message from worker: " + receivedMessage);
-                    // Handle received message
-                }
+                /*  // Receives the intermediate results from the worker and finds who the client handler of the client is and
+                // sends the intermediate results to the client handler
+                HashMap<String, ActivityStats> stats = (HashMap<String, ActivityStats>) receivedObject;
+
+                // find the client that sent the route
+                // extract the key from the stats hashmap
+                String clientID = stats.keySet().iterator().next();
+                // get the client handler from the clients hashmap
+                ClientHandler = clients.get(clientID);
+                // send the intermediate results to the client handler
+                clientHandler.sendIntermediateResults(stats);
+                */
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("WorkerHandler: Connection to worker lost");
             e.printStackTrace();
         } finally {
-            close();
+            shutdown();
         }
     }
 
@@ -90,7 +104,7 @@ public class WorkerHandler implements Runnable
 
     // This method will close the connection to the worker
     // and clean up the resources
-    private void close()
+    private void shutdown()
     {
         try
         {

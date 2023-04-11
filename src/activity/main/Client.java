@@ -27,7 +27,7 @@ public class Client
         catch (Exception e)
         {
             System.out.println("Could not connect to master");
-            close();
+            shutdown();
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -42,7 +42,7 @@ public class Client
         catch (Exception e)
         {
             System.out.println("Could not send file");
-            close();
+            shutdown();
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -77,7 +77,7 @@ public class Client
 
     }
 
-    private void close()
+    private void shutdown()
     {
         if (connection != null)
         {

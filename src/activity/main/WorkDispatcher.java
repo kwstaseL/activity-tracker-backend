@@ -37,6 +37,7 @@ public class WorkDispatcher implements Runnable
 
                 Route route = filesToWorker.poll();
                 ArrayList<Waypoint> waypoints = route.waypoints();
+
                 int routeID = route.getRouteID();
                 String clientID = route.getClientID();
 
@@ -51,6 +52,7 @@ public class WorkDispatcher implements Runnable
 
                     if ((i + 1) % n == 0 || i == waypoints.size() - 1)
                     {
+
                         WorkerHandler worker = workers.poll();
                         assert worker != null;
                         Route route_ = new Route(chunk, routeID, clientID);

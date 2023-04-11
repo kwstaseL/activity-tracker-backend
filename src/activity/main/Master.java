@@ -5,6 +5,7 @@ import activity.parser.Route;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -19,6 +20,8 @@ public class Master
     private Queue<WorkerHandler> workerHandlers;
     private Queue<ClientHandler> clientHandlers;
     private Queue<Route> routes;
+
+    private HashMap<String,ClientHandler> clientMap;
     private int numOfWorkers;
 
 
@@ -31,6 +34,7 @@ public class Master
             workerSocket = new ServerSocket(WORKER_PORT);
             workerHandlers = new LinkedList<>();
             clientHandlers = new LinkedList<>();
+            clientMap = new HashMap<>();
             routes = new LinkedList<>();
         }
         catch (Exception e)
@@ -52,10 +56,6 @@ public class Master
                 {
                     Worker worker = new Worker();
                 }
-
-                WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);
-                Thread workDispatcherThread = new Thread(workDispatcher);
-                workDispatcherThread.start();
             }
         });
 
@@ -74,6 +74,8 @@ public class Master
                         System.out.println("MASTER: Client connected");
                         // Create a new thread to handle the client
                         ClientHandler clientHandler = new ClientHandler(client,routes);
+                        String clientID = clientHandler.getClientID();
+                        clientMap.put(clientID,clientHandler);
                         clientHandlers.add(clientHandler);
                         Thread clientThread = new Thread(clientHandler);
                         clientThread.start();
@@ -110,7 +112,7 @@ public class Master
                         Socket worker = workerSocket.accept();
                         System.out.println("MASTER: Worker connected");
                         // Create a new thread to handle the worker
-                        WorkerHandler workerHandler = new WorkerHandler(worker);
+                        WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
                         workerHandlers.add(workerHandler);
                         Thread workerThread = new Thread(workerHandler);
                         workerThread.start();
@@ -134,9 +136,20 @@ public class Master
             }
         });
 
+        Thread dispatchWork = new Thread(new Runnable() {
+            @Override
+            public void run()
+            {
+                WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);
+                Thread workDispatcherThread = new Thread(workDispatcher);
+                workDispatcherThread.start();
+            }
+        });
+
         handleClient.start();
         handleWorker.start();
-        init.start();
+        dispatchWork.start();
+        //init.start();
     }
 
     public static void main(String[] args)

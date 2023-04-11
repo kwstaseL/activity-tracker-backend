@@ -41,6 +41,7 @@ public class ClientHandler implements Runnable
         catch (IOException e)
         {
             System.out.println("Could not create input and output streams");
+            shutdown();
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -94,14 +95,14 @@ public class ClientHandler implements Runnable
         }
         finally
         {
-            close();
+            shutdown();
         }
 
     }
 
     // This method will close the connection to the client
     // and clean up the resources
-    private void close()
+    private void shutdown()
     {
         try
         {
@@ -126,6 +127,12 @@ public class ClientHandler implements Runnable
         }
 
     }
+
+    public String getClientID()
+    {
+        return clientID;
+    }
+
 
 
 }

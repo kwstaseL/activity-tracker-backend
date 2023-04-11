@@ -1,9 +1,13 @@
 package activity.mapreduce;
 
+import activity.calculations.ActivityStats;
+
+import java.util.HashMap;
+
 public class Reduce
 {
-    public void reduce()
+    public ActivityStats reduce(HashMap<Integer, ActivityStats> intermediate_results)
     {
-
+        return null;
     }
 }

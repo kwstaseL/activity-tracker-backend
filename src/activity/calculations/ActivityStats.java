@@ -52,6 +52,4 @@ public class ActivityStats
         return "Total Distance: " + distance + " Average Speed: "
                 + speed + " Total Elevation: " + elevation + " Total Time: " + time;
     }
-
-
 }

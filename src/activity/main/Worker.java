@@ -1,17 +1,25 @@
 package activity.main;
 
+import activity.calculations.ActivityStats;
 import activity.parser.Route;
+import activity.mapreduce.Map;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Queue;
 
 public class Worker
 {
     private Socket connection;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+
+    private Queue<HashMap<String, ActivityStats>> results;
+
+    private Map mapFunction;
 
     public Worker()
     {
@@ -20,6 +28,7 @@ public class Worker
             connection = new Socket("localhost", Master.WORKER_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
+            mapFunction = new Map();
         }
         catch (Exception e)
         {
@@ -53,6 +62,19 @@ public class Worker
                 System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
                 Route route = (Route) receivedObject;
+
+                // Implements the mapping phase of the MapReduce algorithm
+                /*
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        results.add(mapFunction.map(route.getClientID(),route));
+                    }
+                }).start();
+                */
+                // TODO: Send the results to the worker-handler
 
                 System.out.println("WORKER: Received object from master" + receivedObject.toString());
 
@@ -101,5 +123,11 @@ public class Worker
             }
         }
     }
+    public static void main(String[] args)
+    {
+        Worker worker = new Worker();
+        worker.start();
+    }
+
 
 }
