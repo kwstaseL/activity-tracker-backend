@@ -40,38 +40,54 @@ public class WorkerHandler implements Runnable
     // This is where the worker will be handled
     public void run()
     {
-        Thread readData = new Thread(new Runnable()
+        Thread listenToWorker = new Thread(new Runnable()
         {
             @Override
             public void run()
             {
-                readForData();
+                listenToWorker();
             }
         });
 
-        readData.start();
+        listenToWorker.start();
     }
-
-    private void readForData()
+    private void listenToWorker()
     {
         try
         {
-            System.out.println("WorkerHandler: Waiting for waypoints");
-            // Someone will send me here data and I need to send it to my worker
             while (!workerSocket.isClosed())
             {
-                // Receive the file object from the master
+                // Receive message from worker
+                System.out.println("WorkerHandler: Waiting for message from worker");
                 Object receivedObject = in.readObject();
 
-                // Send the file object to the worker
-                out.writeObject(receivedObject);
-                out.flush();
+                if (receivedObject instanceof String receivedMessage)
+                {
+                    System.out.println("WorkerHandler: Received message from worker: " + receivedMessage);
+                    // Handle received message
+                }
             }
-        }
-        catch (Exception e)
-        {
-            System.out.println("WorkerHandler: Connection to master lost");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("WorkerHandler: Connection to worker lost");
+            e.printStackTrace();
+        } finally {
             close();
+        }
+    }
+
+    public void processJob(Route route)
+    {
+        try
+        {
+            // Send the route to the worker
+            System.out.println("WorkerHandler: Sending route to worker");
+            out.writeObject(route);
+            out.flush();
+        }
+        catch (IOException e)
+        {
+            System.out.println("WorkerHandler: Could not send route to worker");
+            e.printStackTrace();
         }
     }
 

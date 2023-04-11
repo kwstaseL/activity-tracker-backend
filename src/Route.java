@@ -1,6 +1,8 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Route {
+public class Route implements Serializable
+{
     private ArrayList<Waypoint> waypoints;
     private String username;
     private int routeID;

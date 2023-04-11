@@ -14,8 +14,10 @@ public class Master
     public static final int WORKER_PORT = 4322;
     private ServerSocket clientSocket;
     private ServerSocket workerSocket;
-    private ArrayList<WorkerHandler> workerHandlers;
-    private ArrayList<ClientHandler> clientHandlers;
+    private Queue<WorkerHandler> workerHandlers;
+    private Queue<ClientHandler> clientHandlers;
+
+    private Queue<Route> routes;
 
     private int numOfWorkers;
 
@@ -26,8 +28,9 @@ public class Master
             this.numOfWorkers = numOfWorkers;
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
-            workerHandlers = new ArrayList<>();
-            clientHandlers = new ArrayList<>();
+            workerHandlers = new LinkedList<>();
+            clientHandlers = new LinkedList<>();
+            routes = new LinkedList<>();
         }
         catch (Exception e)
         {
@@ -39,7 +42,7 @@ public class Master
     // This method will start the master server and listen for connections
     private void start()
     {
-        Thread initializeWorkers = new Thread(new Runnable()
+        Thread init = new Thread(new Runnable()
         {
             @Override
             public void run()
@@ -48,6 +51,10 @@ public class Master
                 {
                     Worker worker = new Worker();
                 }
+
+                WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);
+                Thread workDispatcherThread = new Thread(workDispatcher);
+                workDispatcherThread.start();
             }
         });
 
@@ -65,7 +72,7 @@ public class Master
                         Socket client = clientSocket.accept();
                         System.out.println("MASTER: Client connected");
                         // Create a new thread to handle the client
-                        ClientHandler clientHandler = new ClientHandler(client);
+                        ClientHandler clientHandler = new ClientHandler(client,routes);
                         clientHandlers.add(clientHandler);
                         Thread clientThread = new Thread(clientHandler);
                         clientThread.start();
@@ -128,7 +135,7 @@ public class Master
 
         handleClient.start();
         handleWorker.start();
-        initializeWorkers.start();
+        init.start();
     }
 
     public static void main(String[] args)

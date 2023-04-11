@@ -121,6 +121,7 @@ public class Client
         Client client = new Client(file);
         Client client2 = new Client(file2);
         Client client3 = new Client(file3);
+
         Thread c1 = new Thread(new Runnable()
         {
             @Override

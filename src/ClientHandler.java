@@ -4,6 +4,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Queue;
 
 
 // This class will handle the client connection
@@ -15,7 +16,10 @@ public class ClientHandler implements Runnable
     private ObjectOutputStream out;
     public static ArrayList<ClientHandler> clients = new ArrayList<>();
 
-    public ClientHandler(Socket clientSocket)
+    GPXParser parser;
+    private Queue<Route> routes;
+
+    public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
         this.clientSocket = clientSocket;
 
@@ -23,6 +27,8 @@ public class ClientHandler implements Runnable
         {
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
+            this.parser = new GPXParser();
+            this.routes = routes;
         }
         catch (IOException e)
         {
@@ -57,10 +63,18 @@ public class ClientHandler implements Runnable
                 System.out.println("ClientHandler: Waiting for file from client");
                 Object receivedObject = in.readObject();
 
-                if (receivedObject instanceof File receivedFile) {
+                if (receivedObject instanceof File receivedFile)
+                {
                     System.out.println("ClientHandler: Received file from client  " + receivedFile.getName());
                     // Dispatching the file to the workers
-
+                    // Parse the file
+                    Route route = parser.parse(receivedFile);
+                    // Add the route to the queue
+                    synchronized (routes)
+                    {
+                        routes.add(route);
+                        routes.notify();
+                    }
                 }
             }
 
