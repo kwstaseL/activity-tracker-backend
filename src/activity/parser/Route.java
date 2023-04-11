@@ -40,6 +40,6 @@ public class Route implements Serializable
 
     public String toString()
     {
-        return "Route ID: " + routeID + " Username: " + username + " Waypoints: " + waypoints.toString();
+        return "Route ID: " + routeID + " Username: " + username + " Waypoints: " + waypoints.size();
     }
 }

@@ -54,7 +54,7 @@ public class GPXParser
                 throw new RuntimeException("Could not parse the file successfully.");
             }
             route = new Route(waypoints, creator);
-
+            System.out.println("Parsed: " + route);
         }
         catch (Exception e)
         {
