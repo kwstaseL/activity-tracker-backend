@@ -89,7 +89,7 @@ public class WorkerHandler implements Runnable
         try
         {
             // Send the route to the worker
-            System.out.println("WorkerHandler: Sending route to worker");
+            System.out.println("WorkerHandler: Sending route to worker: " + route);
             out.writeObject(route);
             out.flush();
         }

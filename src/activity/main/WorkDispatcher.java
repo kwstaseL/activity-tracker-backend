@@ -50,7 +50,7 @@ public class WorkDispatcher implements Runnable
                 {
                     chunk.add(waypoints.get(i));
 
-                    if (chunk.size() == n || waypoints.isEmpty())
+                    if (chunk.size() == n || i == waypoints.size() - 1)
                     {
                         WorkerHandler worker = workers.poll();
                         assert worker != null;
@@ -60,7 +60,7 @@ public class WorkDispatcher implements Runnable
                         // add the worker to the end of the queue
                         workers.add(worker);
                         // clear the chunk for the next set of waypoints
-                        chunk.clear();
+                        chunk = new ArrayList<>();
                     }
                 }
                 // Add the worker to the end of the queue
