@@ -56,18 +56,6 @@ public class WorkDispatcher implements Runnable
                 int chunks = 1;
                 ArrayList<Waypoint> chunk = new ArrayList<>();
 
-                for (int i = 0; i < waypoints.size(); i++) {
-                    chunk.add(waypoints.get(i));
-                    if (chunk.size() == n || i == waypoints.size() - 1) {
-                        WorkerHandler worker = workers.poll();
-                        Route chunkedRoute = new Route(chunk, routeID, clientID);
-                        worker.processJob(chunkedRoute);
-                        workers.add(worker);
-                        chunk = new ArrayList<>();
-                        chunks++;
-                    }
-                }
-
 
                 for (int i = 0; i < waypoints.size(); i++)
                 {
