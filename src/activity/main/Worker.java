@@ -17,7 +17,7 @@ public class Worker
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private Queue<HashMap<String, ActivityStats>> results;
-    private Map mapFunction;
+    private Map mapper;
     private int workerID;
     private static int idGenerator = 0;
 
@@ -31,7 +31,7 @@ public class Worker
             connection = new Socket("localhost", Master.WORKER_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-            mapFunction = new Map();
+            mapper = new Map();
         }
         catch (Exception e)
         {
@@ -64,10 +64,12 @@ public class Worker
             {
                 System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
+                System.out.println("WORKER: Received job from master");
                 Route route = (Route) receivedObject;
 
 
-                new Thread(() -> {
+                new Thread(() ->
+                {
                         handleMapping(route);
                 }).start();
 
@@ -83,7 +85,7 @@ public class Worker
     private void handleMapping(Route route)
     {
         System.out.println("WORKER: Received route from master " + route);
-        HashMap<String, ActivityStats> result = mapFunction.map(route.getClientID(), route);
+        HashMap<String, ActivityStats> result = mapper.map(route.getClientID(), route);
         try
         {
             // Send the result back to the worker-handler
@@ -94,7 +96,8 @@ public class Worker
             }
 
 
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new RuntimeException(e);
         }
     }
