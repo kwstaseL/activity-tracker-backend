@@ -1,5 +1,6 @@
 package activity.main;
 
+import activity.calculations.ActivityStats;
 import activity.parser.Route;
 
 import java.io.IOException;
@@ -60,7 +61,8 @@ public class WorkerHandler implements Runnable
                 // Receive message from worker
                 System.out.println("WorkerHandler: Waiting for message from worker");
                 Object receivedObject = in.readObject();
-                System.out.println("WorkerHandler: Received message from worker");
+                HashMap<String, ActivityStats> stats = (HashMap<String, ActivityStats>) receivedObject;
+                System.out.println("WorkerHandler: Received intermediate results from worker: " + stats);
                 // TODO: Get the intermediate results from the worker and send them to the client handler
 
                 // Receives the intermediate results from the worker and finds who the client handler of the client is and

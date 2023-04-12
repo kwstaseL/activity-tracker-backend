@@ -6,7 +6,6 @@ import javax.xml.parsers.DocumentBuilder;
 
 import activity.calculations.ActivityCalculator;
 import activity.calculations.ActivityStats;
-import activity.calculations.Waypoint;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;

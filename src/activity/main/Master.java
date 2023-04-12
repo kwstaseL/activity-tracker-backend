@@ -54,6 +54,7 @@ public class Master
                 for (int i = 0; i < numOfWorkers; i++)
                 {
                     Worker worker = new Worker();
+                    worker.start();
                 }
             }
         });
@@ -148,7 +149,7 @@ public class Master
         handleClient.start();
         handleWorker.start();
         dispatchWork.start();
-        //init.start();
+        init.start();
     }
 
     public static void main(String[] args)

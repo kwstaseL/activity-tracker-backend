@@ -85,13 +85,13 @@ public class Worker
     private void handleMapping(Route route)
     {
         System.out.println("WORKER: Received route from master " + route);
-        HashMap<String, ActivityStats> result = mapper.map(route.getClientID(), route);
+        HashMap<String, ActivityStats> intermediate_result = mapper.map(route.getClientID(), route);
         try
         {
             // Send the result back to the worker-handler
             synchronized (writeLock)
             {
-                out.writeObject(result);
+                out.writeObject(intermediate_result);
                 out.flush();
             }
 
@@ -138,11 +138,5 @@ public class Worker
             }
         }
     }
-    public static void main(String[] args)
-    {
-        Worker worker = new Worker();
-        worker.start();
-    }
-
 
 }

@@ -1,5 +1,7 @@
 package activity.calculations;
 
+import activity.parser.Waypoint;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

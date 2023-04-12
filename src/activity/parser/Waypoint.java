@@ -1,4 +1,4 @@
-package activity.calculations;
+package activity.parser;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

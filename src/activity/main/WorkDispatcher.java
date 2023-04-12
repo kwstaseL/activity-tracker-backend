@@ -1,6 +1,6 @@
 package activity.main;
 
-import activity.calculations.Waypoint;
+import activity.parser.Waypoint;
 import activity.parser.Route;
 
 import java.util.ArrayList;
