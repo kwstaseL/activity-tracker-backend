@@ -42,8 +42,17 @@ public class WorkDispatcher implements Runnable
                 int routeID = route.getRouteID();
                 String clientID = route.getClientID();
 
-                // set n to the desired number of waypoints per chunk
-                final int n = 4;
+                // n will represent the chunk size
+                int n;
+
+                // if there's more waypoints than workers provided, make n equal to the size of waypoints / the size of workers
+                if (waypoints.size() >= workers.size()) {
+                    n = waypoints.size() / workers.size();
+                } else {
+                    // making the assumption that if workers are more than the waypoints provided
+                    n = workers.size() / waypoints.size();
+                }
+
                 ArrayList<Waypoint> chunk = new ArrayList<Waypoint>();
 
                 for (int i = 0; i < waypoints.size(); i++)
@@ -61,6 +70,7 @@ public class WorkDispatcher implements Runnable
                         workers.add(worker);
                         // clear the chunk for the next set of waypoints
                         chunk = new ArrayList<>();
+                        chunk.add(waypoints.get(i));    // adding the last waypoint from the previous chunk, to not miss the connection
                     }
                 }
             }
