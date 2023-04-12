@@ -104,11 +104,21 @@ public class ClientHandler implements Runnable
     // addStats: Adds the stats to the queue
     public void addStats(ActivityStats stats)
     {
-        assert stats != null;
         synchronized (statsQueue)
         {
-            statsQueue.add(stats);
-            statsQueue.notify();
+            if (stats == null) {
+                // TODO : Remove
+                if (statsQueue.contains(null)) {
+                    throw new RuntimeException("Oops");
+                }
+
+                System.out.println("Current queue size: " + statsQueue.size());
+
+                System.out.println("Received the final chunk for route with route id: " + statsQueue.peek().getRouteID());
+            } else {
+                statsQueue.add(stats);
+                statsQueue.notify();
+            }
         }
     }
 

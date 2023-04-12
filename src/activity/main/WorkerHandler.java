@@ -92,25 +92,32 @@ public class WorkerHandler implements Runnable
 
             synchronized (chunksPerRoute)
             {
-                int count = chunksPerRoute.get(routeID);
-                count--;
+                if (chunksPerRoute.containsKey(routeID)) {
+                    int count = chunksPerRoute.get(routeID);
+                    count--;
 
-                chunksPerRoute.put(routeID, count);
+                    chunksPerRoute.put(routeID, count);
 
-                if (chunksPerRoute.get(routeID) > 0)
-                {
-                    String clientID = activityStatsPair.getKey();
-                    ClientHandler appropriateHandler = clients.get(clientID);
-                    appropriateHandler.addStats(stats);
-                }
-                else if (chunksPerRoute.get(routeID) == 0)
-                {
-                    String clientID = activityStatsPair.getKey();
-                    ClientHandler appropriateHandler = clients.get(clientID);
-                    appropriateHandler.addStats(stats);
+                    if (chunksPerRoute.get(routeID) > 0)
+                    {
+                        String clientID = activityStatsPair.getKey();
+                        ClientHandler appropriateHandler = clients.get(clientID);
+                        appropriateHandler.addStats(stats);
+                    }
+                    else if (chunksPerRoute.get(routeID) == 0)
+                    {
+                        String clientID = activityStatsPair.getKey();
+                        ClientHandler appropriateHandler = clients.get(clientID);
+                        appropriateHandler.addStats(stats);
 
-                    System.out.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
-                    chunksPerRoute.remove(routeID);
+                        System.out.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
+
+                        // pushing a null Stats instance to serve as a "flag" that all chunks have been sent.
+                        appropriateHandler.addStats(null);
+                        chunksPerRoute.remove(routeID);
+                    }
+                } else {
+                    System.err.println("Tried to access route that its chunks have already been processed.");
                 }
 
             }
