@@ -21,6 +21,8 @@ public class WorkerHandler implements Runnable
     private final Socket workerSocket;
     private final Object lock = new Object();
 
+    private static HashMap<Integer,Integer> chunksPerRoute;
+
     private HashMap<String,ClientHandler> clients;
 
     public WorkerHandler(Socket workerSocket,HashMap<String,ClientHandler> clients)
@@ -32,6 +34,7 @@ public class WorkerHandler implements Runnable
             this.clients = clients;
             this.in = new ObjectInputStream(workerSocket.getInputStream());
             this.out = new ObjectOutputStream(workerSocket.getOutputStream());
+            chunksPerRoute = new HashMap<>();
         }
         catch (IOException e)
         {
@@ -69,9 +72,7 @@ public class WorkerHandler implements Runnable
                 System.out.println("WorkerHandler: Received intermediate results from worker: " + stats);
 
                 // TODO: Get the intermediate results from the worker and send them to the client handler
-
                 handleRequests(stats);
-
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("WorkerHandler: Connection to worker lost");
@@ -90,15 +91,17 @@ public class WorkerHandler implements Runnable
             String clientID = activityStatsPair.getKey();
             ClientHandler appropriateHandler = clients.get(clientID);
             appropriateHandler.addStats(activityStatsPair.getValue());
-
         }
-
     }
 
     public void processJob(Route route)
     {
         try
         {
+            Integer routeID = route.getRouteID();
+            int count = chunksPerRoute.getOrDefault(routeID,0);
+            chunksPerRoute.put(routeID,count+1);
+            System.out.println("WORKERHANDLER: Route id : " + routeID + " count : " + chunksPerRoute.get(routeID));
             // Send the route to the worker
             System.out.println("WorkerHandler: Sending route to worker: " + route);
             out.writeObject(route);

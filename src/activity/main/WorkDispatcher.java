@@ -4,6 +4,7 @@ import activity.parser.Waypoint;
 import activity.parser.Route;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Queue;
 
 public class WorkDispatcher implements Runnable
@@ -52,9 +53,9 @@ public class WorkDispatcher implements Runnable
                     // making the assumption that if workers are more than the waypoints provided
                     n = workers.size() / waypoints.size();
                 }
+                System.out.println("WorkerDispatcher route id: " + routeID + " has " + (int)(waypoints.size()/n) + " chunks");
 
                 ArrayList<Waypoint> chunk = new ArrayList<Waypoint>();
-
                 for (int i = 0; i < waypoints.size(); i++)
                 {
                     chunk.add(waypoints.get(i));

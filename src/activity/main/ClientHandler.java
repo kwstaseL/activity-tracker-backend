@@ -102,7 +102,8 @@ public class ClientHandler implements Runnable
     }
 
     // addStats: Adds the stats to the queue
-    public void addStats(ActivityStats stats) {
+    public void addStats(ActivityStats stats)
+    {
         assert stats != null;
         synchronized (statsQueue)
         {
