@@ -4,12 +4,14 @@ import activity.calculations.ActivityStats;
 import activity.mapreduce.Pair;
 import activity.parser.GPXParser;
 import activity.parser.Route;
+import activity.parser.Waypoint;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.UUID;
 
@@ -70,10 +72,41 @@ public class ClientHandler implements Runnable
         });
 
         readFromClient.start();
+        readFromWorkerHandler.start();
     }
 
-    private void readFromWorkerHandler() {
+    private void readFromWorkerHandler()
+    {
+        synchronized (statsQueue)
+        {
+            while (true)
+            {
+                while (statsQueue.isEmpty())
+                {
+                    try
+                    {
+                        statsQueue.wait();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                }
+                ActivityStats stats = statsQueue.poll();
+                System.out.println("Client Handler successfully received: " + stats);
 
+            }
+        }
+    }
+
+    // addStats: Adds the stats to the queue
+    public void addStats(ActivityStats stats) {
+        assert stats != null;
+        synchronized (statsQueue)
+        {
+            statsQueue.add(stats);
+            statsQueue.notify();
+        }
     }
 
     private void readFromClient()

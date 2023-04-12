@@ -95,21 +95,15 @@ public class WorkerHandler implements Runnable
     // handleRequests: Receives the <K, V> pair the worker generates, and sends it to the appropriate ClientHandler
     private void handleRequests(Pair<String, ActivityStats> activityStatsPair)
     {
-        try
+        // Send the result back to the client-handler
+        synchronized (lock)
         {
-            // Send the result back to the client-handler
-            synchronized (lock)
-            {
-                String clientID = activityStatsPair.getKey();
-                ClientHandler appropriateHandler = clients.get(clientID);
-            }
+            String clientID = activityStatsPair.getKey();
+            ClientHandler appropriateHandler = clients.get(clientID);
+            appropriateHandler.addStats(activityStatsPair.getValue());
 
-
-        } catch (IOException e)
-        {
-            System.out.println("Could not send object to the worker handler");
-            throw new RuntimeException(e);
         }
+
     }
 
     public void processJob(Route route)

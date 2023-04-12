@@ -1,7 +1,9 @@
 package activity.mapreduce;
 
+import java.io.Serializable;
+
 // Pair: A generic class that represents a key-value pair
-public class Pair<K, V> {
+public class Pair<K, V> implements Serializable {
     private K key;
     private V value;
 
