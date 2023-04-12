@@ -56,25 +56,25 @@ public class ActivityCalculator
         return distance / time;
     }
 
-    private double calculateElevation(Waypoint w2, double currentHighestElevation)
+    private double calculateElevation(Waypoint w1, Waypoint w2)
     {
         // if w2 is above the current highest elevation recorded, we return w2.getElevation - currentHighestElevation
-        if (w2.getElevation() > currentHighestElevation)
+        if (w2.getElevation() > w1.getElevation())
         {
-            return w2.getElevation() - currentHighestElevation;
+            return w2.getElevation() - w1.getElevation();
         }
 
         // else (which means w2 is below the current highest elevation recorded), we return 0.
         return 0;
     }
 
-    public ActivityStats calculateStats(Waypoint w1, Waypoint w2, double currentHighestElevation)
+    public ActivityStats calculateStats(Waypoint w1, Waypoint w2)
     {
         ActivityStats stats = new ActivityStats();
         double distance = calculateDistance(w1, w2);
         double time = calculateTime(w1, w2);
         double speed = calculateSpeed(distance, time);
-        double elevation = calculateElevation(w2, currentHighestElevation);
+        double elevation = calculateElevation(w1, w2);
 
         stats.setDistance(distance);
         stats.setSpeed(speed);
