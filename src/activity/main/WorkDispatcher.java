@@ -53,9 +53,10 @@ public class WorkDispatcher implements Runnable
                     // making the assumption that if workers are more than the waypoints provided
                     n = workers.size() / waypoints.size();
                 }
-                System.out.println("WorkerDispatcher route id: " + routeID + " has " + (int)(waypoints.size()/n) + " chunks");
 
-                ArrayList<Waypoint> chunk = new ArrayList<Waypoint>();
+                int numberOfChunks = 1;
+
+                ArrayList<Waypoint> chunk = new ArrayList<>();
                 for (int i = 0; i < waypoints.size(); i++)
                 {
                     chunk.add(waypoints.get(i));
@@ -64,16 +65,23 @@ public class WorkDispatcher implements Runnable
                     {
                         WorkerHandler worker = workers.poll();
                         assert worker != null;
-                        Route route_ = new Route(chunk, routeID, clientID);
+                        Route chunkedRoute = new Route(chunk, routeID, clientID);
                         System.out.println("WorkerDispatcher: Sending route to workerhandler");
-                        worker.processJob(route_);
+                        worker.processJob(chunkedRoute);
                         // add the worker to the end of the queue
                         workers.add(worker);
                         // clear the chunk for the next set of waypoints
                         chunk = new ArrayList<>();
+                        ++numberOfChunks;
                         chunk.add(waypoints.get(i));    // adding the last waypoint from the previous chunk, to not miss the connection
                     }
                 }
+                System.out.println("****************************");
+                System.out.println("****************************");
+                System.out.println("WorkerDispatcher route id: " + routeID + " has " + numberOfChunks + " chunks");
+                System.out.println("****************************");
+                System.out.println("****************************");
+
             }
         }
     }

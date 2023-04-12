@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 // This class will handle the worker connection
 public class WorkerHandler implements Runnable
@@ -21,7 +22,7 @@ public class WorkerHandler implements Runnable
     private final Socket workerSocket;
     private final Object lock = new Object();
 
-    private static HashMap<Integer,Integer> chunksPerRoute;
+    private static ConcurrentHashMap<Integer,Integer> chunksPerRoute;
 
     private HashMap<String,ClientHandler> clients;
 
@@ -34,7 +35,7 @@ public class WorkerHandler implements Runnable
             this.clients = clients;
             this.in = new ObjectInputStream(workerSocket.getInputStream());
             this.out = new ObjectOutputStream(workerSocket.getOutputStream());
-            chunksPerRoute = new HashMap<>();
+            chunksPerRoute = new ConcurrentHashMap<>();
         }
         catch (IOException e)
         {
@@ -99,8 +100,13 @@ public class WorkerHandler implements Runnable
         try
         {
             Integer routeID = route.getRouteID();
-            int count = chunksPerRoute.getOrDefault(routeID,0);
-            chunksPerRoute.put(routeID,count+1);
+            if (chunksPerRoute.containsKey(routeID)) {
+                int count = chunksPerRoute.get(routeID);
+                ++count;
+                chunksPerRoute.put(routeID, count);
+            } else {
+                chunksPerRoute.put(routeID, 1);
+            }
             System.out.println("WORKERHANDLER: Route id : " + routeID + " count : " + chunksPerRoute.get(routeID));
             // Send the route to the worker
             System.out.println("WorkerHandler: Sending route to worker: " + route);
