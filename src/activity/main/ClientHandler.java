@@ -24,6 +24,7 @@ public class ClientHandler implements Runnable
     // This is the unique ID of the client so we can
     private String clientID;
     GPXParser parser;
+    // This is the queue that the routes will be added to
     private Queue<Route> routes;
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
