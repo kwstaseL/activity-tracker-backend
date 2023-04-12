@@ -109,12 +109,8 @@ public class ClientHandler implements Runnable
         {
             if (stats.isFlag()) {
                 assert statsQueue.peek() != null;
-                System.out.println("/////////////////////");
-                System.out.println("/////////////////////");
-                System.out.println("Received the final chunk for route with route id: " + statsArrayList.get(0).getRouteID());
-                System.out.println("Current list size: " + statsArrayList.size());
-                System.out.println("/////////////////////");
-                System.out.println("/////////////////////");
+                System.err.print("Received the final chunk for route with route id: " + statsArrayList.get(0).getRouteID());
+                System.err.println(" Current list size: " + statsArrayList.size());
             } else {
                 statsQueue.add(stats);
                 statsQueue.notify();

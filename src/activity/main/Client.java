@@ -122,9 +122,16 @@ public class Client
         File file = new File("./gpxs/route1.gpx");
         File file2 = new File("./gpxs/route2.gpx");
         File file3 = new File("./gpxs/route3.gpx");
+        File file4 = new File("./gpxs/route4.gpx");
+        File file5 = new File("./gpxs/route5.gpx");
+        File file6 = new File("./gpxs/route6.gpx");
+
         Client client = new Client(file);
         Client client2 = new Client(file2);
         Client client3 = new Client(file3);
+        Client client4 = new Client(file4);
+        Client client5 = new Client(file5);
+        Client client6 = new Client(file6);
 
         Thread c1 = new Thread(new Runnable()
         {
@@ -152,13 +159,47 @@ public class Client
             }
 
         });
+
+        Thread c4 = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+                client4.sendFile();
+            }
+
+        });
+
+        Thread c5 = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+                client5.sendFile();
+            }
+
+        });
+
+        Thread c6 = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+                client6.sendFile();
+            }
+
+        });
+
         c1.start();
         c2.start();
         c3.start();
+        c4.start();
+        c5.start();
+        c6.start();
 
         client.listenForMessages();
         client2.listenForMessages();
         client3.listenForMessages();
+        client4.listenForMessages();
+        client5.listenForMessages();
+        client6.listenForMessages();
 
     }
 }

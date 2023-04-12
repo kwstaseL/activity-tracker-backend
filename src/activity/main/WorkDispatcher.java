@@ -74,11 +74,7 @@ public class WorkDispatcher implements Runnable
                     }
                 }
 
-                System.out.println("*********");
-                System.out.println("*********");
-                System.out.println("Finished chunking up route:" + routeID + ". Total chunks: " + chunks);
-                System.out.println("*********");
-                System.out.println("*********");
+                System.err.println("Finished chunking up route:" + routeID + ". Total chunks: " + chunks);
 
 
             }
