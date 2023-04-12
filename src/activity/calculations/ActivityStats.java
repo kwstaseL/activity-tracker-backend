@@ -8,8 +8,11 @@ public class ActivityStats implements Serializable
     private double speed;
     private double elevation;
     private double time;
+    private boolean flag = false;
 
     private int routeID;
+
+    // TODO: Cleanup "Flag"
 
     public ActivityStats(double distance, double speed, double elevation, double time,int routeID)
     {
@@ -22,7 +25,16 @@ public class ActivityStats implements Serializable
 
     public ActivityStats()
     {
-        this(0, 0, 0, 0,0);
+        this(0, 0, 0, 0,-1);
+    }
+
+    public ActivityStats(boolean flag) {
+        this(0, 0, 0, 0, -1);
+        this.flag = flag;
+    }
+
+    public boolean isFlag() {
+        return flag;
     }
 
     public void setDistance(double distance)

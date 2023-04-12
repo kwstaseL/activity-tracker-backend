@@ -112,8 +112,9 @@ public class WorkerHandler implements Runnable
 
                         System.out.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
 
-                        // pushing a null Stats instance to serve as a "flag" that all chunks have been sent.
-                        appropriateHandler.addStats(null);
+                        // TODO pushing a null Stats instance to serve as a "flag" that all chunks have been sent.
+
+                        appropriateHandler.addStats(new ActivityStats(true));
                         chunksPerRoute.remove(routeID);
                     }
                 } else {

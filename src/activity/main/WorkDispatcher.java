@@ -53,6 +53,7 @@ public class WorkDispatcher implements Runnable
                     n = workers.size() / waypoints.size();
                 }
 
+                int chunks = 0;
                 ArrayList<Waypoint> chunk = new ArrayList<>();
                 for (int i = 0; i < waypoints.size(); i++)
                 {
@@ -68,9 +69,16 @@ public class WorkDispatcher implements Runnable
                         workers.add(worker);
                         // clear the chunk for the next set of waypoints
                         chunk = new ArrayList<>();
+                        chunks++;
                         chunk.add(waypoints.get(i));    // adding the last waypoint from the previous chunk, to not miss the connection
                     }
                 }
+
+                System.out.println("*********");
+                System.out.println("*********");
+                System.out.println("Finished chunking up route:" + routeID + ". Total chunks: " + chunks);
+                System.out.println("*********");
+                System.out.println("*********");
 
 
             }

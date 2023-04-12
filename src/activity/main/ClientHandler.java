@@ -32,6 +32,7 @@ public class ClientHandler implements Runnable
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
     private Queue<ActivityStats> statsQueue;
+    private ArrayList<ActivityStats> statsArrayList;
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
@@ -44,6 +45,7 @@ public class ClientHandler implements Runnable
             this.routes = routes;
             this.clientID = UUID.randomUUID().toString();
             this.statsQueue = new LinkedList<>();
+            this.statsArrayList = new ArrayList<>();
         }
         catch (IOException e)
         {
@@ -95,8 +97,7 @@ public class ClientHandler implements Runnable
                     }
                 }
                 ActivityStats stats = statsQueue.poll();
-                System.out.println("Client Handler successfully received: " + stats);
-
+                statsArrayList.add(stats);
             }
         }
     }
@@ -106,15 +107,14 @@ public class ClientHandler implements Runnable
     {
         synchronized (statsQueue)
         {
-            if (stats == null) {
-                // TODO : Remove
-                if (statsQueue.contains(null)) {
-                    throw new RuntimeException("Oops");
-                }
-
-                System.out.println("Current queue size: " + statsQueue.size());
-
-                System.out.println("Received the final chunk for route with route id: " + statsQueue.peek().getRouteID());
+            if (stats.isFlag()) {
+                assert statsQueue.peek() != null;
+                System.out.println("/////////////////////");
+                System.out.println("/////////////////////");
+                System.out.println("Received the final chunk for route with route id: " + statsArrayList.get(0).getRouteID());
+                System.out.println("Current list size: " + statsArrayList.size());
+                System.out.println("/////////////////////");
+                System.out.println("/////////////////////");
             } else {
                 statsQueue.add(stats);
                 statsQueue.notify();
