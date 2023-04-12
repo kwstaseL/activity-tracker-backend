@@ -53,7 +53,7 @@ public class WorkDispatcher implements Runnable
                     n = workers.size() / waypoints.size();
                 }
 
-                int chunks = 1;
+                int chunks = 0;
                 ArrayList<Waypoint> chunk = new ArrayList<>();
 
 
