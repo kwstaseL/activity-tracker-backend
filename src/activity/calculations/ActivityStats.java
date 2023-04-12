@@ -9,6 +9,17 @@ public class ActivityStats implements Serializable
     private double elevation;
     private double time;
 
+    public ActivityStats(double distance, double speed, double elevation, double time) {
+        this.distance = distance;
+        this.speed = speed;
+        this.elevation = elevation;
+        this.time = time;
+    }
+
+    public ActivityStats() {
+        this(0, 0, 0, 0);
+    }
+
     public void setDistance(double distance)
     {
         this.distance = distance;

@@ -30,7 +30,6 @@ public class Map
         double averageSpeed = 0.0;
 
         ActivityStats stats = new ActivityStats();
-        ActivityStats finalStats = new ActivityStats();
 
         for (int i = 1; i < waypoints.size(); ++i)
         {
@@ -43,12 +42,8 @@ public class Map
             w1 = waypoints.get(i);
         }
 
-        // TODO: Construct the object directly
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
-        finalStats.setDistance(totalDistance);
-        finalStats.setSpeed(averageSpeed);
-        finalStats.setElevation(totalElevation);
-        finalStats.setTime(totalTime);
+        ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime);
 
         intermediate_results.put(clientID, finalStats);
 
