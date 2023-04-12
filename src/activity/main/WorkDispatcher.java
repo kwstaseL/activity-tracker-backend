@@ -8,8 +8,8 @@ import java.util.Queue;
 
 public class WorkDispatcher implements Runnable
 {
-    private Queue<WorkerHandler> workers;
-    private Queue<Route> filesToWorker;
+    private final Queue<WorkerHandler> workers;
+    private final Queue<Route> filesToWorker;
 
     public WorkDispatcher(Queue<WorkerHandler> workers, Queue<Route> filesToWorker)
     {

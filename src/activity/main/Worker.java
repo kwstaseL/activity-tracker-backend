@@ -36,7 +36,7 @@ public class Worker
         catch (Exception e)
         {
             System.out.println("Could not connect to master");
-            close();
+            shutdown();
             System.out.println("Error: " + e.getMessage());
         }
 
@@ -74,7 +74,7 @@ public class Worker
             } catch (IOException | ClassNotFoundException e)
             {
                 System.out.println("Could not receive object");
-                close();
+                shutdown();
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -86,7 +86,7 @@ public class Worker
         HashMap<String, ActivityStats> result = mapFunction.map(route.getClientID(), route);
         try
         {
-            // Send the result back to the master
+            // Send the result back to the worker-handler
             synchronized (writeLock)
             {
                 out.writeObject(result);
@@ -99,7 +99,7 @@ public class Worker
         }
     }
 
-    private void close()
+    private void shutdown()
     {
         if (connection != null)
         {

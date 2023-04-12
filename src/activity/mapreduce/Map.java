@@ -1,6 +1,5 @@
 package activity.mapreduce;
 
-import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,7 +46,8 @@ public class Map
             totalTime += stats.getTime();
             double elevation = stats.getElevation();
 
-            // if (currentElevation > 0): indicates the second waypoint (w2) has a higher elevation than the one we have currently registered as highest.
+            // if (currentElevation > 0): indicates the second waypoint (w2) has a higher elevation
+            // than the one we have currently registered as highest.
             // therefore, updating currentHighestElevation
             if (elevation > 0)
             {
