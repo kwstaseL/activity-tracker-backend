@@ -69,7 +69,7 @@ public class WorkerHandler implements Runnable
                 System.out.println("WorkerHandler: Waiting for message from worker");
                 Object receivedObject = in.readObject();
                 Pair<String, ActivityStats> stats = (Pair<String, ActivityStats>) receivedObject;
-                System.out.println("WorkerHandler: Received intermediate results from worker: " + stats);
+                System.out.println("WorkerHandler: Received intermediate results from worker: " + stats.getKey());
                 // TODO: Get the intermediate results from the worker and send them to the client handler
                 handleRequests(stats);
             }

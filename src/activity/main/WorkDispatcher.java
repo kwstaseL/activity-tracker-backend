@@ -53,8 +53,22 @@ public class WorkDispatcher implements Runnable
                     n = workers.size() / waypoints.size();
                 }
 
-                int chunks = 0;
+                int chunks = 1;
                 ArrayList<Waypoint> chunk = new ArrayList<>();
+
+                for (int i = 0; i < waypoints.size(); i++) {
+                    chunk.add(waypoints.get(i));
+                    if (chunk.size() == n || i == waypoints.size() - 1) {
+                        WorkerHandler worker = workers.poll();
+                        Route chunkedRoute = new Route(chunk, routeID, clientID);
+                        worker.processJob(chunkedRoute);
+                        workers.add(worker);
+                        chunk = new ArrayList<>();
+                        chunks++;
+                    }
+                }
+
+
                 for (int i = 0; i < waypoints.size(); i++)
                 {
                     chunk.add(waypoints.get(i));
@@ -67,10 +81,16 @@ public class WorkDispatcher implements Runnable
                         worker.processJob(chunkedRoute);
                         // add the worker to the end of the queue
                         workers.add(worker);
-                        // clear the chunk for the next set of waypoints
-                        chunk = new ArrayList<>();
+
                         chunks++;
-                        chunk.add(waypoints.get(i));    // adding the last waypoint from the previous chunk, to not miss the connection
+
+                        if (i != waypoints.size() - 1) {
+
+                            // clear the chunk for the next set of waypoints
+                            chunk = new ArrayList<>();
+                            // adding the last waypoint from the previous chunk, so we do not miss the connection between i and i+1
+                            chunk.add(waypoints.get(i));
+                        }
                     }
                 }
 
