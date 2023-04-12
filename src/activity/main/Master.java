@@ -23,7 +23,6 @@ public class Master
     private HashMap<String,ClientHandler> clientMap;
     private int numOfWorkers;
 
-
     public Master(int numOfWorkers)
     {
         try
@@ -43,9 +42,9 @@ public class Master
         }
     }
 
-    // This method will start the master server and listen for connections
     private void start()
     {
+        // Thread that will create the workers
         Thread init = new Thread(new Runnable()
         {
             @Override
@@ -58,7 +57,7 @@ public class Master
                 }
             }
         });
-
+        // Thread that will handle the clients
         Thread handleClient = new Thread(new Runnable()
         {
             @Override
@@ -98,7 +97,7 @@ public class Master
                 }
             }
         });
-
+        // Thread that will handle the workers
         Thread handleWorker = new Thread(new Runnable()
         {
             public void run()
@@ -135,7 +134,7 @@ public class Master
                 }
             }
         });
-
+        // Thread that will start dispatching work to the workers
         Thread dispatchWork = new Thread(new Runnable() {
             @Override
             public void run()

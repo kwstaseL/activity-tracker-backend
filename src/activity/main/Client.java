@@ -87,6 +87,7 @@ public class Client
             }
             catch (IOException e)
             {
+                System.out.println("Could not close connection");
                 throw new RuntimeException(e);
             }
         }
@@ -98,6 +99,7 @@ public class Client
             }
             catch (IOException e)
             {
+                System.out.println("Could not close output stream");
                 throw new RuntimeException(e);
             }
         }
@@ -109,6 +111,7 @@ public class Client
             }
             catch (IOException e)
             {
+                System.out.println("Could not close input stream");
                 throw new RuntimeException(e);
             }
         }

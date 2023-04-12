@@ -66,8 +66,7 @@ public class Worker
                 Object receivedObject = in.readObject();
                 System.out.println("WORKER: Received job from master");
                 Route route = (Route) receivedObject;
-
-
+                
                 new Thread(() ->
                 {
                         handleMapping(route);
@@ -98,6 +97,7 @@ public class Worker
 
         } catch (IOException e)
         {
+            System.out.println("Could not send object to the worker handler");
             throw new RuntimeException(e);
         }
     }
@@ -112,6 +112,7 @@ public class Worker
 
             } catch (IOException e)
             {
+                System.out.println("Could not close connection");
                 throw new RuntimeException(e);
             }
         }
@@ -123,6 +124,7 @@ public class Worker
 
             } catch (IOException e)
             {
+                System.out.println("Could not close input stream");
                 throw new RuntimeException(e);
             }
         }
@@ -134,6 +136,7 @@ public class Worker
             }
             catch (IOException e)
             {
+                System.out.println("Could not close output stream");
                 throw new RuntimeException(e);
             }
         }

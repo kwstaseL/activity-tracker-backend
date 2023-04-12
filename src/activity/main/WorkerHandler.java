@@ -128,6 +128,7 @@ public class WorkerHandler implements Runnable
         }
         catch (IOException e)
         {
+            System.out.println("Could not close connection to worker");
             throw new RuntimeException(e);
         }
 
