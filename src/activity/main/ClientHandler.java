@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ public class ClientHandler implements Runnable
             this.parser = new GPXParser();
             this.routes = routes;
             this.clientID = UUID.randomUUID().toString();
+            this.statsQueue = new LinkedList<>();
         }
         catch (IOException e)
         {

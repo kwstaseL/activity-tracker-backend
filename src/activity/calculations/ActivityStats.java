@@ -62,7 +62,6 @@ public class ActivityStats implements Serializable
 
     public String toString()
     {
-        return "Total Distance: " + distance + " Average Speed: "
-                + speed + " Total Elevation: " + elevation + " Total Time: " + time;
+        return String.format("Total Distance: %.2f, Average Speed: %.2f, Total Elevation: %.2f and Total Time: %.2f", distance, speed, elevation, time);
     }
 }

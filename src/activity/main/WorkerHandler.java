@@ -67,21 +67,10 @@ public class WorkerHandler implements Runnable
                 Object receivedObject = in.readObject();
                 Pair<String, ActivityStats> stats = (Pair<String, ActivityStats>) receivedObject;
                 System.out.println("WorkerHandler: Received intermediate results from worker: " + stats);
+
                 // TODO: Get the intermediate results from the worker and send them to the client handler
 
-                // Receives the intermediate results from the worker and finds who the client handler of the client is and
-                // sends the intermediate results to the client handler
-                /*
-                HashMap<String, ActivityStats> stats = (HashMap<String, ActivityStats>) receivedObject;
-
-                // find the client that sent the route
-                // extract the key from the stats hashmap
-                String clientID = stats.keySet().iterator().next();
-                // get the client handler from the clients hashmap
-                ClientHandler clientHandler = clients.get(clientID);
-                // send the intermediate results to the client handler
-                clientHandler.sendIntermediateResults(stats);
-                 */
+                handleRequests(stats);
 
             }
         } catch (IOException | ClassNotFoundException e) {
