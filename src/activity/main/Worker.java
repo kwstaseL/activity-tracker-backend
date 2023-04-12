@@ -1,6 +1,7 @@
 package activity.main;
 
 import activity.calculations.ActivityStats;
+import activity.mapreduce.Pair;
 import activity.parser.Route;
 import activity.mapreduce.Map;
 
@@ -84,7 +85,7 @@ public class Worker
     private void handleMapping(Route route)
     {
         System.out.println("WORKER: Received route from master " + route);
-        HashMap<String, ActivityStats> intermediate_result = mapper.map(route.getClientID(), route);
+        Pair<String, ActivityStats> intermediate_result = mapper.map(route.getClientID(), route);
         try
         {
             // Send the result back to the worker-handler

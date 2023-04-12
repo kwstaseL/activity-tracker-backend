@@ -1,5 +1,7 @@
 package activity.main;
 
+import activity.calculations.ActivityStats;
+import activity.mapreduce.Pair;
 import activity.parser.GPXParser;
 import activity.parser.Route;
 
@@ -26,6 +28,7 @@ public class ClientHandler implements Runnable
     GPXParser parser;
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
+    private Queue<ActivityStats> statsQueue;
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
@@ -59,7 +62,18 @@ public class ClientHandler implements Runnable
 
         });
 
+        Thread readFromWorkerHandler = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                readFromWorkerHandler();
+            }
+        });
+
         readFromClient.start();
+    }
+
+    private void readFromWorkerHandler() {
+
     }
 
     private void readFromClient()

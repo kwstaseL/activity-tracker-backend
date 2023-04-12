@@ -16,11 +16,8 @@ public class Map
     {
         calculator = new ActivityCalculator();
     }
-
-    public synchronized HashMap<String, ActivityStats> map(String clientID, Route route)
+    public synchronized Pair<String, ActivityStats> map(String clientID, Route route)
     {
-        HashMap<String, ActivityStats> intermediate_results = new HashMap<>();
-
         ArrayList<Waypoint> waypoints = route.waypoints();
 
         Waypoint w1 = waypoints.get(0);
@@ -45,9 +42,9 @@ public class Map
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
         ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime);
 
-        intermediate_results.put(clientID, finalStats);
+        Pair<String, ActivityStats> pair = new Pair<>(clientID, finalStats);
 
-        return intermediate_results;
+        return pair;
     }
 
 }

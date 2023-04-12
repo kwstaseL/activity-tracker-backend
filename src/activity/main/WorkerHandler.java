@@ -1,6 +1,7 @@
 package activity.main;
 
 import activity.calculations.ActivityStats;
+import activity.mapreduce.Pair;
 import activity.parser.Route;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class WorkerHandler implements Runnable
 
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
+    private final Object lock = new Object();
 
     private HashMap<String,ClientHandler> clients;
 
@@ -52,6 +54,8 @@ public class WorkerHandler implements Runnable
 
         listenToWorker.start();
     }
+
+    @SuppressWarnings("unchecked")
     private void listenToWorker()
     {
         try
@@ -61,7 +65,7 @@ public class WorkerHandler implements Runnable
                 // Receive message from worker
                 System.out.println("WorkerHandler: Waiting for message from worker");
                 Object receivedObject = in.readObject();
-                HashMap<String, ActivityStats> stats = (HashMap<String, ActivityStats>) receivedObject;
+                Pair<String, ActivityStats> stats = (Pair<String, ActivityStats>) receivedObject;
                 System.out.println("WorkerHandler: Received intermediate results from worker: " + stats);
                 // TODO: Get the intermediate results from the worker and send them to the client handler
 
@@ -85,6 +89,26 @@ public class WorkerHandler implements Runnable
             e.printStackTrace();
         } finally {
             shutdown();
+        }
+    }
+
+    // handleRequests: Receives the <K, V> pair the worker generates, and sends it to the appropriate ClientHandler
+    private void handleRequests(Pair<String, ActivityStats> activityStatsPair)
+    {
+        try
+        {
+            // Send the result back to the client-handler
+            synchronized (lock)
+            {
+                String clientID = activityStatsPair.getKey();
+                ClientHandler appropriateHandler = clients.get(clientID);
+            }
+
+
+        } catch (IOException e)
+        {
+            System.out.println("Could not send object to the worker handler");
+            throw new RuntimeException(e);
         }
     }
 
