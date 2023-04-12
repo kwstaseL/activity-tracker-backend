@@ -40,7 +40,7 @@ public class Map
         }
 
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
-        ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime);
+        ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime,route.getRouteID());
 
         Pair<String, ActivityStats> pair = new Pair<>(clientID, finalStats);
 

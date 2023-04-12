@@ -37,7 +37,6 @@ public class WorkDispatcher implements Runnable
                 }
 
                 Route route = filesToWorker.poll();
-                System.out.println("WorkerDispatcher: About to process route: " + route.toString());
                 ArrayList<Waypoint> waypoints = route.waypoints();
 
                 int routeID = route.getRouteID();
@@ -54,8 +53,6 @@ public class WorkDispatcher implements Runnable
                     n = workers.size() / waypoints.size();
                 }
 
-                int numberOfChunks = 1;
-
                 ArrayList<Waypoint> chunk = new ArrayList<>();
                 for (int i = 0; i < waypoints.size(); i++)
                 {
@@ -66,21 +63,15 @@ public class WorkDispatcher implements Runnable
                         WorkerHandler worker = workers.poll();
                         assert worker != null;
                         Route chunkedRoute = new Route(chunk, routeID, clientID);
-                        System.out.println("WorkerDispatcher: Sending route to workerhandler");
                         worker.processJob(chunkedRoute);
                         // add the worker to the end of the queue
                         workers.add(worker);
                         // clear the chunk for the next set of waypoints
                         chunk = new ArrayList<>();
-                        ++numberOfChunks;
                         chunk.add(waypoints.get(i));    // adding the last waypoint from the previous chunk, to not miss the connection
                     }
                 }
-                System.out.println("****************************");
-                System.out.println("****************************");
-                System.out.println("WorkerDispatcher route id: " + routeID + " has " + numberOfChunks + " chunks");
-                System.out.println("****************************");
-                System.out.println("****************************");
+
 
             }
         }

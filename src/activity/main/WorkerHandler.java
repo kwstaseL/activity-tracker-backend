@@ -9,7 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 // This class will handle the worker connection
 public class WorkerHandler implements Runnable
@@ -22,7 +21,7 @@ public class WorkerHandler implements Runnable
     private final Socket workerSocket;
     private final Object lock = new Object();
 
-    private static ConcurrentHashMap<Integer,Integer> chunksPerRoute;
+    private static HashMap<Integer,Integer> chunksPerRoute;
 
     private HashMap<String,ClientHandler> clients;
 
@@ -35,7 +34,7 @@ public class WorkerHandler implements Runnable
             this.clients = clients;
             this.in = new ObjectInputStream(workerSocket.getInputStream());
             this.out = new ObjectOutputStream(workerSocket.getOutputStream());
-            chunksPerRoute = new ConcurrentHashMap<>();
+            chunksPerRoute = new HashMap<>();
         }
         catch (IOException e)
         {
@@ -71,7 +70,6 @@ public class WorkerHandler implements Runnable
                 Object receivedObject = in.readObject();
                 Pair<String, ActivityStats> stats = (Pair<String, ActivityStats>) receivedObject;
                 System.out.println("WorkerHandler: Received intermediate results from worker: " + stats);
-
                 // TODO: Get the intermediate results from the worker and send them to the client handler
                 handleRequests(stats);
             }
@@ -89,9 +87,36 @@ public class WorkerHandler implements Runnable
         // Send the result back to the client-handler
         synchronized (lock)
         {
-            String clientID = activityStatsPair.getKey();
-            ClientHandler appropriateHandler = clients.get(clientID);
-            appropriateHandler.addStats(activityStatsPair.getValue());
+            ActivityStats stats = activityStatsPair.getValue();
+            int routeID = stats.getRouteID();
+
+            synchronized (chunksPerRoute)
+            {
+                int count = chunksPerRoute.get(routeID);
+                count--;
+
+                chunksPerRoute.put(routeID, count);
+
+                if (chunksPerRoute.get(routeID) > 0)
+                {
+                    String clientID = activityStatsPair.getKey();
+                    ClientHandler appropriateHandler = clients.get(clientID);
+                    appropriateHandler.addStats(stats);
+                }
+                else if (chunksPerRoute.get(routeID) == 0)
+                {
+                    String clientID = activityStatsPair.getKey();
+                    ClientHandler appropriateHandler = clients.get(clientID);
+                    appropriateHandler.addStats(stats);
+
+                    System.out.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
+                    chunksPerRoute.remove(routeID);
+                }
+
+            }
+
+
+
         }
     }
 
@@ -99,17 +124,18 @@ public class WorkerHandler implements Runnable
     {
         try
         {
-            Integer routeID = route.getRouteID();
-            if (chunksPerRoute.containsKey(routeID)) {
-                int count = chunksPerRoute.get(routeID);
-                ++count;
-                chunksPerRoute.put(routeID, count);
-            } else {
-                chunksPerRoute.put(routeID, 1);
+            synchronized (chunksPerRoute)
+            {
+                Integer routeID = route.getRouteID();
+                if (chunksPerRoute.containsKey(routeID)) {
+                    int count = chunksPerRoute.get(routeID);
+                    count++;
+                    chunksPerRoute.put(routeID, count);
+                } else {
+                    chunksPerRoute.put(routeID, 1);
+                }
             }
-            System.out.println("WORKERHANDLER: Route id : " + routeID + " count : " + chunksPerRoute.get(routeID));
-            // Send the route to the worker
-            System.out.println("WorkerHandler: Sending route to worker: " + route);
+
             out.writeObject(route);
             out.flush();
         }
