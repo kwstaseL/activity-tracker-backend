@@ -63,7 +63,6 @@ public class WorkDispatcher implements Runnable
                         chunk = new ArrayList<>();
                     }
                 }
-                // Add the worker to the end of the queue
             }
         }
     }
