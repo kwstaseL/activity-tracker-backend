@@ -103,7 +103,7 @@ public class ClientHandler implements Runnable
                     System.err.println("The number of chunks received for route " + stats.getRouteID() + " is " + routeidToChunkCount.get(stats.getRouteID()));
                 }
                 else
-                {
+                {   // TODO: Remove this after testing
                     // For each route id increment the number of times it has been received
                     if (routeidToChunkCount.containsKey(stats.getRouteID())) {
                         routeidToChunkCount.put(stats.getRouteID(), routeidToChunkCount.get(stats.getRouteID()) + 1);
