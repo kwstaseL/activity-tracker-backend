@@ -9,20 +9,14 @@ public class Waypoint implements Serializable
     final private double longitude;
     final private double elevation;
     final private String timestamp;
-    final private String username;
-
-    private String userID;
-
-    private int routeID;
 
     public Waypoint(double latitude, double longitude,
-                    double elevation, String timestamp,String username)
+                    double elevation, String timestamp)
     {
         this.latitude = latitude;
         this.longitude = longitude;
         this.elevation = elevation;
         this.timestamp = timestamp;
-        this.username = username;
     }
 
 
@@ -46,10 +40,11 @@ public class Waypoint implements Serializable
         return timestamp;
     }
 
+
     public String toString()
     {
         return "Latitude: " + latitude + " Longitude: "
-                + longitude + " Elevation: " + elevation + " Timestamp: " + timestamp + " Username: " + username;
+                + longitude + " Elevation: " + elevation + " Timestamp: " + timestamp;
     }
 
 

@@ -51,6 +51,7 @@ public class WorkDispatcher implements Runnable
 
         int routeID = route.getRouteID();
         int clientID = route.getClientID();
+        String user = route.getUser();
 
         // n will represent the chunk size
         int n;
@@ -73,7 +74,8 @@ public class WorkDispatcher implements Runnable
 
         for (int i = 0; i < waypoints.size(); i++)
         {
-            waypointChunk.add(waypoints.get(i));
+            Waypoint currentWaypoint = waypoints.get(i);
+            waypointChunk.add(currentWaypoint);
 
             if (waypointChunk.size() == n && chunks == 0)
             {
@@ -83,7 +85,7 @@ public class WorkDispatcher implements Runnable
                 chunks++;
                 chunkIndex++;
 
-                Route chunkedRoute = new Route(waypointChunk, routeID, clientID);
+                Route chunkedRoute = new Route(waypointChunk, routeID, clientID, user);
                 Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
 
                 // TODO: Make WorkerHandlers process Chunks instead of Routes
@@ -105,21 +107,24 @@ public class WorkDispatcher implements Runnable
                 chunks++;
                 chunkIndex++;
 
-                Route chunkedRoute = new Route(waypointChunk, routeID, clientID);
+                Route chunkedRoute = new Route(waypointChunk, routeID, clientID, user);
                 Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
 
                 // TODO: Make WorkerHandlers process Chunks instead of Routes
                 worker.processJob(chunk);
                 // add the worker to the end of the queue
                 workers.add(worker);
-            } else if (waypointChunk.size() == n+1 && chunks != 0) {
+            }
+            else if (waypointChunk.size() == n+1 && chunks != 0)
+            {
+
                 WorkerHandler worker = workers.poll();
                 assert worker != null;
 
                 chunks++;
                 chunkIndex++;
 
-                Route chunkedRoute = new Route(waypointChunk, routeID, clientID);
+                Route chunkedRoute = new Route(waypointChunk, routeID, clientID, user);
                 Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
 
                 // TODO: Make WorkerHandlers process Chunks instead of Routes
@@ -132,10 +137,9 @@ public class WorkDispatcher implements Runnable
                     // clear the chunk for the next set of waypoints
                     waypointChunk = new ArrayList<>();
                     // adding the last waypoint from the previous chunk, so we do not miss the connection between i and i+1
-                    waypointChunk.add(waypoints.get(i));
+                    waypointChunk.add(currentWaypoint);
                 }
             }
-
         }
 
         synchronized (routeStatus)

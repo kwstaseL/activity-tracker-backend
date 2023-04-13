@@ -43,7 +43,7 @@ public class GPXParser
 
                 // Add the waypoint to the list
                 waypoints.add(new Waypoint(Double.parseDouble(latitude), Double.parseDouble(longitude),
-                        Double.parseDouble(elevation), time, creator));
+                        Double.parseDouble(elevation), time));
 
             }
 

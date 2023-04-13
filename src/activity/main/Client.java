@@ -123,8 +123,6 @@ public class Client
         File file4 = new File("./gpxs/route4.gpx");
         File file5 = new File("./gpxs/route5.gpx");
         File file6 = new File("./gpxs/route6.gpx");
-        File segment1 = new File("./gpxs/segment1.gpx");
-        File segment2 = new File("./gpxs/segment2.gpx");
 
         Client client = new Client(file);
         Client client2 = new Client(file2);
@@ -132,8 +130,6 @@ public class Client
         Client client4 = new Client(file4);
         Client client5 = new Client(file5);
         Client client6 = new Client(file6);
-        Client client7 = new Client(segment1);
-        Client client8 = new Client(segment2);
 
         Thread c1 = new Thread(client::sendFile);
 
@@ -147,17 +143,12 @@ public class Client
 
         Thread c6 = new Thread(client6::sendFile);
 
-        Thread c7 = new Thread(client7::sendFile);
-        Thread c8 = new Thread(client8::sendFile);
-
         c1.start();
         c2.start();
         c3.start();
         c4.start();
         c5.start();
         c6.start();
-        c7.start();
-        c8.start();
 
 
         client.listenForMessages();
@@ -166,9 +157,5 @@ public class Client
         client4.listenForMessages();
         client5.listenForMessages();
         client6.listenForMessages();
-        client7.listenForMessages();
-        client8.listenForMessages();
-
-
     }
 }
