@@ -1,6 +1,5 @@
 package activity.main;
 
-import activity.calculations.ActivityCalculator;
 import activity.calculations.ActivityStats;
 import activity.mapreduce.Pair;
 import activity.mapreduce.Reduce;
@@ -21,6 +20,7 @@ public class ClientHandler implements Runnable
 
     // This is the socket that the client is connected to
     private Socket clientSocket;
+
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
@@ -32,8 +32,17 @@ public class ClientHandler implements Runnable
     private Queue<Pair<Chunk, ActivityStats>> statsQueue;
     private final Object writeLock = new Object();
 
+    // TODO: Write the 6 functions in regards to user statistics
+
+    // totalActivityStats: Includes all the results from all the route calculations
+    private static ArrayList<ActivityStats> totalActivityStats = new ArrayList<>();
+
+    // userActivityStats: Links all users to the list of routes recorded by them
+    private static HashMap<String, ArrayList<ActivityStats>> userActivityStats = new HashMap<>();
+
     // routeHashmap: Matches the route IDs with a list of the chunks they contain
     private static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
+
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
@@ -127,7 +136,7 @@ public class ClientHandler implements Runnable
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    handleReducing(new Pair<Integer, ArrayList<ActivityStats>>(routeID, statsArrayList));
+                                    handleReducing(new Pair<Integer, ArrayList<ActivityStats>>(routeID, statsArrayList), chunk.getRoute().getUser());
                                 }
                             }).start();
                         } else
@@ -147,7 +156,7 @@ public class ClientHandler implements Runnable
         }
     }
 
-    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediate_results)
+    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediate_results, String user)
     {
         System.out.println("ClientHandler: " + "Route: " + intermediate_results.getKey() + "is about to be reduced with " + intermediate_results.getValue().size() + " chunks");
 
@@ -159,6 +168,16 @@ public class ClientHandler implements Runnable
             // Send the result back to the worker-handler
             synchronized (writeLock)
             {
+                ArrayList<ActivityStats> userStats;
+                if (userActivityStats.containsKey(user)) {
+                    userStats = userActivityStats.get(user);
+                } else {
+                    userStats = new ArrayList<>();
+                }
+                userStats.add(finalResults);
+                userActivityStats.put(user, userStats);
+                totalActivityStats.add(finalResults);
+
                 out.writeObject(finalResults);
                 out.flush();
             }
