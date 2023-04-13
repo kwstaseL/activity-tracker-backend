@@ -8,12 +8,13 @@ import java.util.Queue;
 
 public class ResultDispatcher
 {
-    private final HashMap<String,ClientHandler> clients;
+    private final HashMap<Integer,ClientHandler> clients;
+    // RouteStatus: A hashmap of RouteID and whether it's had all its chunks received or not
     private final HashMap<Integer,Boolean> routeStatus;
     private static HashMap<Integer,Integer> chunksPerRoute;
     private final Queue<Pair<String, ActivityStats>> intermediateResults;
 
-    public ResultDispatcher(HashMap<String, ClientHandler> clients, HashMap<Integer, Boolean> routeStatus,
+    public ResultDispatcher(HashMap<Integer, ClientHandler> clients, HashMap<Integer, Boolean> routeStatus,
                                      Queue<Pair<String, ActivityStats>> intermediateResults , HashMap<Integer,Integer> chunksPerRoute)
     {
         this.clients = clients;

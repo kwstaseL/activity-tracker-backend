@@ -20,7 +20,7 @@ public class Master
     private Queue<WorkerHandler> workerHandlers;
     private Queue<ClientHandler> clientHandlers;
     private Queue<Route> routes;
-    private HashMap<String,ClientHandler> clientMap;
+    private HashMap<Integer,ClientHandler> clientMap;
     private HashMap<Integer,Boolean> routeStatus;
 
     private int numOfWorkers;
@@ -76,7 +76,7 @@ public class Master
                         System.out.println("MASTER: Client connected");
                         // Create a new thread to handle the client
                         ClientHandler clientHandler = new ClientHandler(client,routes);
-                        String clientID = clientHandler.getClientID();
+                        int clientID = clientHandler.getClientID();
                         clientMap.put(clientID,clientHandler);
                         clientHandlers.add(clientHandler);
                         Thread clientThread = new Thread(clientHandler);

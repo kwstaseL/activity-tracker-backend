@@ -8,7 +8,7 @@ public class Route implements Serializable
     private ArrayList<Waypoint> waypoints;
     private String username;
     private int routeID;
-    private String clientID;
+    private int clientID;
     private boolean moreFragments = true;
     private static int idGenerator = 0;
 
@@ -19,7 +19,7 @@ public class Route implements Serializable
         this.routeID = idGenerator++;
     }
 
-    public Route(ArrayList<Waypoint> waypoints, int routeID, String clientID) {
+    public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID) {
         this.waypoints = waypoints;
         this.routeID = routeID;
         this.clientID = clientID;
@@ -33,9 +33,9 @@ public class Route implements Serializable
         return routeID;
     }
 
-    public String getClientID() { return clientID; }
+    public int getClientID() { return clientID; }
 
-    public void setClientID(String clientID) { this.clientID = clientID; }
+    public void setClientID(int clientID) { this.clientID = clientID; }
 
     public String toString()
     {

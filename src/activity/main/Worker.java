@@ -32,6 +32,7 @@ public class Worker
             connection = new Socket("localhost", Master.WORKER_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
+            workerID = idGenerator++;
             mapper = new Map();
         }
         catch (Exception e)
@@ -86,7 +87,7 @@ public class Worker
     private void handleMapping(Route route)
     {
         System.out.println("WORKER: Received route from master " + route);
-        Pair<String, ActivityStats> intermediate_result = mapper.map(route.getClientID(), route);
+        Pair<Integer, ActivityStats> intermediate_result = mapper.map(route.getClientID(), route);
         try
         {
             // Send the result back to the worker-handler

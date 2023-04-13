@@ -49,7 +49,7 @@ public class WorkDispatcher implements Runnable
         ArrayList<Waypoint> waypoints = route.waypoints();
 
         int routeID = route.getRouteID();
-        String clientID = route.getClientID();
+        int clientID = route.getClientID();
 
         // n will represent the chunk size
         int n;

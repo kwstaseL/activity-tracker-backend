@@ -23,7 +23,7 @@ public class WorkerHandler implements Runnable
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
     private final Object lock = new Object();
-    private HashMap<String,ClientHandler> clients;
+    private HashMap<Integer,ClientHandler> clients;
     private ResultDispatcher resultDispatcher;
     private HashMap<Integer,Boolean> routeStatus;
     private Queue<Pair<String,ActivityStats>> intermediateResults;
@@ -31,7 +31,7 @@ public class WorkerHandler implements Runnable
     private static HashMap<Integer,Integer> chunksPerRoute;
 
 
-    public WorkerHandler(Socket workerSocket,HashMap<String,ClientHandler> clients,HashMap<Integer,Boolean> routeStatus)
+    public WorkerHandler(Socket workerSocket,HashMap<Integer,ClientHandler> clients,HashMap<Integer,Boolean> routeStatus)
     {
         this.workerSocket = workerSocket;
         // Add the worker to the queue
