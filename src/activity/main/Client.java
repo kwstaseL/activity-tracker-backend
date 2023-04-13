@@ -6,13 +6,17 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.File;
 
+// DONE
+
 public class Client
 {
+    // Connection socket to the master
     private Socket connection;
-
+    // Output stream to the master
     private ObjectOutputStream out;
+    // Input stream from the master
     private ObjectInputStream in;
-
+    // The file that will be sent to the master
     private File file;
 
     public Client(File file)
@@ -20,6 +24,7 @@ public class Client
         try
         {
             this.file = file;
+            // Creating the connection to the master
             connection = new Socket("localhost", Master.CLIENT_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
@@ -27,11 +32,15 @@ public class Client
         catch (Exception e)
         {
             System.out.println("Could not connect to master");
-            shutdown();
             System.out.println("Error: " + e.getMessage());
+        }
+        finally
+        {
+            shutdown();
         }
     }
 
+    // This method will send the file to the master
     public void sendFile()
     {
         try
@@ -47,6 +56,7 @@ public class Client
         }
     }
 
+    // This method will listen for messages from the master
     public void listenForMessages()
     {
         new Thread(() -> {
@@ -55,23 +65,24 @@ public class Client
                 try
                 {
                     Object receivedObject = in.readObject();
-                    if (receivedObject instanceof File receivedFile)
-                    {
-                        System.out.println("Received file: " + receivedFile.getName());
-                    }
+                    // TODO: This will need to be casted to an ActivityStats object
                 }
                 catch (Exception e)
                 {
                     System.out.println("Could not receive object");
-                    shutdown();
                     System.out.println("Error: " + e.getMessage());
                 }
-
+                finally
+                {
+                    shutdown();
+                }
             }
         }).start();
 
     }
 
+    // This method will close the connection to the master
+    // and the input and output streams when an error occurs or the client is done
     private void shutdown()
     {
         if (connection != null)

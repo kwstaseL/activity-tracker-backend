@@ -2,10 +2,13 @@ package activity.calculations;
 
 import java.io.Serializable;
 
+// DONE
+
 // Contains the results of the calculations for the activities
 // during the map/reduce phase
 public class ActivityStats implements Serializable
 {
+    // The total distance, elevation,time and average speed for the current routeID
     private double distance;
     private double speed;
     private double elevation;
@@ -39,6 +42,8 @@ public class ActivityStats implements Serializable
         this.flag = flag;
     }
 
+    // Returns true if this is the last chunk of data for the current routeID
+    // false otherwise
     public boolean isFlag() {
         return flag;
     }

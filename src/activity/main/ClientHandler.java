@@ -5,19 +5,19 @@ import activity.parser.GPXParser;
 import activity.parser.Route;
 
 import java.io.File;
+import java.util.UUID;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.UUID;
 
 // This class will handle the client connection
 public class ClientHandler implements Runnable
 {
-
     // This is the socket that the client is connected to
     private Socket clientSocket;
     private ObjectInputStream in;

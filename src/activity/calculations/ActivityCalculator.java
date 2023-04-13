@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+// DONE
+
 // Class used for the mapping phase
 // It will calculate for a chunk of data the distance,time ,speed and elevation
 public class ActivityCalculator
@@ -48,9 +50,11 @@ public class ActivityCalculator
     // Calculating the time between two waypoints
     private double calculateTime(Waypoint w1, Waypoint w2)
     {
+        // Converting the timestamps to LocalDateTime objects
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
         LocalDateTime t1 = LocalDateTime.parse(w1.getTimestamp(), formatter);
         LocalDateTime t2 = LocalDateTime.parse(w2.getTimestamp(), formatter);
+        // Calculating the difference between the two timestamps
         Duration duration = Duration.between(t1, t2);
         double timeInSeconds = duration.getSeconds();
         return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
