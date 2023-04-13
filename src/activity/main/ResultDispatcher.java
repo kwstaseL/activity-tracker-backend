@@ -64,7 +64,6 @@ public class ResultDispatcher
                             ClientHandler appropriateHandler = clients.get(clientID);
                             appropriateHandler.addStats(stats);
 
-                            System.out.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
                             // If the Work Dispatcher hasn't finished processing all chunks for this route
                             // Then continue getting chunks from the Work Dispatcher
                             // Else send the final result to the client
@@ -78,6 +77,7 @@ public class ResultDispatcher
                             {
                                 appropriateHandler.addStats(new ActivityStats(true,routeID));
                                 chunksPerRoute.remove(routeID);
+                                System.err.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
                             }
 
                         }

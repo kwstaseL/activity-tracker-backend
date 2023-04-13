@@ -6,13 +6,17 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.File;
 
+// DONE
+
 public class Client
 {
+    // This is the socket that the client is connected to with the master
     private Socket connection;
-
+    // This is the output stream that will be used to send objects to the master
     private ObjectOutputStream out;
+    // This is the input stream that will be used to receive objects from the master
     private ObjectInputStream in;
-
+    // This is the file that will be sent to the master
     private File file;
 
     public Client(File file)
@@ -20,6 +24,7 @@ public class Client
         try
         {
             this.file = file;
+            // Create a socket that will connect to the master
             connection = new Socket("localhost", Master.CLIENT_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
