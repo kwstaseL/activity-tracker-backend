@@ -12,7 +12,7 @@ public class WorkDispatcher implements Runnable
 {
     private final Queue<WorkerHandler> workers;
     private final Queue<Route> filesToWorker;
-    private HashMap<Integer,Boolean> routeStatus;
+    private final HashMap<Integer,Boolean> routeStatus;
 
     public WorkDispatcher(Queue<WorkerHandler> workers, Queue<Route> filesToWorker,HashMap<Integer,Boolean> routeStatus)
     {
@@ -68,6 +68,7 @@ public class WorkDispatcher implements Runnable
 
         ArrayList<Waypoint> waypointChunk = new ArrayList<>();
         int chunkIndex = 1;
+        int chunks = 0;
 
         for (int i = 0; i < waypoints.size(); i++)
         {
@@ -79,7 +80,9 @@ public class WorkDispatcher implements Runnable
                 assert worker != null;
                 Route chunkedRoute = new Route(waypointChunk, routeID, clientID);
                 Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
-                ++chunkIndex;
+
+                chunks++;
+                chunkIndex++;
 
                 // TODO: Make WorkerHandlers process Chunks instead of Routes
                 worker.processJob(chunk);
@@ -94,6 +97,12 @@ public class WorkDispatcher implements Runnable
                     waypointChunk.add(waypoints.get(i));
                 }
             }
+        }
+
+        synchronized (routeStatus)
+        {
+            System.err.println("Finished chunking up route: " + routeID + ". Total chunks: " + chunks);
+            System.err.println("Expected chunks were: " + expectedChunks);
         }
     }
 
