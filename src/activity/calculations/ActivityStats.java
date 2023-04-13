@@ -77,7 +77,7 @@ public class ActivityStats implements Serializable
     @Override
     public String toString()
     {
-        return String.format("Total Distance: %.2f, Average Speed: %.2f, Total Elevation: %.2f and Total Time: %.2f",
+        return String.format("Total Distance: %.2fkm, Average Speed: %.2fkm/h, Total Elevation: %.2fm and Total Time: %.2f minutes",
                 distance, speed, elevation, time);
     }
 }
