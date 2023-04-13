@@ -8,10 +8,10 @@ import java.util.Queue;
 
 public class ResultDispatcher
 {
-    private HashMap<String,ClientHandler> clients;
-    private HashMap<Integer,Boolean> routeStatus;
+    private final HashMap<String,ClientHandler> clients;
+    private final HashMap<Integer,Boolean> routeStatus;
     private static HashMap<Integer,Integer> chunksPerRoute;
-    private Queue<Pair<String, ActivityStats>> intermediateResults;
+    private final Queue<Pair<String, ActivityStats>> intermediateResults;
 
     public ResultDispatcher(HashMap<String, ClientHandler> clients, HashMap<Integer, Boolean> routeStatus,
                                      Queue<Pair<String, ActivityStats>> intermediateResults , HashMap<Integer,Integer> chunksPerRoute)

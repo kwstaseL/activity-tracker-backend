@@ -6,8 +6,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+// Class used for the mapping phase
+// It will calculate for a chunk of data the distance,time ,speed and elevation
 public class ActivityCalculator
 {
+    // Calculating the distance between two waypoints
     private double calculateDistance(Waypoint w1, Waypoint w2)
     {
         // Convert degrees to radians
@@ -37,9 +40,12 @@ public class ActivityCalculator
         final double theta = Math.acos(cos_theta);
         // Distance in Metres
         double d_meters = r * theta;
+        // Converting to Kilometers
         return d_meters/1000;
     }
 
+
+    // Calculating the time between two waypoints
     private double calculateTime(Waypoint w1, Waypoint w2)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -50,12 +56,13 @@ public class ActivityCalculator
         return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
     }
 
-
+    // Calculating the speed between two waypoints
     private double calculateSpeed(double distance, double time)
     {
         return distance / time;
     }
 
+    // Calculating the elevation between two waypoints
     private double calculateElevation(Waypoint w1, Waypoint w2)
     {
         // if w2 is above the current highest elevation recorded, we return w2.getElevation - currentHighestElevation
@@ -67,7 +74,8 @@ public class ActivityCalculator
         // else (which means w2 is below the current highest elevation recorded), we return 0.
         return 0;
     }
-
+    // This is the method that will be called during the mapping phase
+    // to calculate the stats for a chunk of data
     public ActivityStats calculateStats(Waypoint w1, Waypoint w2)
     {
         ActivityStats stats = new ActivityStats();

@@ -2,17 +2,20 @@ package activity.calculations;
 
 import java.io.Serializable;
 
+// Contains the results of the calculations for the activities
+// during the map/reduce phase
 public class ActivityStats implements Serializable
 {
     private double distance;
     private double speed;
     private double elevation;
     private double time;
+    private final int routeID;
+
+    // This flag is used as a communication protocol between the master and the worker
+    // to alert him that this is the last chunk of data for the current routeID
     private boolean flag = false;
 
-    private int routeID;
-
-    // TODO: Cleanup "Flag"
 
     public ActivityStats(double distance, double speed, double elevation, double time,int routeID)
     {
@@ -23,11 +26,14 @@ public class ActivityStats implements Serializable
         this.routeID = routeID;
     }
 
+    // This constructor is used for calculating and saving the results of the calculations
     public ActivityStats()
     {
-        this(0, 0, 0, 0,-1);
+        this(0, 0, 0, 0, -1);
     }
 
+
+    // This constructor is used to create the last chunk of data for the current routeID
     public ActivityStats(boolean flag, int routeID) {
         this(0, 0, 0, 0, routeID);
         this.flag = flag;
@@ -57,11 +63,6 @@ public class ActivityStats implements Serializable
         this.time = time;
     }
 
-    public void setRouteID(int routeID)
-    {
-        this.routeID = routeID;
-    }
-
     public double getDistance()
     {
         return distance;
@@ -89,6 +90,7 @@ public class ActivityStats implements Serializable
 
     public String toString()
     {
-        return String.format("Total Distance: %.2f, Average Speed: %.2f, Total Elevation: %.2f and Total Time: %.2f", distance, speed, elevation, time);
+        return String.format("Total Distance: %.2f, Average Speed: %.2f, Total Elevation: %.2f and Total Time: %.2f",
+                distance, speed, elevation, time);
     }
 }

@@ -1,18 +1,18 @@
 package activity.main;
 
 import activity.calculations.ActivityStats;
-import activity.mapreduce.Pair;
 import activity.parser.GPXParser;
 import activity.parser.Route;
-import activity.parser.Waypoint;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.*;
-
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.UUID;
 
 // This class will handle the client connection
 public class ClientHandler implements Runnable
