@@ -114,7 +114,7 @@ public class Master
                         Socket worker = workerSocket.accept();
                         System.out.println("MASTER: Worker connected");
                         // Create a new thread to handle the worker
-                        WorkerHandler workerHandler = new WorkerHandler(worker,clientMap,routeStatus);
+                        WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
                         workerHandlers.add(workerHandler);
                         Thread workerThread = new Thread(workerHandler);
                         workerThread.start();

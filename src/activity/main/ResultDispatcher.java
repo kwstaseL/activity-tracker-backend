@@ -11,17 +11,13 @@ public class ResultDispatcher
 {
     private final HashMap<Integer,ClientHandler> clients;
     // RouteStatus: A hashmap of RouteID and whether it's had all its chunks received or not
-    private final HashMap<Integer,Boolean> routeStatus;
-    private static HashMap<Integer,Integer> chunksPerRoute;
     private final Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults;
 
-    public ResultDispatcher(HashMap<Integer, ClientHandler> clients, HashMap<Integer, Boolean> routeStatus,
-                            Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults , HashMap<Integer,Integer> chunksPerRoute)
+    public ResultDispatcher(HashMap<Integer, ClientHandler> clients,
+                            Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults)
     {
         this.clients = clients;
-        this.routeStatus = routeStatus;
         this.intermediateResults = intermediateResults;
-        this.chunksPerRoute = chunksPerRoute;
     }
 
     public void handleResults()

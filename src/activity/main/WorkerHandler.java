@@ -3,7 +3,6 @@ package activity.main;
 import activity.calculations.ActivityStats;
 import activity.mapreduce.Pair;
 import activity.parser.Chunk;
-import activity.parser.Route;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,7 +11,6 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 
 // This class will handle the worker connection
 public class WorkerHandler implements Runnable
@@ -23,27 +21,23 @@ public class WorkerHandler implements Runnable
 
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
-    private HashMap<Integer,ClientHandler> clients;
     private ResultDispatcher resultDispatcher;
-    private HashMap<Integer,Boolean> routeStatus;
     private Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults;
 
-    private static HashMap<Integer,Integer> chunksPerRoute;
 
 
-    public WorkerHandler(Socket workerSocket,HashMap<Integer,ClientHandler> clients,HashMap<Integer,Boolean> routeStatus)
+    public WorkerHandler(Socket workerSocket,HashMap<Integer,ClientHandler> clients)
     {
         this.workerSocket = workerSocket;
         // Add the worker to the queue
         try
         {
-            this.clients = clients;
             this.in = new ObjectInputStream(workerSocket.getInputStream());
             this.out = new ObjectOutputStream(workerSocket.getOutputStream());
-            this.routeStatus = routeStatus;
-            this.chunksPerRoute = new HashMap<>();
             this.intermediateResults = new LinkedList<>();
-            this.resultDispatcher = new ResultDispatcher(clients,routeStatus,intermediateResults,chunksPerRoute);
+
+            // initialising a ResultDispatcher with the clients matched to their unique IDs
+            this.resultDispatcher = new ResultDispatcher(clients,intermediateResults);
         }
         catch (IOException e)
         {
@@ -85,7 +79,6 @@ public class WorkerHandler implements Runnable
             while (!workerSocket.isClosed())
             {
                 // Receive message from worker
-                //System.out.println("WorkerHandler: Waiting for message from worker");
                 Object receivedObject = in.readObject();
                 Pair<Integer, Pair<Chunk, ActivityStats>> stats = (Pair<Integer, Pair<Chunk, ActivityStats>>) receivedObject;
 

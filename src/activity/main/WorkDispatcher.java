@@ -57,7 +57,7 @@ public class WorkDispatcher implements Runnable
 
         // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size
         if (waypoints.size() >= workers.size()) {
-            n = waypoints.size() / workers.size();
+            n = (int) Math.ceil(waypoints.size() / (workers.size() * 2.0));
         } else {
             // making the assumption that if workers are more than the waypoints provided, n will be equal to workers.size / waypoints.size
             n = workers.size() / waypoints.size();

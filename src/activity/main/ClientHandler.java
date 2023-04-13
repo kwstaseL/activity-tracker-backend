@@ -104,7 +104,7 @@ public class ClientHandler implements Runnable
                     {
                         ArrayList<Pair<Chunk, ActivityStats>> activityList = routeHashmap.get(routeID);
                         if (activityList.size() == chunk.getTotalChunks()) {
-                            System.err.println("All the chunks appear to have been processed for route ID: " + routeID);
+                            System.err.println("Found an extra chunk for route ID: " + routeID);
                         } else {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
