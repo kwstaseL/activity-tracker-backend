@@ -96,21 +96,24 @@ public class ClientHandler implements Runnable
                     }
                 }
                 ActivityStats stats = statsQueue.poll();
-
-                if (stats.isFlag())
+                synchronized (routeidToChunkCount)
                 {
-                    System.err.println("ClientHandler: " + clientID + " received the final chunk");
-                    System.err.println("The number of chunks received for route " + stats.getRouteID() + " is " + routeidToChunkCount.get(stats.getRouteID()));
-                }
-                else
-                {   // TODO: Remove this after testing
-                    // For each route id increment the number of times it has been received
-                    if (routeidToChunkCount.containsKey(stats.getRouteID())) {
-                        routeidToChunkCount.put(stats.getRouteID(), routeidToChunkCount.get(stats.getRouteID()) + 1);
-                    } else {
-                        routeidToChunkCount.put(stats.getRouteID(), 1);
+                    if (stats.isFlag())
+                    {
+                        System.err.println("ClientHandler: " + clientID + " received the final chunk");
+                        System.err.println("The number of chunks received for route " + stats.getRouteID() + " is " + routeidToChunkCount.get(stats.getRouteID()));
+                    }
+                    else
+                    {   // TODO: Remove this after testing
+                        // For each route id increment the number of times it has been received
+                        if (routeidToChunkCount.containsKey(stats.getRouteID())) {
+                            routeidToChunkCount.put(stats.getRouteID(), routeidToChunkCount.get(stats.getRouteID()) + 1);
+                        } else {
+                            routeidToChunkCount.put(stats.getRouteID(), 1);
+                        }
                     }
                 }
+
             }
         }
     }

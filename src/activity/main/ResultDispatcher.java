@@ -47,38 +47,42 @@ public class ResultDispatcher
                 synchronized (chunksPerRoute)
                 {
                     if (chunksPerRoute.containsKey(routeID)) {
+
                         int count = chunksPerRoute.get(routeID);
                         count--;
-
                         chunksPerRoute.put(routeID, count);
+
+                        String clientID = activityStatsPair.getKey();
+                        ClientHandler appropriateHandler = clients.get(clientID);
 
                         if (chunksPerRoute.get(routeID) > 0)
                         {
-                            String clientID = activityStatsPair.getKey();
-                            ClientHandler appropriateHandler = clients.get(clientID);
                             appropriateHandler.addStats(stats);
                         }
                         else if (chunksPerRoute.get(routeID) == 0)
                         {
-                            String clientID = activityStatsPair.getKey();
-                            ClientHandler appropriateHandler = clients.get(clientID);
                             appropriateHandler.addStats(stats);
 
                             // If the Work Dispatcher hasn't finished processing all chunks for this route
                             // Then continue getting chunks from the Work Dispatcher
                             // Else send the final result to the client
-                            if (!routeStatus.containsKey(routeID))
+                            synchronized (routeStatus)
                             {
-                                int chunks = chunksPerRoute.get(routeID);
-                                chunks++;
-                                chunksPerRoute.put(routeID, chunks);
+                                System.err.println("Route Status: " + routeStatus + " for route " + routeID);
+                                if (!routeStatus.containsKey(routeID))
+                                {
+                                    int chunks = chunksPerRoute.get(routeID);
+                                    chunks++;
+                                    chunksPerRoute.put(routeID, chunks);
+                                }
+                                else
+                                {
+                                    appropriateHandler.addStats(new ActivityStats(true,routeID));
+                                    chunksPerRoute.remove(routeID);
+                                    System.err.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
+                                }
                             }
-                            else
-                            {
-                                appropriateHandler.addStats(new ActivityStats(true,routeID));
-                                chunksPerRoute.remove(routeID);
-                                System.err.println("WorkerHandler: All chunks for route " + routeID + " have been processed");
-                            }
+
 
                         }
                     } else {

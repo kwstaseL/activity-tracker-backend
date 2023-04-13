@@ -90,8 +90,11 @@ public class WorkDispatcher implements Runnable
                 }
             }
         }
-        routeStatus.put(routeID, true);
-        System.err.println("Finished chunking up route:" + routeID + ". Total chunks: " + chunks);
+        synchronized (routeStatus)
+        {
+            routeStatus.put(routeID, true);
+            System.err.println("Finished chunking up route:" + routeID + ". Total chunks: " + chunks);
+        }
     }
 
 }
