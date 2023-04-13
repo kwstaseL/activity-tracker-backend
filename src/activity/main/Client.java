@@ -49,29 +49,24 @@ public class Client
 
     public void listenForMessages()
     {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
+        new Thread(() -> {
+            while (!connection.isClosed())
             {
-                while (!connection.isClosed())
+                try
                 {
-                    try
+                    Object receivedObject = in.readObject();
+                    if (receivedObject instanceof File receivedFile)
                     {
-                        Object receivedObject = in.readObject();
-                        if (receivedObject instanceof File receivedFile)
-                        {
-                            System.out.println("Received file: " + receivedFile.getName());
-                        }
+                        System.out.println("Received file: " + receivedFile.getName());
                     }
-                    catch (Exception e)
-                    {
-                        System.out.println("Could not receive object");
-                        shutdown();
-                        System.out.println("Error: " + e.getMessage());
-                    }
-
                 }
+                catch (Exception e)
+                {
+                    System.out.println("Could not receive object");
+                    shutdown();
+                    System.out.println("Error: " + e.getMessage());
+                }
+
             }
         }).start();
 
@@ -125,6 +120,8 @@ public class Client
         File file4 = new File("./gpxs/route4.gpx");
         File file5 = new File("./gpxs/route5.gpx");
         File file6 = new File("./gpxs/route6.gpx");
+        File segment1 = new File("./gpxs/segment1.gpx");
+        File segment2 = new File("./gpxs/segment2.gpx");
 
         Client client = new Client(file);
         Client client2 = new Client(file2);
@@ -132,60 +129,23 @@ public class Client
         Client client4 = new Client(file4);
         Client client5 = new Client(file5);
         Client client6 = new Client(file6);
+        Client client7 = new Client(segment1);
+        Client client8 = new Client(segment2);
 
-        Thread c1 = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                client.sendFile();
-            }
+        Thread c1 = new Thread(client::sendFile);
 
-        });
+        Thread c2 = new Thread(client2::sendFile);
 
-        Thread c2 = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                client2.sendFile();
-            }
+        Thread c3 = new Thread(client3::sendFile);
 
-        });
+        Thread c4 = new Thread(client4::sendFile);
 
-        Thread c3 = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                client3.sendFile();
-            }
+        Thread c5 = new Thread(client5::sendFile);
 
-        });
+        Thread c6 = new Thread(client6::sendFile);
 
-        Thread c4 = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                client4.sendFile();
-            }
-
-        });
-
-        Thread c5 = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                client5.sendFile();
-            }
-
-        });
-
-        Thread c6 = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                client6.sendFile();
-            }
-
-        });
+        Thread c7 = new Thread(client7::sendFile);
+        Thread c8 = new Thread(client8::sendFile);
 
         c1.start();
         c2.start();
@@ -193,6 +153,9 @@ public class Client
         c4.start();
         c5.start();
         c6.start();
+        c7.start();
+        c8.start();
+
 
         client.listenForMessages();
         client2.listenForMessages();
@@ -200,6 +163,9 @@ public class Client
         client4.listenForMessages();
         client5.listenForMessages();
         client6.listenForMessages();
+        client7.listenForMessages();
+        client8.listenForMessages();
+
 
     }
 }
