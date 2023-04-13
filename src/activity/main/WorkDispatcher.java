@@ -90,15 +90,14 @@ public class WorkDispatcher implements Runnable
                 // add the worker to the end of the queue
                 workers.add(worker);
 
-                if (i != waypoints.size() - 1)
-                {
+                if (i != waypoints.size() - 1) {
+
                     // clear the chunk for the next set of waypoints
                     waypointChunk = new ArrayList<>();
                     // adding the last waypoint from the previous chunk, so we do not miss the connection between i and i+1
                     waypointChunk.add(waypoints.get(i));
                 }
-            } else if (i == waypoints.size() - 1)
-            {
+            } else if (i == waypoints.size() - 1) {
                 WorkerHandler worker = workers.poll();
                 assert worker != null;
 
@@ -126,6 +125,14 @@ public class WorkDispatcher implements Runnable
                 worker.processJob(chunk);
                 // add the worker to the end of the queue
                 workers.add(worker);
+
+                if (i != waypoints.size() - 1) {
+
+                    // clear the chunk for the next set of waypoints
+                    waypointChunk = new ArrayList<>();
+                    // adding the last waypoint from the previous chunk, so we do not miss the connection between i and i+1
+                    waypointChunk.add(waypoints.get(i));
+                }
             }
 
         }
