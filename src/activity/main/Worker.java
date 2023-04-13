@@ -71,6 +71,7 @@ public class Worker
                 new Thread(() ->
                 {
                         handleMapping(route);
+
                 }).start();
 
             } catch (IOException | ClassNotFoundException e)

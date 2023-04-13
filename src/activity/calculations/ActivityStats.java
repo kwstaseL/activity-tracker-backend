@@ -28,8 +28,8 @@ public class ActivityStats implements Serializable
         this(0, 0, 0, 0,-1);
     }
 
-    public ActivityStats(boolean flag) {
-        this(0, 0, 0, 0, -1);
+    public ActivityStats(boolean flag, int routeID) {
+        this(0, 0, 0, 0, routeID);
         this.flag = flag;
     }
 

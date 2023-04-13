@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 
 
 // This class will handle the client connection
@@ -32,7 +29,7 @@ public class ClientHandler implements Runnable
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
     private Queue<ActivityStats> statsQueue;
-    private ArrayList<ActivityStats> statsArrayList;
+    private HashMap<Integer,Integer> statsArrayList;
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
@@ -45,7 +42,7 @@ public class ClientHandler implements Runnable
             this.routes = routes;
             this.clientID = UUID.randomUUID().toString();
             this.statsQueue = new LinkedList<>();
-            this.statsArrayList = new ArrayList<>();
+            this.statsArrayList = new HashMap();
         }
         catch (IOException e)
         {
@@ -97,7 +94,23 @@ public class ClientHandler implements Runnable
                     }
                 }
                 ActivityStats stats = statsQueue.poll();
-                statsArrayList.add(stats);
+                synchronized (statsArrayList)
+                {
+                    if (stats.isFlag())
+                    {
+                        System.err.println("ClientHandler: " + clientID + " received the final chunk");
+                        System.err.println("The number of chunks received for route " + stats.getRouteID() + " is " + statsArrayList.get(stats.getRouteID()));
+                    }
+                    else
+                    {
+                        // For each route id increment the number of times it has been received
+                        if (statsArrayList.containsKey(stats.getRouteID())) {
+                            statsArrayList.put(stats.getRouteID(), statsArrayList.get(stats.getRouteID()) + 1);
+                        } else {
+                            statsArrayList.put(stats.getRouteID(), 1);
+                        }
+                    }
+                }
             }
         }
     }
@@ -107,17 +120,10 @@ public class ClientHandler implements Runnable
     {
         synchronized (statsQueue)
         {
-            if (stats.isFlag()) {
-                assert statsQueue.peek() != null;
-                System.err.print("Received the final chunk for route with route id: " + statsArrayList.get(0).getRouteID());
-                System.err.println(" Current list size: " + statsArrayList.size());
-            } else {
-                statsQueue.add(stats);
-                statsQueue.notify();
-            }
+            statsQueue.add(stats);
+            statsQueue.notify();
         }
     }
-
     private void readFromClient()
     {
         try

@@ -12,15 +12,17 @@ import java.util.Queue;
 public class Master
 {
     // This will be the port that the client will connect to
-    public static final int CLIENT_PORT = 4321;
+    public static final int CLIENT_PORT = 4445;
     // This will be the port that the worker will connect to
-    public static final int WORKER_PORT = 4322;
+    public static final int WORKER_PORT = 4444;
     private ServerSocket clientSocket;
     private ServerSocket workerSocket;
     private Queue<WorkerHandler> workerHandlers;
     private Queue<ClientHandler> clientHandlers;
     private Queue<Route> routes;
     private HashMap<String,ClientHandler> clientMap;
+    private HashMap<Integer,Boolean> routeStatus;
+
     private int numOfWorkers;
 
     public Master(int numOfWorkers)
@@ -34,6 +36,7 @@ public class Master
             clientHandlers = new LinkedList<>();
             clientMap = new HashMap<>();
             routes = new LinkedList<>();
+            routeStatus = new HashMap<>();
         }
         catch (Exception e)
         {
@@ -111,7 +114,7 @@ public class Master
                         Socket worker = workerSocket.accept();
                         System.out.println("MASTER: Worker connected");
                         // Create a new thread to handle the worker
-                        WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
+                        WorkerHandler workerHandler = new WorkerHandler(worker,clientMap,routeStatus);
                         workerHandlers.add(workerHandler);
                         Thread workerThread = new Thread(workerHandler);
                         workerThread.start();
@@ -139,7 +142,7 @@ public class Master
             @Override
             public void run()
             {
-                WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);
+                WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes,routeStatus);
                 Thread workDispatcherThread = new Thread(workDispatcher);
                 workDispatcherThread.start();
             }

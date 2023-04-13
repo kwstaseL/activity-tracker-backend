@@ -9,6 +9,7 @@ public class Route implements Serializable
     private String username;
     private int routeID;
     private String clientID;
+    private boolean moreFragments = true;
     private static int idGenerator = 0;
 
     public Route(ArrayList<Waypoint> waypoints, String username)
