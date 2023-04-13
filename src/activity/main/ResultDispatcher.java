@@ -6,14 +6,14 @@ import activity.mapreduce.Pair;
 import java.util.HashMap;
 import java.util.Queue;
 
-public class IntermediateResultHandler
+public class ResultDispatcher
 {
     private HashMap<String,ClientHandler> clients;
     private HashMap<Integer,Boolean> routeStatus;
     private static HashMap<Integer,Integer> chunksPerRoute;
     private Queue<Pair<String, ActivityStats>> intermediateResults;
 
-    public IntermediateResultHandler(HashMap<String, ClientHandler> clients, HashMap<Integer, Boolean> routeStatus,
+    public ResultDispatcher(HashMap<String, ClientHandler> clients, HashMap<Integer, Boolean> routeStatus,
                                      Queue<Pair<String, ActivityStats>> intermediateResults , HashMap<Integer,Integer> chunksPerRoute)
     {
         this.clients = clients;

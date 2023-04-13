@@ -29,20 +29,22 @@ public class ClientHandler implements Runnable
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
     private Queue<ActivityStats> statsQueue;
-    private HashMap<Integer,Integer> statsArrayList;
+    private HashMap<Integer,Integer> routeidToChunkCount;
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
         this.clientSocket = clientSocket;
         try
         {
+            this.clientID = UUID.randomUUID().toString();
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
+
             this.parser = new GPXParser();
+
             this.routes = routes;
-            this.clientID = UUID.randomUUID().toString();
             this.statsQueue = new LinkedList<>();
-            this.statsArrayList = new HashMap();
+            this.routeidToChunkCount = new HashMap();
         }
         catch (IOException e)
         {
@@ -94,21 +96,19 @@ public class ClientHandler implements Runnable
                     }
                 }
                 ActivityStats stats = statsQueue.poll();
-                synchronized (statsArrayList)
+
+                if (stats.isFlag())
                 {
-                    if (stats.isFlag())
-                    {
-                        System.err.println("ClientHandler: " + clientID + " received the final chunk");
-                        System.err.println("The number of chunks received for route " + stats.getRouteID() + " is " + statsArrayList.get(stats.getRouteID()));
-                    }
-                    else
-                    {
-                        // For each route id increment the number of times it has been received
-                        if (statsArrayList.containsKey(stats.getRouteID())) {
-                            statsArrayList.put(stats.getRouteID(), statsArrayList.get(stats.getRouteID()) + 1);
-                        } else {
-                            statsArrayList.put(stats.getRouteID(), 1);
-                        }
+                    System.err.println("ClientHandler: " + clientID + " received the final chunk");
+                    System.err.println("The number of chunks received for route " + stats.getRouteID() + " is " + routeidToChunkCount.get(stats.getRouteID()));
+                }
+                else
+                {
+                    // For each route id increment the number of times it has been received
+                    if (routeidToChunkCount.containsKey(stats.getRouteID())) {
+                        routeidToChunkCount.put(stats.getRouteID(), routeidToChunkCount.get(stats.getRouteID()) + 1);
+                    } else {
+                        routeidToChunkCount.put(stats.getRouteID(), 1);
                     }
                 }
             }

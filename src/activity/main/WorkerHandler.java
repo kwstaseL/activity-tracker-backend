@@ -24,7 +24,7 @@ public class WorkerHandler implements Runnable
     private final Socket workerSocket;
     private final Object lock = new Object();
     private HashMap<String,ClientHandler> clients;
-    private IntermediateResultHandler intermediateResultHandler;
+    private ResultDispatcher resultDispatcher;
     private HashMap<Integer,Boolean> routeStatus;
     private Queue<Pair<String,ActivityStats>> intermediateResults;
 
@@ -43,7 +43,7 @@ public class WorkerHandler implements Runnable
             this.routeStatus = routeStatus;
             this.chunksPerRoute = new HashMap<>();
             this.intermediateResults = new LinkedList<>();
-            this.intermediateResultHandler = new IntermediateResultHandler(clients,routeStatus,intermediateResults,chunksPerRoute);
+            this.resultDispatcher = new ResultDispatcher(clients,routeStatus,intermediateResults,chunksPerRoute);
         }
         catch (IOException e)
         {
@@ -69,7 +69,7 @@ public class WorkerHandler implements Runnable
             @Override
             public void run()
             {
-                intermediateResultHandler.handleResults();
+                resultDispatcher.handleResults();
             }
         });
 
