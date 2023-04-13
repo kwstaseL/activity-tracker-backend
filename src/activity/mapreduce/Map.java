@@ -11,12 +11,8 @@ import activity.parser.Chunk;
 
 public class Map
 {
-    private ActivityCalculator calculator;
-    public Map()
-    {
-        calculator = new ActivityCalculator();
-    }
-    public synchronized Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
+
+    public synchronized static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
         Route route = chunk.getRoute();
         ArrayList<Waypoint> waypoints = route.waypoints();
@@ -32,7 +28,7 @@ public class Map
         for (int i = 1; i < waypoints.size(); ++i)
         {
             Waypoint w2 = waypoints.get(i);
-            stats = calculator.calculateStats(w1, w2);
+            stats = ActivityCalculator.calculateStats(w1, w2);
             totalDistance += stats.getDistance();
             averageSpeed += stats.getSpeed();
             totalTime += stats.getTime();

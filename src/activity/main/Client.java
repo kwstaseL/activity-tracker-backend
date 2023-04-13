@@ -60,10 +60,8 @@ public class Client
                 try
                 {
                     Object receivedObject = in.readObject();
-                    if (receivedObject instanceof File receivedFile)
-                    {
-                        System.out.println("Received file: " + receivedFile.getName());
-                    }
+                    System.out.println(receivedObject);
+
                 }
                 catch (Exception e)
                 {

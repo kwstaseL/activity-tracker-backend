@@ -10,15 +10,10 @@ public class ActivityStats implements Serializable
     private double speed;
     private double elevation;
     private double time;
-    private final int routeID;
-
-    // This flag is used as a communication protocol between the master and the worker
-    // to alert him that this is the last chunk of data for the current routeID
-    // TODO: Remove flag completely
-    private boolean flag = false;
+    private final int routeID;  // TODO: Check for uses
 
 
-    public ActivityStats(double distance, double speed, double elevation, double time,int routeID)
+    public ActivityStats(double distance, double speed, double elevation, double time, int routeID)
     {
         this.distance = distance;
         this.speed = speed;
@@ -33,16 +28,6 @@ public class ActivityStats implements Serializable
         this(0, 0, 0, 0, -1);
     }
 
-
-    // This constructor is used to create the last chunk of data for the current routeID
-    public ActivityStats(boolean flag, int routeID) {
-        this(0, 0, 0, 0, routeID);
-        this.flag = flag;
-    }
-
-    public boolean isFlag() {
-        return flag;
-    }
 
     public void setDistance(double distance)
     {
@@ -89,6 +74,7 @@ public class ActivityStats implements Serializable
         return routeID;
     }
 
+    @Override
     public String toString()
     {
         return String.format("Total Distance: %.2f, Average Speed: %.2f, Total Elevation: %.2f and Total Time: %.2f",

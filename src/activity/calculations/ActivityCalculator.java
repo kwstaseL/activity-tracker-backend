@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class ActivityCalculator
 {
     // Calculating the distance between two waypoints
-    private double calculateDistance(Waypoint w1, Waypoint w2)
+    private static double calculateDistance(Waypoint w1, Waypoint w2)
     {
         // Convert degrees to radians
         double lat1 = w1.getLatitude();
@@ -46,7 +46,7 @@ public class ActivityCalculator
 
 
     // Calculating the time between two waypoints
-    private double calculateTime(Waypoint w1, Waypoint w2)
+    private static double calculateTime(Waypoint w1, Waypoint w2)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
         LocalDateTime t1 = LocalDateTime.parse(w1.getTimestamp(), formatter);
@@ -57,13 +57,13 @@ public class ActivityCalculator
     }
 
     // Calculating the speed between two waypoints
-    private double calculateSpeed(double distance, double time)
+    private static double calculateSpeed(double distance, double time)
     {
         return distance / time;
     }
 
     // Calculating the elevation between two waypoints
-    private double calculateElevation(Waypoint w1, Waypoint w2)
+    private static double calculateElevation(Waypoint w1, Waypoint w2)
     {
         // if w2 is above the current highest elevation recorded, we return w2.getElevation - currentHighestElevation
         if (w2.getElevation() > w1.getElevation())
@@ -76,7 +76,7 @@ public class ActivityCalculator
     }
     // This is the method that will be called during the mapping phase
     // to calculate the stats for a chunk of data
-    public ActivityStats calculateStats(Waypoint w1, Waypoint w2)
+    public static ActivityStats calculateStats(Waypoint w1, Waypoint w2)
     {
         ActivityStats stats = new ActivityStats();
         double distance = calculateDistance(w1, w2);

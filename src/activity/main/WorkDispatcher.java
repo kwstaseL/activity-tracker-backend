@@ -55,12 +55,13 @@ public class WorkDispatcher implements Runnable
         // n will represent the chunk size
         int n;
 
-        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size
+        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2
         if (waypoints.size() >= workers.size()) {
             n = (int) Math.ceil(waypoints.size() / (workers.size() * 2.0));
         } else {
-            // making the assumption that if workers are more than the waypoints provided, n will be equal to workers.size / waypoints.size
-            n = workers.size() / waypoints.size();
+            // making the assumption that if workers are more than the waypoints provided, n will be
+            // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
+            n = 1;
         }
 
         // expectedChunks: determines how many chunks of waypoints the route will be split into

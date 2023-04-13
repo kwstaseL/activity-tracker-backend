@@ -1,7 +1,9 @@
 package activity.main;
 
+import activity.calculations.ActivityCalculator;
 import activity.calculations.ActivityStats;
 import activity.mapreduce.Pair;
+import activity.mapreduce.Reduce;
 import activity.parser.Chunk;
 import activity.parser.GPXParser;
 import activity.parser.Route;
@@ -28,6 +30,7 @@ public class ClientHandler implements Runnable
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
     private Queue<Pair<Chunk, ActivityStats>> statsQueue;
+    private final Object writeLock = new Object();
 
     // routeHashmap: Matches the route IDs with a list of the chunks they contain
     private static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
@@ -103,9 +106,32 @@ public class ClientHandler implements Runnable
                     if (routeHashmap.containsKey(routeID))
                     {
                         ArrayList<Pair<Chunk, ActivityStats>> activityList = routeHashmap.get(routeID);
-                        if (activityList.size() == chunk.getTotalChunks()) {
-                            System.err.println("Found an extra chunk for route ID: " + routeID);
-                        } else {
+                        if (activityList.size() >= chunk.getTotalChunks())
+                        {
+                            throw new RuntimeException("Found more chunks than expected!");
+                        }
+                        else if (activityList.size() == chunk.getTotalChunks() -1)
+                        {
+                            activityList.add(stats);
+                            routeHashmap.put(routeID, activityList);
+
+                            // TODO: Cleanup
+
+                            // fetching a list of all the stats we gathered for this specific route
+                            ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
+                            for (Pair<Chunk, ActivityStats> pair : activityList) {
+                                statsArrayList.add(pair.getValue());
+                            }
+
+
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    handleReducing(new Pair<Integer, ArrayList<ActivityStats>>(routeID, statsArrayList));
+                                }
+                            }).start();
+                        } else
+                        {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
                         }
@@ -118,6 +144,30 @@ public class ClientHandler implements Runnable
                 }
 
             }
+        }
+    }
+
+    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediate_results)
+    {
+        System.out.println("ClientHandler: " + "Route: " + intermediate_results.getKey() + "is about to be reduced with " + intermediate_results.getValue().size() + " chunks");
+
+        // TODO: Cleanup?
+        // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
+        ActivityStats finalResults = Reduce.reduce(intermediate_results);
+        try
+        {
+            // Send the result back to the worker-handler
+            synchronized (writeLock)
+            {
+                out.writeObject(finalResults);
+                out.flush();
+            }
+
+
+        } catch (IOException e)
+        {
+            System.out.println("Could not send object to the client");
+            throw new RuntimeException(e);
         }
     }
 
