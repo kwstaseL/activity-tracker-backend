@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class GPXParser
 {
-    public Route parse(File file)
+    public static Route parse(File file)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Route route = null;

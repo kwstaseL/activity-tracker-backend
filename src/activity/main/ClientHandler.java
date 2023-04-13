@@ -26,7 +26,6 @@ public class ClientHandler implements Runnable
     // The unique id of the client, generated through a static id generator
     private int clientID;
     private static int clientIDGenerator = 0;
-    GPXParser parser;
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
     private Queue<ActivityStats> statsQueue;
@@ -40,8 +39,6 @@ public class ClientHandler implements Runnable
             this.clientID = clientIDGenerator++;
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
-
-            this.parser = new GPXParser();
 
             this.routes = routes;
             this.statsQueue = new LinkedList<>();
@@ -143,7 +140,7 @@ public class ClientHandler implements Runnable
                     System.out.println("ClientHandler: Received file from client  " + receivedFile.getName());
                     // Dispatching the file to the workers
                     // Parse the file
-                    Route route = parser.parse(receivedFile);
+                    Route route = GPXParser.parse(receivedFile);
                     route.setClientID(clientID);
                     // Add the route to the queue
                     synchronized (routes)
