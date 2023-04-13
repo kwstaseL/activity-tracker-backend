@@ -2,6 +2,7 @@ package activity.main;
 
 import activity.calculations.ActivityStats;
 import activity.mapreduce.Pair;
+import activity.parser.Chunk;
 import activity.parser.Route;
 import activity.mapreduce.Map;
 
@@ -63,14 +64,14 @@ public class Worker
         {
             try
             {
-                System.out.println("WORKER: Waiting for job from master");
+                //System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
-                System.out.println("WORKER: Received job from master");
-                Route route = (Route) receivedObject;
+                //System.out.println("WORKER: Received job from master");
+                Chunk chunk = (Chunk) receivedObject;
                 
                 new Thread(() ->
                 {
-                        handleMapping(route);
+                        handleMapping(chunk);
 
                 }).start();
 
@@ -83,10 +84,13 @@ public class Worker
         }
     }
 
-    private void handleMapping(Route route)
+    private void handleMapping(Chunk chunk)
     {
-        System.out.println("WORKER: Received route from master " + route);
-        Pair<Integer, ActivityStats> intermediate_result = mapper.map(route.getClientID(), route);
+        System.out.println("WORKER: " + "Route: " + chunk.getRoute().getRouteID() + " Received chunk " + chunk.getChunkIndex() + " of " + chunk.getTotalChunks());
+
+        // TODO: Cleanup?
+        // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
+        Pair<Integer, Pair<Chunk, ActivityStats>> intermediate_result = mapper.map(chunk.getRoute().getClientID(), chunk);
         try
         {
             // Send the result back to the worker-handler

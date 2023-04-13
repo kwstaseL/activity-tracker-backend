@@ -82,10 +82,9 @@ public class WorkDispatcher implements Runnable
                 ++chunkIndex;
 
                 // TODO: Make WorkerHandlers process Chunks instead of Routes
-                worker.processJob(chunkedRoute);
+                worker.processJob(chunk);
                 // add the worker to the end of the queue
                 workers.add(worker);
-
 
                 if (i != waypoints.size() - 1) {
 
@@ -95,11 +94,6 @@ public class WorkDispatcher implements Runnable
                     waypointChunk.add(waypoints.get(i));
                 }
             }
-        }
-        synchronized (routeStatus)
-        {
-            routeStatus.put(routeID, true);
-            System.err.println("Finished chunking up route:" + routeID + ". Total chunks: " + expectedChunks);
         }
     }
 

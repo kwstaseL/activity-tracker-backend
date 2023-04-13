@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 import activity.calculations.ActivityCalculator;
 import activity.calculations.ActivityStats;
-import activity.parser.Waypoint;
 
+import activity.parser.Waypoint;
 import activity.parser.Route;
+import activity.parser.Chunk;
 
 public class Map
 {
@@ -15,8 +16,9 @@ public class Map
     {
         calculator = new ActivityCalculator();
     }
-    public synchronized Pair<Integer, ActivityStats> map(int clientID, Route route)
+    public synchronized Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
+        Route route = chunk.getRoute();
         ArrayList<Waypoint> waypoints = route.waypoints();
 
         Waypoint w1 = waypoints.get(0);
@@ -41,7 +43,8 @@ public class Map
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
         ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime,route.getRouteID());
 
-        return new Pair<>(clientID, finalStats);
+        Pair<Chunk, ActivityStats> statsPair = new Pair<>(chunk, finalStats);
+        return new Pair<Integer, Pair<Chunk, ActivityStats>>(clientID, statsPair);
     }
 
 }

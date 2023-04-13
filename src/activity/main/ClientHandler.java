@@ -1,6 +1,8 @@
 package activity.main;
 
 import activity.calculations.ActivityStats;
+import activity.mapreduce.Pair;
+import activity.parser.Chunk;
 import activity.parser.GPXParser;
 import activity.parser.Route;
 
@@ -9,10 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 
 // This class will handle the client connection
 public class ClientHandler implements Runnable
@@ -28,10 +27,10 @@ public class ClientHandler implements Runnable
     private static int clientIDGenerator = 0;
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
-    private Queue<ActivityStats> statsQueue;
+    private Queue<Pair<Chunk, ActivityStats>> statsQueue;
 
-    // routeIDToChunkCount: Matches route ids to the # of chunks they're comprised of
-    private HashMap<Integer,Integer> routeIDToChunkCount;
+    // routeHashmap: Matches the route IDs with a list of the chunks they contain
+    private static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
@@ -44,7 +43,6 @@ public class ClientHandler implements Runnable
 
             this.routes = routes;
             this.statsQueue = new LinkedList<>();
-            this.routeIDToChunkCount = new HashMap();
         }
         catch (IOException e)
         {
@@ -96,24 +94,26 @@ public class ClientHandler implements Runnable
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
-                ActivityStats stats = statsQueue.poll();
-                synchronized (routeIDToChunkCount)
+                Pair<Chunk, ActivityStats> stats = statsQueue.poll();
+                Chunk chunk = stats.getKey();
+                int routeID = stats.getKey().getRoute().getRouteID();
+
+                synchronized (routeHashmap)
                 {
-                    if (stats.isFlag())
+                    if (routeHashmap.containsKey(routeID))
                     {
-                        System.err.println("ClientHandler: " + clientID + " received the final chunk");
-                        System.err.println("The number of chunks received for route " + stats.getRouteID() + " is " + routeIDToChunkCount.get(stats.getRouteID()));
-                    }
-                    else
-                    {   // TODO: Remove this after testing
-                        // For each route id increment the number of times it has been received
-                        if (routeIDToChunkCount.containsKey(stats.getRouteID()))
-                        {
-                            routeIDToChunkCount.put(stats.getRouteID(), routeIDToChunkCount.get(stats.getRouteID()) + 1);
-                        } else
-                        {
-                            routeIDToChunkCount.put(stats.getRouteID(), 1);
+                        ArrayList<Pair<Chunk, ActivityStats>> activityList = routeHashmap.get(routeID);
+                        if (activityList.size() == chunk.getTotalChunks()) {
+                            System.err.println("All the chunks appear to have been processed for route ID: " + routeID);
+                        } else {
+                            activityList.add(stats);
+                            routeHashmap.put(routeID, activityList);
                         }
+                    } else
+                    {
+                        ArrayList<Pair<Chunk, ActivityStats>> activityList = new ArrayList<>();
+                        activityList.add(stats);
+                        routeHashmap.put(routeID, activityList);
                     }
                 }
 
@@ -122,7 +122,7 @@ public class ClientHandler implements Runnable
     }
 
     // addStats: Adds the stats to the queue
-    public void addStats(ActivityStats stats)
+    public void addStats(Pair<Chunk, ActivityStats> stats)
     {
         synchronized (statsQueue)
         {

@@ -2,6 +2,7 @@ package activity.main;
 
 import activity.calculations.ActivityStats;
 import activity.mapreduce.Pair;
+import activity.parser.Chunk;
 import activity.parser.Route;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class WorkerHandler implements Runnable
     private HashMap<Integer,ClientHandler> clients;
     private ResultDispatcher resultDispatcher;
     private HashMap<Integer,Boolean> routeStatus;
-    private Queue<Pair<String,ActivityStats>> intermediateResults;
+    private Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults;
 
     private static HashMap<Integer,Integer> chunksPerRoute;
 
@@ -84,9 +85,9 @@ public class WorkerHandler implements Runnable
             while (!workerSocket.isClosed())
             {
                 // Receive message from worker
-                System.out.println("WorkerHandler: Waiting for message from worker");
+                //System.out.println("WorkerHandler: Waiting for message from worker");
                 Object receivedObject = in.readObject();
-                Pair<String, ActivityStats> stats = (Pair<String, ActivityStats>) receivedObject;
+                Pair<Integer, Pair<Chunk, ActivityStats>> stats = (Pair<Integer, Pair<Chunk, ActivityStats>>) receivedObject;
 
 
                 synchronized (intermediateResults)
@@ -104,22 +105,11 @@ public class WorkerHandler implements Runnable
     }
 
 
-    public void processJob(Route route)
+    public void processJob(Chunk chunk)
     {
         try
         {
-            synchronized (chunksPerRoute)
-            {
-                Integer routeID = route.getRouteID();
-                if (chunksPerRoute.containsKey(routeID)) {
-                    int count = chunksPerRoute.get(routeID);
-                    count++;
-                    chunksPerRoute.put(routeID, count);
-                } else {
-                    chunksPerRoute.put(routeID, 1);
-                }
-            }
-            out.writeObject(route);
+            out.writeObject(chunk);
             out.flush();
         }
         catch (IOException e)

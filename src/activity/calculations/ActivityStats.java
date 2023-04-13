@@ -14,6 +14,7 @@ public class ActivityStats implements Serializable
 
     // This flag is used as a communication protocol between the master and the worker
     // to alert him that this is the last chunk of data for the current routeID
+    // TODO: Remove flag completely
     private boolean flag = false;
 
 
