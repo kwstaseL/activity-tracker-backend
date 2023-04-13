@@ -29,6 +29,8 @@ public class ClientHandler implements Runnable
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
     private Queue<ActivityStats> statsQueue;
+
+    // routeIDToChunkCount: Matches route ids to the # of chunks they're comprised of
     private HashMap<Integer,Integer> routeIDToChunkCount;
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
@@ -65,7 +67,8 @@ public class ClientHandler implements Runnable
 
         });
 
-        Thread readFromWorkerHandler = new Thread(new Runnable() {
+        Thread readFromWorkerHandler = new Thread(new Runnable()
+        {
             @Override
             public void run() {
                 readFromWorkerHandler();
@@ -104,9 +107,11 @@ public class ClientHandler implements Runnable
                     else
                     {   // TODO: Remove this after testing
                         // For each route id increment the number of times it has been received
-                        if (routeIDToChunkCount.containsKey(stats.getRouteID())) {
+                        if (routeIDToChunkCount.containsKey(stats.getRouteID()))
+                        {
                             routeIDToChunkCount.put(stats.getRouteID(), routeIDToChunkCount.get(stats.getRouteID()) + 1);
-                        } else {
+                        } else
+                        {
                             routeIDToChunkCount.put(stats.getRouteID(), 1);
                         }
                     }
@@ -184,7 +189,7 @@ public class ClientHandler implements Runnable
 
             System.out.println("Client disconnected");
         }
-        catch  (IOException e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }

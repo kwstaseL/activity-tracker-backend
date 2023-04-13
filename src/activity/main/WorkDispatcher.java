@@ -54,15 +54,16 @@ public class WorkDispatcher implements Runnable
         // n will represent the chunk size
         int n;
 
-        // if there's more waypoints than workers provided, make n equal to the size of waypoints / the size of workers
+        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size
         if (waypoints.size() >= workers.size()) {
             n = waypoints.size() / workers.size();
         } else {
-            // making the assumption that if workers are more than the waypoints provided
+            // making the assumption that if workers are more than the waypoints provided, n will be equal to workers.size / waypoints.size
             n = workers.size() / waypoints.size();
         }
 
-        int chunks = 0;
+        // expectedChunks: determines how many chunks of waypoints the route will be split into
+        int expectedChunks = (int) Math.ceil(waypoints.size() / (double) n);
         ArrayList<Waypoint> chunk = new ArrayList<>();
 
 
@@ -79,7 +80,6 @@ public class WorkDispatcher implements Runnable
                 // add the worker to the end of the queue
                 workers.add(worker);
 
-                chunks++;
 
                 if (i != waypoints.size() - 1) {
 
@@ -93,7 +93,7 @@ public class WorkDispatcher implements Runnable
         synchronized (routeStatus)
         {
             routeStatus.put(routeID, true);
-            System.err.println("Finished chunking up route:" + routeID + ". Total chunks: " + chunks);
+            System.err.println("Finished chunking up route:" + routeID + ". Total chunks: " + expectedChunks);
         }
     }
 

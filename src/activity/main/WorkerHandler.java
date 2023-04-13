@@ -22,7 +22,6 @@ public class WorkerHandler implements Runnable
 
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
-    private final Object lock = new Object();
     private HashMap<Integer,ClientHandler> clients;
     private ResultDispatcher resultDispatcher;
     private HashMap<Integer,Boolean> routeStatus;

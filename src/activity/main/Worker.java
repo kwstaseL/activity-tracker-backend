@@ -28,7 +28,6 @@ public class Worker
     {
         try
         {
-            workerID = idGenerator++;
             connection = new Socket("localhost", Master.WORKER_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
