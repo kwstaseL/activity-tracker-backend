@@ -1,5 +1,6 @@
 package activity.main;
 
+import activity.parser.Chunk;
 import activity.parser.Waypoint;
 import activity.parser.Route;
 
@@ -64,18 +65,23 @@ public class WorkDispatcher implements Runnable
 
         // expectedChunks: determines how many chunks of waypoints the route will be split into
         int expectedChunks = (int) Math.ceil(waypoints.size() / (double) n);
-        ArrayList<Waypoint> chunk = new ArrayList<>();
 
+        ArrayList<Waypoint> waypointChunk = new ArrayList<>();
+        int chunkIndex = 1;
 
         for (int i = 0; i < waypoints.size(); i++)
         {
-            chunk.add(waypoints.get(i));
+            waypointChunk.add(waypoints.get(i));
 
-            if (chunk.size() == n || i == waypoints.size() - 1)
+            if (waypointChunk.size() == n || i == waypoints.size() - 1)
             {
                 WorkerHandler worker = workers.poll();
                 assert worker != null;
-                Route chunkedRoute = new Route(chunk, routeID, clientID);
+                Route chunkedRoute = new Route(waypointChunk, routeID, clientID);
+                Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
+                ++chunkIndex;
+
+                // TODO: Make WorkerHandlers process Chunks instead of Routes
                 worker.processJob(chunkedRoute);
                 // add the worker to the end of the queue
                 workers.add(worker);
@@ -84,9 +90,9 @@ public class WorkDispatcher implements Runnable
                 if (i != waypoints.size() - 1) {
 
                     // clear the chunk for the next set of waypoints
-                    chunk = new ArrayList<>();
+                    waypointChunk = new ArrayList<>();
                     // adding the last waypoint from the previous chunk, so we do not miss the connection between i and i+1
-                    chunk.add(waypoints.get(i));
+                    waypointChunk.add(waypoints.get(i));
                 }
             }
         }
