@@ -1,7 +1,6 @@
 package activity.mapreduce;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import activity.calculations.ActivityCalculator;
 import activity.calculations.ActivityStats;
@@ -42,9 +41,7 @@ public class Map
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
         ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime,route.getRouteID());
 
-        Pair<Integer, ActivityStats> pair = new Pair<>(clientID, finalStats);
-
-        return pair;
+        return new Pair<>(clientID, finalStats);
     }
 
 }
