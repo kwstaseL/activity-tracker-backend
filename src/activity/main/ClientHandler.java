@@ -19,7 +19,7 @@ public class ClientHandler implements Runnable
 {
 
     // This is the socket that the client is connected to
-    private Socket clientSocket;
+    private final Socket clientSocket;
 
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -35,13 +35,13 @@ public class ClientHandler implements Runnable
     // TODO: Write the 6 functions in regards to user statistics
 
     // totalActivityStats: Includes all the results from all the route calculations
-    private static ArrayList<ActivityStats> totalActivityStats = new ArrayList<>();
+    private final static ArrayList<ActivityStats> totalActivityStats = new ArrayList<>();
 
     // userActivityStats: Links all users to the list of routes recorded by them
-    private static HashMap<String, ArrayList<ActivityStats>> userActivityStats = new HashMap<>();
+    private final static HashMap<String, ArrayList<ActivityStats>> userActivityStats = new HashMap<>();
 
     // routeHashmap: Matches the route IDs with a list of the chunks they contain
-    private static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
+    private final static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
 
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
@@ -67,23 +67,9 @@ public class ClientHandler implements Runnable
     // This is where the client will be handled
     public void run()
     {
-        Thread readFromClient = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                readFromClient();
-            }
+        Thread readFromClient = new Thread(this::readFromClient);
 
-        });
-
-        Thread readFromWorkerHandler = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                readFromWorkerHandler();
-            }
-        });
+        Thread readFromWorkerHandler = new Thread(this::readFromWorkerHandler);
 
         readFromClient.start();
         readFromWorkerHandler.start();
@@ -132,13 +118,8 @@ public class ClientHandler implements Runnable
                                 statsArrayList.add(pair.getValue());
                             }
 
+                            new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
 
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    handleReducing(new Pair<Integer, ArrayList<ActivityStats>>(routeID, statsArrayList), chunk.getRoute().getUser());
-                                }
-                            }).start();
                         } else
                         {
                             activityList.add(stats);
