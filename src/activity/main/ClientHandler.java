@@ -29,20 +29,33 @@ public class ClientHandler implements Runnable
     private static int clientIDGenerator = 0;
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
-    private Queue<Pair<Chunk, ActivityStats>> statsQueue;
-    private final Object writeLock = new Object();
 
-    // TODO: Write the 6 functions in regards to user statistics
+    // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
+    private Queue<Pair<Chunk, ActivityStats>> statsQueue;
 
     // totalActivityStats: Includes all the results from all the route calculations
-    private final static ArrayList<ActivityStats> totalActivityStats = new ArrayList<>();
+    private static ArrayList<ActivityStats> totalActivityStats = new ArrayList<>();     // TODO: Possibly no longer necessary?
 
     // userActivityStats: Links all users to the list of routes recorded by them
-    private final static HashMap<String, ArrayList<ActivityStats>> userActivityStats = new HashMap<>();
+    private static HashMap<String, ArrayList<ActivityStats>> userActivityStats = new HashMap<>();
 
     // routeHashmap: Matches the route IDs with a list of the chunks they contain
-    private final static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
+    private static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
 
+    /* totalDistance/Elevation/ActivityTime per user: A hashmap matching each user (as a String) with the sum of all
+     * their respective stats. Used in order to divide by the number of a user's recorded routes to fetch the average      */
+    private static HashMap<String, Double> totalDistancePerUser = new HashMap<>();
+    private static HashMap<String, Double> totalElevationPerUser = new HashMap<>();
+    private static HashMap<String, Double> totalActivityTimePerUser = new HashMap<>();
+
+    // routesRecorded: A counter for how many routes we have recorded in total in our app.
+    private static int routesRecorded = 0;
+
+    // totalAverageDistance/Elevation/ActivityTime: Likewise, for recording the sum of all the respective stats across all users.
+    private static double totalDistance = 0.0;
+    private static double totalElevation = 0.0;
+    private static double totalActivityTime = 0.0;
+    private final Object writeLock = new Object();
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)
     {
@@ -94,7 +107,7 @@ public class ClientHandler implements Runnable
                 }
                 Pair<Chunk, ActivityStats> stats = statsQueue.poll();
                 Chunk chunk = stats.getKey();
-                int routeID = stats.getKey().getRoute().getRouteID();
+                int routeID = chunk.getRoute().getRouteID();
 
                 synchronized (routeHashmap)
                 {
@@ -109,6 +122,7 @@ public class ClientHandler implements Runnable
                         {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
+                            ++routesRecorded;
 
                             // TODO: Cleanup
 
@@ -137,28 +151,19 @@ public class ClientHandler implements Runnable
         }
     }
 
-    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediate_results, String user)
+    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
     {
-        System.out.println("ClientHandler: " + "Route: " + intermediate_results.getKey() + "is about to be reduced with " + intermediate_results.getValue().size() + " chunks");
+        System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
 
         // TODO: Cleanup?
         // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
-        ActivityStats finalResults = Reduce.reduce(intermediate_results);
+        ActivityStats finalResults = Reduce.reduce(intermediateResults);
         try
         {
             // Send the result back to the worker-handler
             synchronized (writeLock)
             {
-                ArrayList<ActivityStats> userStats;
-                if (userActivityStats.containsKey(user)) {
-                    userStats = userActivityStats.get(user);
-                } else {
-                    userStats = new ArrayList<>();
-                }
-                userStats.add(finalResults);
-                userActivityStats.put(user, userStats);
-                totalActivityStats.add(finalResults);
-
+                updateStats(finalResults, user);
                 out.writeObject(finalResults);
                 out.flush();
             }
@@ -170,6 +175,89 @@ public class ClientHandler implements Runnable
             throw new RuntimeException(e);
         }
     }
+
+    // updateStats: Called when receiving new stats for a specific user. Updates all ClientHandler stats-related data structures and member variables accordingly
+    private void updateStats(ActivityStats stats, String user)
+    {
+        ArrayList<ActivityStats> userStats;
+        double distance = stats.getDistance();
+        double elevation = stats.getElevation();
+        double time = stats.getTime();
+
+        if (userActivityStats.containsKey(user)) {
+            userStats = userActivityStats.get(user);
+            totalDistancePerUser.put(user, totalDistancePerUser.get(user) + distance);
+            totalElevationPerUser.put(user, totalElevationPerUser.get(user) + elevation);
+            totalActivityTimePerUser.put(user, totalActivityTimePerUser.get(user) + time);
+        } else {
+            userStats = new ArrayList<>();
+            totalDistancePerUser.put(user, distance);
+            totalElevationPerUser.put(user, elevation);
+            totalActivityTimePerUser.put(user, time);
+        }
+        userStats.add(stats);
+        userActivityStats.put(user, userStats);
+        totalActivityStats.add(stats);
+        
+        totalDistance += distance;
+        totalElevation += elevation;
+        totalActivityTime += time;
+    }
+
+    // getAverageDistanceForUser: Calculates the average distance for a user by dividing their total distance with the # of routes they have recorded
+    public double getAverageDistanceForUser(String user)
+    {
+        if (!userActivityStats.containsKey(user))
+        {
+            throw new RuntimeException("User does not have any routes registered.");
+        }
+
+        double totalDistanceForUser = totalDistancePerUser.get(user);
+        return totalDistanceForUser / userActivityStats.get(user).size();
+    }
+
+    // getAverageElevationForUser: Similarly to getAverageDistanceForUser
+    public double getAverageElevationForUser(String user)
+    {
+        if (!userActivityStats.containsKey(user))
+        {
+            throw new RuntimeException("User does not have any routes registered.");
+        }
+
+        double totalElevationForUser = totalElevationPerUser.get(user);
+        return totalElevationForUser / userActivityStats.get(user).size();
+    }
+
+    // getAverageActivityTimeForUser: Similarly to getAverageDistanceForUser
+    public double getAverageActivityTimeForUser(String user)
+    {
+        if (!userActivityStats.containsKey(user))
+        {
+            throw new RuntimeException("User does not have any routes registered.");
+        }
+
+        double totalActivityTimeForUser = totalActivityTimePerUser.get(user);
+        return totalActivityTimeForUser / userActivityStats.get(user).size();
+    }
+
+    // getAverageDistance: Calculates the average distance recorded across all routes.
+    public double getAverageDistance()
+    {
+        return totalDistance / routesRecorded;
+    }
+
+    // getAverageElevation: Similarly to getAverageDistance
+    public double getAverageElevation()
+    {
+        return totalElevation / routesRecorded;
+    }
+
+    // getAverageDistance: Similarly to getAverageDistance
+    public double getAverageActivityTime()
+    {
+        return totalActivityTime / routesRecorded;
+    }
+
 
     // addStats: Adds the stats to the queue
     public void addStats(Pair<Chunk, ActivityStats> stats)
