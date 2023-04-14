@@ -1,7 +1,6 @@
 package activity.parser;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 public class Waypoint implements Serializable
 {
@@ -18,7 +17,6 @@ public class Waypoint implements Serializable
         this.elevation = elevation;
         this.timestamp = timestamp;
     }
-
 
     public double getLatitude()
     {

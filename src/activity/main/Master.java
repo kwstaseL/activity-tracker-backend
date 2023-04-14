@@ -15,14 +15,16 @@ public class Master
     public static final int CLIENT_PORT = 4445;
     // This will be the port that the worker will connect to
     public static final int WORKER_PORT = 4444;
+    // This is the socket that the client will connect to
     private ServerSocket clientSocket;
+    // This is the socket that the worker will connect to
     private ServerSocket workerSocket;
-    private Queue<WorkerHandler> workerHandlers;
-    private Queue<ClientHandler> clientHandlers;
+    // Queue containing the routes that will be sent to the workers
     private Queue<Route> routes;
+    // Queue containing all the worker handlers
+    private Queue<WorkerHandler> workerHandlers;
+    // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
-    private HashMap<Integer,Boolean> routeStatus;
-
     private int numOfWorkers;
 
     public Master(int numOfWorkers)
@@ -33,10 +35,8 @@ public class Master
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
             workerHandlers = new LinkedList<>();
-            clientHandlers = new LinkedList<>();
             clientMap = new HashMap<>();
             routes = new LinkedList<>();
-            routeStatus = new HashMap<>();
         }
         catch (Exception e)
         {
@@ -48,104 +48,89 @@ public class Master
     private void start()
     {
         // Thread that will create the workers
-        Thread init = new Thread(new Runnable()
+        Thread init = new Thread(() ->
         {
-            @Override
-            public void run()
+            for (int i = 0; i < numOfWorkers; i++)
             {
-                for (int i = 0; i < numOfWorkers; i++)
-                {
-                    Worker worker = new Worker();
-                    worker.start();
-                }
+                Worker worker = new Worker();
+                worker.start();
             }
         });
         // Thread that will handle the clients
-        Thread handleClient = new Thread(new Runnable()
+        Thread handleClient = new Thread(() ->
         {
-            @Override
-            public void run()
+            while (!clientSocket.isClosed())
             {
-                while (!clientSocket.isClosed())
+                try
                 {
+                    System.out.println("MASTER: Waiting for client connection");
+                    // Accept a client connection
+                    Socket client = clientSocket.accept();
+                    System.out.println("MASTER: Client connected");
+                    // Create a new thread to handle the client
+                    ClientHandler clientHandler = new ClientHandler(client,routes);
+                    int clientID = clientHandler.getClientID();
+                    clientMap.put(clientID,clientHandler);
+                    Thread clientThread = new Thread(clientHandler);
+                    clientThread.start();
+
+                } catch (Exception e)
+                {
+                    System.out.println("Could not accept client connection");
                     try
                     {
-                        System.out.println("MASTER: Waiting for client connection");
-                        // Accept a client connection
-                        Socket client = clientSocket.accept();
-                        System.out.println("MASTER: Client connected");
-                        // Create a new thread to handle the client
-                        ClientHandler clientHandler = new ClientHandler(client,routes);
-                        int clientID = clientHandler.getClientID();
-                        clientMap.put(clientID,clientHandler);
-                        clientHandlers.add(clientHandler);
-                        Thread clientThread = new Thread(clientHandler);
-                        clientThread.start();
 
-                    } catch (Exception e)
+                        clientSocket.close();
+
+                    } catch (IOException ex)
                     {
-                        System.out.println("Could not accept client connection");
-                        try
-                        {
-
-                            clientSocket.close();
-
-                        } catch (IOException ex)
-                        {
-                            throw new RuntimeException(ex);
-                        }
-                        System.out.println("Client connection closed");
-                        System.out.println("Error: " + e.getMessage());
+                        throw new RuntimeException(ex);
                     }
+                    System.out.println("Client connection closed");
+                    System.out.println("Error: " + e.getMessage());
                 }
             }
         });
         // Thread that will handle the workers
-        Thread handleWorker = new Thread(new Runnable()
+        Thread handleWorker = new Thread(() ->
         {
-            public void run()
+            while (!workerSocket.isClosed())
             {
-                while (!workerSocket.isClosed())
+                try
                 {
+                    System.out.println("MASTER: Waiting for worker connection");
+                    // Accept a worker connection
+                    Socket worker = workerSocket.accept();
+                    System.out.println("MASTER: Worker connected");
+                    // Create a new thread to handle the worker
+                    WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
+                    workerHandlers.add(workerHandler);
+                    Thread workerThread = new Thread(workerHandler);
+                    workerThread.start();
+
+                } catch (Exception e)
+                {
+                    System.out.println("Could not accept worker connection");
+                    e.printStackTrace();
                     try
                     {
-                        System.out.println("MASTER: Waiting for worker connection");
-                        // Accept a worker connection
-                        Socket worker = workerSocket.accept();
-                        System.out.println("MASTER: Worker connected");
-                        // Create a new thread to handle the worker
-                        WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
-                        workerHandlers.add(workerHandler);
-                        Thread workerThread = new Thread(workerHandler);
-                        workerThread.start();
 
-                    } catch (Exception e)
-                    {
-                        System.out.println("Could not accept worker connection");
-                        e.printStackTrace();
-                        try
-                        {
+                        workerSocket.close();
 
-                            workerSocket.close();
-
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        System.out.println("Worker connection closed");
-                        System.out.println("Error: " + e.getMessage());
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
                     }
+                    System.out.println("Worker connection closed");
+                    System.out.println("Error: " + e.getMessage());
                 }
             }
         });
         // Thread that will start dispatching work to the workers
-        Thread dispatchWork = new Thread(new Runnable() {
-            @Override
-            public void run()
-            {
-                WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes,routeStatus);
-                Thread workDispatcherThread = new Thread(workDispatcher);
-                workDispatcherThread.start();
-            }
+        Thread dispatchWork = new Thread(() ->
+        {
+            WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);
+            Thread workDispatcherThread = new Thread(workDispatcher);
+            workDispatcherThread.start();
         });
 
         handleClient.start();

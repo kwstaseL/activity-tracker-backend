@@ -6,9 +6,13 @@ import java.io.Serializable;
  * the route was split into, and a variable indicating the index of the chunk being currently processed amongst the total chunks
  */
 public class Chunk implements Serializable {
-    private Route route;
-    private int totalChunks;
-    private int chunkIndex;
+
+    // Route contains the ArrayList of Waypoints, the route id, client id, and the username of the user who recorded the route
+    private final Route route;
+    // Total chunks is the total number of chunks the route was split into
+    private final int totalChunks;
+    // Chunk index is the index of the chunk being currently processed amongst the total chunks
+    private final int chunkIndex;
 
     public Chunk(Route route, int totalChunks, int chunkIndex)
     {

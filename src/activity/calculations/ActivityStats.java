@@ -6,28 +6,26 @@ import java.io.Serializable;
 // during the map/reduce phase
 public class ActivityStats implements Serializable
 {
+    // Represents the total distance, average speed, total elevation and total time of the activity
     private double distance;
     private double speed;
     private double elevation;
     private double time;
-    private final int routeID;  // TODO: Check for uses
 
-
-    public ActivityStats(double distance, double speed, double elevation, double time, int routeID)
+    // Constructor used for the map/reduce phase for the final results
+    public ActivityStats(double distance, double speed, double elevation, double time)
     {
         this.distance = distance;
         this.speed = speed;
         this.elevation = elevation;
         this.time = time;
-        this.routeID = routeID;
     }
 
     // This constructor is used for calculating and saving the results of the calculations
     public ActivityStats()
     {
-        this(0, 0, 0, 0, -1);
+        this(0, 0, 0, 0);
     }
-
 
     public void setDistance(double distance)
     {
@@ -67,11 +65,6 @@ public class ActivityStats implements Serializable
     public double getTime()
     {
         return time;
-    }
-
-    public int getRouteID()
-    {
-        return routeID;
     }
 
     @Override

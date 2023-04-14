@@ -23,7 +23,7 @@ public class Map
         double totalTime = 0.0;
         double averageSpeed = 0.0;
 
-        ActivityStats stats = new ActivityStats();
+        ActivityStats stats;
 
         for (int i = 1; i < waypoints.size(); ++i)
         {
@@ -37,10 +37,10 @@ public class Map
         }
 
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
-        ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime,route.getRouteID());
+        ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime);
 
         Pair<Chunk, ActivityStats> statsPair = new Pair<>(chunk, finalStats);
-        return new Pair<Integer, Pair<Chunk, ActivityStats>>(clientID, statsPair);
+        return new Pair<>(clientID, statsPair);
     }
 
 }

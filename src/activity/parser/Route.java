@@ -5,11 +5,15 @@ import java.util.ArrayList;
 
 public class Route implements Serializable
 {
-    private ArrayList<Waypoint> waypoints;
-    private String user;
-    private int routeID;
+    // Waypoints is the ArrayList of Waypoints that the route contains
+    private final ArrayList<Waypoint> waypoints;
+    // User is the username of the user who recorded the route
+    private final String user;
+    // Route ID is the unique ID of the route
+    private final int routeID;
+    // Client ID is the unique ID of the client-handler who sent the route
     private int clientID;
-    private boolean moreFragments = true;
+    // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
 
     public Route(ArrayList<Waypoint> waypoints, String user)
@@ -23,7 +27,7 @@ public class Route implements Serializable
         this.waypoints = waypoints;
         this.routeID = routeID;
         this.clientID = clientID;
-
+        this.user = user;
     }
 
     public ArrayList<Waypoint> waypoints() {

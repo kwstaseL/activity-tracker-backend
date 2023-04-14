@@ -24,8 +24,6 @@ public class WorkerHandler implements Runnable
     private ResultDispatcher resultDispatcher;
     private Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults;
 
-
-
     public WorkerHandler(Socket workerSocket,HashMap<Integer,ClientHandler> clients)
     {
         this.workerSocket = workerSocket;
@@ -49,23 +47,9 @@ public class WorkerHandler implements Runnable
     // This is where the worker will be handled
     public void run()
     {
-        Thread listenToWorker = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                listenToWorker();
-            }
-        });
+        Thread listenToWorker = new Thread(this::listenToWorker);
 
-        Thread handleResults = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                resultDispatcher.handleResults();
-            }
-        });
+        Thread handleResults = new Thread(() -> resultDispatcher.handleResults());
 
         listenToWorker.start();
         handleResults.start();

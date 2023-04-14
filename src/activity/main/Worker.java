@@ -3,26 +3,19 @@ package activity.main;
 import activity.calculations.ActivityStats;
 import activity.mapreduce.Pair;
 import activity.parser.Chunk;
-import activity.parser.Route;
 import activity.mapreduce.Map;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Queue;
+
 
 public class Worker
 {
     private Socket connection;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private Queue<HashMap<String, ActivityStats>> results;
-    private Map mapper;
-    private int workerID;
-    private static int idGenerator = 0;
-
     private final Object writeLock = new Object();
 
     public Worker()
@@ -32,8 +25,6 @@ public class Worker
             connection = new Socket("localhost", Master.WORKER_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-            workerID = idGenerator++;
-            mapper = new Map();
         }
         catch (Exception e)
         {
@@ -46,14 +37,7 @@ public class Worker
 
     public void start()
     {
-        Thread readData = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                readForData();
-            }
-        });
+        Thread readData = new Thread(this::readForData);
 
         readData.start();
     }
@@ -69,11 +53,7 @@ public class Worker
                 //System.out.println("WORKER: Received job from master");
                 Chunk chunk = (Chunk) receivedObject;
                 
-                new Thread(() ->
-                {
-                        handleMapping(chunk);
-
-                }).start();
+                new Thread(() -> handleMapping(chunk)).start();
 
             } catch (IOException | ClassNotFoundException e)
             {
@@ -90,7 +70,7 @@ public class Worker
 
         // TODO: Cleanup?
         // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
-        Pair<Integer, Pair<Chunk, ActivityStats>> intermediate_result = mapper.map(chunk.getRoute().getClientID(), chunk);
+        Pair<Integer, Pair<Chunk, ActivityStats>> intermediate_result = Map.map(chunk.getRoute().getClientID(), chunk);
         try
         {
             // Send the result back to the worker-handler
