@@ -19,6 +19,8 @@ public class Client
     // This is the file that will be sent to the master
     private File file;
 
+    private final Object lock = new Object();
+
     public Client(File file)
     {
         try
@@ -41,8 +43,10 @@ public class Client
     {
         try
         {
+
             out.writeObject(file);
             out.flush();
+
         }
         catch (Exception e)
         {
@@ -59,8 +63,9 @@ public class Client
             {
                 try
                 {
+
                     Object receivedObject = in.readObject();
-                    System.out.println(receivedObject);
+                    System.out.println("Output for file | " + file.getName() + " | " + receivedObject + "\n");
 
                 }
                 catch (Exception e)
