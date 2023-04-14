@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 public class Reduce
 {
-    public synchronized static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediate_results)
+    public synchronized static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediateResults)
     {
-        assert intermediate_results.getValue() != null && intermediate_results.getValue().size()>0;
-        ArrayList<ActivityStats> activityStats = intermediate_results.getValue();
+        assert intermediateResults.getValue() != null && intermediateResults.getValue().size()>0;
+        ArrayList<ActivityStats> activityStats = intermediateResults.getValue();
 
         double elevation = 0;
         double time = 0;
@@ -24,7 +24,5 @@ public class Reduce
         }
 
         return new ActivityStats(distance, totalSpeed / activityStats.size(), elevation, time);
-
-
     }
 }

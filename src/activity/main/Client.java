@@ -6,8 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.File;
 
-// DONE
-
 public class Client
 {
     // This is the socket that the client is connected to with the master
@@ -66,7 +64,6 @@ public class Client
 
                     Object receivedObject = in.readObject();
                     System.out.println("Output for file | " + file.getName() + " | " + receivedObject + "\n");
-
                 }
                 catch (Exception e)
                 {

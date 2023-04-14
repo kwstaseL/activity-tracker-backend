@@ -72,7 +72,7 @@ public class WorkDispatcher implements Runnable {
         } else {
             // making the assumption that if workers are more than the waypoints provided, n will be
             // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
-            n = 1;
+            n = 1;  // TODO: Test with custom gpx file
         }
 
         // expectedChunks: determines how many chunks of waypoints the route will be split into
