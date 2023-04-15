@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class Statistics {
     private HashMap<String, UserStatistics> userStats = new HashMap<>();
-    private ArrayList<Pair<String, ActivityStats>> activityArchive = new ArrayList<>();
+    private ArrayList<Pair<String, ActivityStats>> activityArchive = new ArrayList<>();     // TODO: Possibly unnecessary?
     private int routesRecorded = 0;
     private double totalDistance = 0;
     private double totalElevation = 0;
