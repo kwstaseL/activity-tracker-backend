@@ -303,7 +303,7 @@ public class ClientHandler implements Runnable
     {
         if (routesRecorded == 0)
         {
-            return 0;
+            throw new RuntimeException("No routes have been recorded yet.");
         }
         return totalDistance / routesRecorded;
     }
@@ -313,7 +313,7 @@ public class ClientHandler implements Runnable
     {
         if (routesRecorded == 0)
         {
-            return 0;
+            throw new RuntimeException("No routes have been recorded yet.");
         }
         return totalElevation / routesRecorded;
     }
@@ -323,7 +323,7 @@ public class ClientHandler implements Runnable
     {
         if (routesRecorded == 0)
         {
-            return 0;
+            throw new RuntimeException("No routes have been recorded yet.");
         }
         return totalActivityTime / routesRecorded;
     }
