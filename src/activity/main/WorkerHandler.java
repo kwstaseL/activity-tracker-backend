@@ -21,6 +21,8 @@ public class WorkerHandler implements Runnable
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
     private ResultDispatcher resultDispatcher;
+    // This is the queue that will hold the intermediate results from the workers
+    // The results will be sent to the appropriate client-handler
     private Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults;
 
     public WorkerHandler(Socket workerSocket,HashMap<Integer,ClientHandler> clients)
@@ -29,6 +31,7 @@ public class WorkerHandler implements Runnable
         // Add the worker to the queue
         try
         {
+            // Creating the input and output streams for the worker
             this.in = new ObjectInputStream(workerSocket.getInputStream());
             this.out = new ObjectOutputStream(workerSocket.getOutputStream());
             this.intermediateResults = new LinkedList<>();
@@ -44,6 +47,8 @@ public class WorkerHandler implements Runnable
     }
 
     // This is where the worker will be handled
+    // A thread will be created to listen for messages from the worker
+    // and a thread will be created to handle the results from the worker
     public void run()
     {
         Thread listenToWorker = new Thread(this::listenToWorker);
@@ -52,7 +57,8 @@ public class WorkerHandler implements Runnable
         listenToWorker.start();
         handleResults.start();
     }
-
+    // This method will listen for messages from the worker
+    // and add the intermediate results to the queue for the ResultDispatcher to handle
     @SuppressWarnings("unchecked")
     private void listenToWorker()
     {
@@ -80,10 +86,12 @@ public class WorkerHandler implements Runnable
             shutdown();
         }
     }
+    // This method will send a chunk to the worker to be mapped
     public void processJob(Chunk chunk)
     {
         try
         {
+            // Send the chunk to the worker to be mapped
             out.writeObject(chunk);
             out.flush();
         }

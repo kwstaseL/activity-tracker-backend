@@ -7,9 +7,13 @@ import activity.parser.Route;
 import java.util.ArrayList;
 import java.util.Queue;
 
+// This class is responsible for taking in a route and splitting it into chunks, then sending the chunks to the workers
+// using round-robin
 public class WorkDispatcher implements Runnable {
 
+    // This is the queue that contains all the workers
     private final Queue<WorkerHandler> workers;
+    // This is the queue that contains all the routes that need to be handled
     private final Queue<Route> filesToWorker;
 
     public WorkDispatcher(Queue<WorkerHandler> workers, Queue<Route> filesToWorker)
@@ -42,28 +46,14 @@ public class WorkDispatcher implements Runnable {
             }
         }
     }
-
-    private void createChunk(ArrayList<Waypoint> chunkWaypoints, int routeID, int clientID, String user,
-                             int expectedChunks, int chunkIndex, Queue<WorkerHandler> workers)
-    {
-        WorkerHandler worker = workers.poll();
-        assert worker != null;
-
-        Route chunkedRoute = new Route(chunkWaypoints, routeID, clientID, user);
-        Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
-
-        worker.processJob(chunk);
-        // add the worker to the end of the queue
-        workers.add(worker);
-    }
-
+    // Takes in a route and splits it into chunks, then sends the chunks to the workers using round-robin
     private void handleRoute(Route route)
     {
         ArrayList<Waypoint> waypoints = route.waypoints();
 
-        int routeID = route.getRouteID();
-        int clientID = route.getClientID();
-        String user = route.getUser();
+        final int routeID = route.getRouteID();
+        final int clientID = route.getClientID();
+        final String user = route.getUser();
 
         // n will represent the chunk size
         int n;
@@ -80,7 +70,7 @@ public class WorkDispatcher implements Runnable {
         }
 
         // expectedChunks: determines how many chunks of waypoints the route will be split into
-        int expectedChunks = (int) Math.ceil(waypoints.size() / (double) n);
+        final int expectedChunks = (int) Math.ceil(waypoints.size() / (double) n);
 
         ArrayList<Waypoint> waypointChunk = new ArrayList<>();
         int chunkIndex = 0;
@@ -128,5 +118,20 @@ public class WorkDispatcher implements Runnable {
         }
         System.err.println("Finished chunking up route: " + routeID + ". Total chunks: " + chunks);
         System.err.println("Expected chunks were: " + expectedChunks);
+    }
+
+    // Creates the chunk and sends it to a worker
+    private void createChunk(ArrayList<Waypoint> chunkWaypoints, int routeID, int clientID, String user,
+                             int expectedChunks, int chunkIndex, Queue<WorkerHandler> workers)
+    {
+        WorkerHandler worker = workers.poll();
+        assert worker != null;
+
+        Route chunkedRoute = new Route(chunkWaypoints, routeID, clientID, user);
+        Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
+
+        worker.processJob(chunk);
+        // adding the worker to the end of the queue
+        workers.add(worker);
     }
 }

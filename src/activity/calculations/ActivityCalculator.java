@@ -6,8 +6,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-// DONE
-
 // Class used for the mapping phase
 // It will calculate for a chunk of data the distance,time ,speed and elevation
 public class ActivityCalculator

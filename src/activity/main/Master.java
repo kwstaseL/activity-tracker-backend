@@ -45,9 +45,10 @@ public class Master
         }
     }
 
+    // This method will start the master and all the threads
     private void start()
     {
-        // Thread that will create the workers
+        // Thread that will create and start the workers
         Thread init = new Thread(() ->
         {
             for (int i = 0; i < numOfWorkers; i++)
@@ -58,7 +59,6 @@ public class Master
         });
 
         // Thread that will handle the clients
-
         Thread handleClient = new Thread(() ->
         {
             while (!clientSocket.isClosed())
@@ -71,6 +71,7 @@ public class Master
                     System.out.println("MASTER: Client connected");
                     // Create a new thread to handle the client
                     ClientHandler clientHandler = new ClientHandler(client,routes);
+                    // Add the client handler to the lookup table
                     int clientID = clientHandler.getClientID();
                     clientMap.put(clientID,clientHandler);
                     Thread clientThread = new Thread(clientHandler);
@@ -104,9 +105,11 @@ public class Master
                     // Accept a worker connection
                     Socket worker = workerSocket.accept();
                     System.out.println("MASTER: Worker connected");
-                    // Create a new thread to handle the worker
+                    // Create a new thread to handle the worker also passing the client map
+                    // so that the worker can send the results to the appropriate client
                     WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
                     workerHandlers.add(workerHandler);
+
                     Thread workerThread = new Thread(workerHandler);
                     workerThread.start();
 
@@ -126,10 +129,14 @@ public class Master
                     System.out.println("Worker connection closed");
                     System.out.println("Error: " + e.getMessage());
                 }
+
             }
         });
 
         // Thread that will start dispatching work to the workers
+        // We are passing the worker handler so that the work dispatcher can send work to the workers
+        // We are also passing the routes, which is a shared memory between the client handler and the work dispatcher
+        // The client-handler will upload the routes to the work dispatcher and the work dispatcher will send the routes to the workers
         Thread dispatchWork = new Thread(() ->
         {
             WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);

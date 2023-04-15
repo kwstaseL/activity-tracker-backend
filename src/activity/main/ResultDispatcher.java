@@ -7,11 +7,11 @@ import activity.parser.Chunk;
 import java.util.HashMap;
 import java.util.Queue;
 
-//TODO: handle what happens if a worker is disconnected so send it to the next worker
 public class ResultDispatcher
 {
+    // This is the lookup table that will map the client id to the appropriate client handler
     private final HashMap<Integer,ClientHandler> clients;
-    // RouteStatus: A hashmap of RouteID and whether it's had all its chunks received or not
+    // This is the queue that will contain the intermediate results calculated by the workers and will be sent to the appropriate client
     private final Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults;
 
     public ResultDispatcher(HashMap<Integer, ClientHandler> clients,
@@ -21,6 +21,7 @@ public class ResultDispatcher
         this.intermediateResults = intermediateResults;
     }
 
+    // This method will handle the intermediate results by sending them to the appropriate client-handler.
     public void handleResults()
     {
         synchronized (intermediateResults)
@@ -31,11 +32,13 @@ public class ResultDispatcher
                 {
                     try
                     {
+                        // waiting for the workers to send the intermediate results
                         intermediateResults.wait();
                     }
                     catch (InterruptedException e)
                     {
-                        System.out.println("Error: " + e.getMessage());
+                        System.out.println("Error while waiting for intermediate results");
+                        System.out.println(e.getMessage());
                     }
                 }
 
@@ -46,6 +49,7 @@ public class ResultDispatcher
                 Pair<Chunk, ActivityStats> stats = activityStatsPair.getValue();
 
                 ClientHandler appropriateHandler = clients.get(activityStatsPair.getKey());
+                // sending the results to the appropriate client by writing them to shared memory
                 appropriateHandler.addStats(stats);
             }
         }
