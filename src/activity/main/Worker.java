@@ -61,6 +61,7 @@ public class Worker
                 shutdown();
                 System.out.println("Error: " + e.getMessage());
             }
+
         }
     }
 

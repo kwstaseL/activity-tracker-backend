@@ -11,7 +11,6 @@ import activity.parser.Chunk;
 
 public class Map
 {
-
     public synchronized static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
         Route route = chunk.getRoute();

@@ -88,6 +88,8 @@ public class ClientHandler implements Runnable
         readFromWorkerHandler.start();
     }
 
+    // This method is used to receive back all the chunks from the file we dispatched to the worker
+    // In order to start the reduce phase for that route (and thus, the client)
     private void readFromWorkerHandler()
     {
         synchronized (statsQueue)
@@ -111,34 +113,37 @@ public class ClientHandler implements Runnable
 
                 synchronized (routeHashmap)
                 {
+                    // If the route already exists in the hashmap, we add the chunk to the list of chunks
                     if (routeHashmap.containsKey(routeID))
                     {
                         ArrayList<Pair<Chunk, ActivityStats>> activityList = routeHashmap.get(routeID);
+                        // If the chunks we received are more than what we expected, we throw an exception
                         if (activityList.size() >= chunk.getTotalChunks())
                         {
                             throw new RuntimeException("Found more chunks than expected!");
                         }
-                        else if (activityList.size() == chunk.getTotalChunks() -1)
+                        // Else, if we have accumulated all the chunks we need, we can start reducing
+                        else if (activityList.size() == (chunk.getTotalChunks() -1))
                         {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
                             ++routesRecorded;
-
                             // TODO: Cleanup
-
                             // fetching a list of all the stats we gathered for this specific route
                             ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
-                            for (Pair<Chunk, ActivityStats> pair : activityList) {
+                            for (Pair<Chunk, ActivityStats> pair : activityList)
+                            {
                                 statsArrayList.add(pair.getValue());
                             }
-
+                            // Creating a new thread to handle the reducing phase
                             new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
-
+                        // Else, we just add the chunk to the list
                         } else
                         {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
                         }
+                    // Else, we create a new entry in the hashmap for this route
                     } else
                     {
                         ArrayList<Pair<Chunk, ActivityStats>> activityList = new ArrayList<>();
@@ -150,124 +155,8 @@ public class ClientHandler implements Runnable
             }
         }
     }
-
-    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
-    {
-        System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
-
-        // TODO: Cleanup?
-        // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
-        ActivityStats finalResults = Reduce.reduce(intermediateResults);
-        try
-        {
-            // Send the result back to the worker-handler
-            synchronized (writeLock)
-            {
-                updateStats(finalResults, user);
-                out.writeObject(finalResults);
-                out.flush();
-            }
-
-
-        } catch (IOException e)
-        {
-            System.out.println("Could not send object to the client");
-            throw new RuntimeException(e);
-        }
-    }
-
-    // updateStats: Called when receiving new stats for a specific user. Updates all ClientHandler stats-related data structures and member variables accordingly
-    private void updateStats(ActivityStats stats, String user)
-    {
-        ArrayList<ActivityStats> userStats;
-        double distance = stats.getDistance();
-        double elevation = stats.getElevation();
-        double time = stats.getTime();
-
-        if (userActivityStats.containsKey(user)) {
-            userStats = userActivityStats.get(user);
-            totalDistancePerUser.put(user, totalDistancePerUser.get(user) + distance);
-            totalElevationPerUser.put(user, totalElevationPerUser.get(user) + elevation);
-            totalActivityTimePerUser.put(user, totalActivityTimePerUser.get(user) + time);
-        } else {
-            userStats = new ArrayList<>();
-            totalDistancePerUser.put(user, distance);
-            totalElevationPerUser.put(user, elevation);
-            totalActivityTimePerUser.put(user, time);
-        }
-        userStats.add(stats);
-        userActivityStats.put(user, userStats);
-        totalActivityStats.add(stats);
-        
-        totalDistance += distance;
-        totalElevation += elevation;
-        totalActivityTime += time;
-    }
-
-    // getAverageDistanceForUser: Calculates the average distance for a user by dividing their total distance with the # of routes they have recorded
-    public double getAverageDistanceForUser(String user)
-    {
-        if (!userActivityStats.containsKey(user))
-        {
-            throw new RuntimeException("User does not have any routes registered.");
-        }
-
-        double totalDistanceForUser = totalDistancePerUser.get(user);
-        return totalDistanceForUser / userActivityStats.get(user).size();
-    }
-
-    // getAverageElevationForUser: Similarly to getAverageDistanceForUser
-    public double getAverageElevationForUser(String user)
-    {
-        if (!userActivityStats.containsKey(user))
-        {
-            throw new RuntimeException("User does not have any routes registered.");
-        }
-
-        double totalElevationForUser = totalElevationPerUser.get(user);
-        return totalElevationForUser / userActivityStats.get(user).size();
-    }
-
-    // getAverageActivityTimeForUser: Similarly to getAverageDistanceForUser
-    public double getAverageActivityTimeForUser(String user)
-    {
-        if (!userActivityStats.containsKey(user))
-        {
-            throw new RuntimeException("User does not have any routes registered.");
-        }
-
-        double totalActivityTimeForUser = totalActivityTimePerUser.get(user);
-        return totalActivityTimeForUser / userActivityStats.get(user).size();
-    }
-
-    // getAverageDistance: Calculates the average distance recorded across all routes.
-    public double getAverageDistance()
-    {
-        return totalDistance / routesRecorded;
-    }
-
-    // getAverageElevation: Similarly to getAverageDistance
-    public double getAverageElevation()
-    {
-        return totalElevation / routesRecorded;
-    }
-
-    // getAverageDistance: Similarly to getAverageDistance
-    public double getAverageActivityTime()
-    {
-        return totalActivityTime / routesRecorded;
-    }
-
-
-    // addStats: Adds the stats to the queue
-    public void addStats(Pair<Chunk, ActivityStats> stats)
-    {
-        synchronized (statsQueue)
-        {
-            statsQueue.add(stats);
-            statsQueue.notify();
-        }
-    }
+    // This method is used to get the file from the client
+    // And to send it to the work-dispatcher that will dispatch it to the workers.
     private void readFromClient()
     {
         try
@@ -303,7 +192,152 @@ public class ClientHandler implements Runnable
         {
             shutdown();
         }
+    }
+    // This is the method that will handle the reducing phase and send the result back to the client
+    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
+    {
+        System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
 
+        // TODO: Cleanup?
+        // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
+        ActivityStats finalResults = Reduce.reduce(intermediateResults);
+        try
+        {
+            // Send the result back to the worker-handler
+            synchronized (writeLock)
+            {
+                updateStats(finalResults, user);
+                out.writeObject(finalResults);
+                out.flush();
+            }
+
+
+        } catch (IOException e)
+        {
+            System.out.println("Could not send object to the client");
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    // addStats: Adds the stats to the queue to be processed by the readFromWorkerHandler method
+    public void addStats(Pair<Chunk, ActivityStats> stats)
+    {
+        synchronized (statsQueue)
+        {
+            statsQueue.add(stats);
+            statsQueue.notify();
+        }
+    }
+
+    // updateStats: Called when receiving new stats for a specific user.
+    // Updates all ClientHandler stats-related data structures and member variables accordingly.
+    private void updateStats(ActivityStats stats, String user)
+    {
+        ArrayList<ActivityStats> userStats;
+        double distance = stats.getDistance();
+        double elevation = stats.getElevation();
+        double time = stats.getTime();
+
+        if (userActivityStats.containsKey(user))
+        {
+            userStats = userActivityStats.get(user);
+            totalDistancePerUser.put(user, totalDistancePerUser.get(user) + distance);
+            totalElevationPerUser.put(user, totalElevationPerUser.get(user) + elevation);
+            totalActivityTimePerUser.put(user, totalActivityTimePerUser.get(user) + time);
+        } else
+        {
+            userStats = new ArrayList<>();
+            totalDistancePerUser.put(user, distance);
+            totalElevationPerUser.put(user, elevation);
+            totalActivityTimePerUser.put(user, time);
+        }
+
+        userStats.add(stats);
+        userActivityStats.put(user, userStats);
+        totalActivityStats.add(stats);
+
+        totalDistance += distance;
+        totalElevation += elevation;
+        totalActivityTime += time;
+    }
+
+    // getAverageDistanceForUser: Calculates the average distance for a user by dividing their total distance with the # of routes they have recorded.
+    public double getAverageDistanceForUser(String user)
+    {
+        if (!userActivityStats.containsKey(user))
+        {
+            throw new RuntimeException("User does not have any routes registered.");
+        }
+
+        double totalDistanceForUser = totalDistancePerUser.get(user);
+        if (totalDistanceForUser == 0)
+        {
+            return 0;
+        }
+        return totalDistanceForUser / userActivityStats.get(user).size();
+    }
+
+    // getAverageElevationForUser: Similarly to getAverageDistanceForUser
+    public double getAverageElevationForUser(String user)
+    {
+        if (!userActivityStats.containsKey(user))
+        {
+            throw new RuntimeException("User does not have any routes registered.");
+        }
+
+        double totalElevationForUser = totalElevationPerUser.get(user);
+        if (totalElevationForUser == 0)
+        {
+            return 0;
+        }
+        return totalElevationForUser / userActivityStats.get(user).size();
+    }
+
+    // getAverageActivityTimeForUser: Similarly to getAverageDistanceForUser
+    public double getAverageActivityTimeForUser(String user)
+    {
+        if (!userActivityStats.containsKey(user))
+        {
+            throw new RuntimeException("User does not have any routes registered.");
+        }
+
+        double totalActivityTimeForUser = totalActivityTimePerUser.get(user);
+        if (totalActivityTimeForUser == 0)
+        {
+            return 0;
+        }
+        return totalActivityTimeForUser / userActivityStats.get(user).size();
+    }
+
+    // getAverageDistance: Calculates the average distance recorded across all routes.
+    public double getAverageDistance()
+    {
+        if (routesRecorded == 0)
+        {
+            return 0;
+        }
+        return totalDistance / routesRecorded;
+    }
+
+    // getAverageElevation: Similarly to getAverageDistance
+    public double getAverageElevation()
+    {
+        if (routesRecorded == 0)
+        {
+            return 0;
+        }
+        return totalElevation / routesRecorded;
+    }
+
+    // getAverageDistance: Similarly to getAverageDistance
+    public double getAverageActivityTime()
+    {
+        if (routesRecorded == 0)
+        {
+            return 0;
+        }
+        return totalActivityTime / routesRecorded;
     }
 
     // This method will close the connection to the client

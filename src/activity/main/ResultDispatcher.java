@@ -7,6 +7,7 @@ import activity.parser.Chunk;
 import java.util.HashMap;
 import java.util.Queue;
 
+//TODO: handle what happens if a worker is disconnected so send it to the next worker
 public class ResultDispatcher
 {
     private final HashMap<Integer,ClientHandler> clients;
@@ -48,8 +49,5 @@ public class ResultDispatcher
                 appropriateHandler.addStats(stats);
             }
         }
-
     }
-
-
 }

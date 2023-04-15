@@ -56,7 +56,9 @@ public class Master
                 worker.start();
             }
         });
+
         // Thread that will handle the clients
+
         Thread handleClient = new Thread(() ->
         {
             while (!clientSocket.isClosed())
@@ -117,7 +119,8 @@ public class Master
 
                         workerSocket.close();
 
-                    } catch (IOException ex) {
+                    } catch (IOException ex)
+                    {
                         throw new RuntimeException(ex);
                     }
                     System.out.println("Worker connection closed");
@@ -125,6 +128,7 @@ public class Master
                 }
             }
         });
+
         // Thread that will start dispatching work to the workers
         Thread dispatchWork = new Thread(() ->
         {

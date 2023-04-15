@@ -28,7 +28,9 @@ public class WorkDispatcher implements Runnable {
                 {
                     try
                     {
+
                         filesToWorker.wait();
+
                     } catch (InterruptedException e)
                     {
                         System.out.println("Error: " + e.getMessage());
@@ -67,9 +69,11 @@ public class WorkDispatcher implements Runnable {
         int n;
 
         // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2
-        if (waypoints.size() >= workers.size()) {
+        if (waypoints.size() >= workers.size())
+        {
             n = (int) Math.ceil(waypoints.size() / (workers.size() * 2.0));
-        } else {
+        } else
+        {
             // making the assumption that if workers are more than the waypoints provided, n will be
             // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
             n = 1;  // TODO: Test with custom gpx file
@@ -84,7 +88,6 @@ public class WorkDispatcher implements Runnable {
 
         for (int i = 0; i < waypoints.size(); i++)
         {
-
             Waypoint currentWaypoint = waypoints.get(i);
             waypointChunk.add(currentWaypoint);
 

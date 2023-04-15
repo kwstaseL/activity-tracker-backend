@@ -18,7 +18,6 @@ public class WorkerHandler implements Runnable
     // These are the input and output streams for the worker
     private ObjectInputStream in;
     private ObjectOutputStream out;
-
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
     private ResultDispatcher resultDispatcher;
@@ -48,7 +47,6 @@ public class WorkerHandler implements Runnable
     public void run()
     {
         Thread listenToWorker = new Thread(this::listenToWorker);
-
         Thread handleResults = new Thread(() -> resultDispatcher.handleResults());
 
         listenToWorker.start();
@@ -66,22 +64,22 @@ public class WorkerHandler implements Runnable
                 Object receivedObject = in.readObject();
                 Pair<Integer, Pair<Chunk, ActivityStats>> stats = (Pair<Integer, Pair<Chunk, ActivityStats>>) receivedObject;
 
-
                 synchronized (intermediateResults)
                 {
                     intermediateResults.add(stats);
                     intermediateResults.notify();
                 }
             }
-        } catch (IOException | ClassNotFoundException e) {
+
+        } catch (IOException | ClassNotFoundException e)
+        {
             System.out.println("WorkerHandler: Connection to worker lost");
             e.printStackTrace();
-        } finally {
+        } finally
+        {
             shutdown();
         }
     }
-
-
     public void processJob(Chunk chunk)
     {
         try
@@ -95,8 +93,6 @@ public class WorkerHandler implements Runnable
             e.printStackTrace();
         }
     }
-
-
     // This method will close the connection to the worker
     // and clean up the resources
     private void shutdown()
@@ -125,7 +121,4 @@ public class WorkerHandler implements Runnable
         }
 
     }
-
-
-
 }
