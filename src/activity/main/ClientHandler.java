@@ -271,10 +271,6 @@ public class ClientHandler implements Runnable
         }
 
         double totalDistanceForUser = totalDistancePerUser.get(user);
-        if (totalDistanceForUser == 0)
-        {
-            return 0;
-        }
         return totalDistanceForUser / userActivityStats.get(user).size();
     }
 
@@ -287,10 +283,6 @@ public class ClientHandler implements Runnable
         }
 
         double totalElevationForUser = totalElevationPerUser.get(user);
-        if (totalElevationForUser == 0)
-        {
-            return 0;
-        }
         return totalElevationForUser / userActivityStats.get(user).size();
     }
 
@@ -303,10 +295,6 @@ public class ClientHandler implements Runnable
         }
 
         double totalActivityTimeForUser = totalActivityTimePerUser.get(user);
-        if (totalActivityTimeForUser == 0)
-        {
-            return 0;
-        }
         return totalActivityTimeForUser / userActivityStats.get(user).size();
     }
 
@@ -372,7 +360,5 @@ public class ClientHandler implements Runnable
     {
         return clientID;
     }
-
-
-
+    
 }
