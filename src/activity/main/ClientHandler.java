@@ -20,7 +20,6 @@ public class ClientHandler implements Runnable
 
     // This is the socket that the client is connected to
     private final Socket clientSocket;
-
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
@@ -47,6 +46,7 @@ public class ClientHandler implements Runnable
     private static HashMap<String, Double> totalDistancePerUser = new HashMap<>();
     private static HashMap<String, Double> totalElevationPerUser = new HashMap<>();
     private static HashMap<String, Double> totalActivityTimePerUser = new HashMap<>();
+    private static HashMap<String,UserStats> userStats = new HashMap<>();
 
     // routesRecorded: A counter for how many routes we have recorded in total in our app.
     private static int routesRecorded = 0;
