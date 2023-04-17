@@ -1,6 +1,6 @@
 package activity.calculations;
 
-// UserStatistics: Contains the total distance, elevation and activity time recorded for a specific user. Also keeps track of how many routes they have registered
+// UserStatistics: Contains the total distance, elevation and activity time recorded for a specific user. Also keeps track of how many routesRecorded they have registered.
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ public class UserStatistics
     private double totalElevation;
     private double totalActivityTime;
     private ArrayList<ActivityStats> activityArchive;      // TODO: Possibly unnecessary
-    private int routes;
+    private int routesRecorded;
     private String user;
 
     public UserStatistics(double totalDistance, double totalElevation, double totalActivityTime, String user)
@@ -20,7 +20,7 @@ public class UserStatistics
         this.totalActivityTime = totalActivityTime;
         this.activityArchive = new ArrayList<>();
         this.user = user;
-        routes = 0;
+        routesRecorded = 0;
     }
 
     public UserStatistics(String user)
@@ -34,31 +34,31 @@ public class UserStatistics
         totalElevation += stats.getElevation();
         totalActivityTime += stats.getTime();
         activityArchive.add(stats);
-        ++routes;
+        ++routesRecorded;
     }
 
     public double getAverageDistance()
     {
-        assert routes >= 1;
-        return totalDistance / routes;
+        assert routesRecorded >= 1;
+        return totalDistance / routesRecorded;
     }
 
     public double getAverageElevation()
     {
-        assert routes >= 1;
-        return totalElevation / routes;
+        assert routesRecorded >= 1;
+        return totalElevation / routesRecorded;
     }
 
     public double getAverageActivityTime()
     {
-        assert routes >= 1;
-        return totalActivityTime / routes;
+        assert routesRecorded >= 1;
+        return totalActivityTime / routesRecorded;
     }
 
 
     public String toString()
     {
-        return "Routes recorded for " + user + ": " + routes + ".\n Total Distance: " + totalDistance + " Total Elevation: " + totalElevation + " Total Activity Time: " + totalActivityTime;
+        return "routesRecorded recorded for " + user + ": " + routesRecorded + ".\n Total Distance: " + totalDistance + " Total Elevation: " + totalElevation + " Total Activity Time: " + totalActivityTime;
     }
 
 }
