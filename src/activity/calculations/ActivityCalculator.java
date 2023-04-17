@@ -10,6 +10,9 @@ import java.time.format.DateTimeFormatter;
 // It will calculate for a chunk of data the distance,time ,speed and elevation
 public class ActivityCalculator
 {
+
+    // TODO: Possibly rework all methods into Waypoint?
+
     // Calculating the distance between two waypoints
     private static double calculateDistance(Waypoint w1, Waypoint w2)
     {
@@ -65,13 +68,11 @@ public class ActivityCalculator
     // Calculating the elevation between two waypoints
     private static double calculateElevation(Waypoint w1, Waypoint w2)
     {
-        // if w2 is above the current highest elevation recorded, we return w2.getElevation - currentHighestElevation
         if (w2.getElevation() > w1.getElevation())
         {
             return w2.getElevation() - w1.getElevation();
         }
 
-        // else (which means w2 is below the current highest elevation recorded), we return 0.
         return 0;
     }
     // This is the method that will be called during the mapping phase
