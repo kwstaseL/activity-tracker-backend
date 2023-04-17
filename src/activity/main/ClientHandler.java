@@ -2,7 +2,6 @@ package activity.main;
 
 import activity.calculations.ActivityStats;
 import activity.calculations.Statistics;
-import activity.calculations.UserStatistics;
 import activity.mapreduce.Pair;
 import activity.mapreduce.Reduce;
 import activity.parser.Chunk;
@@ -36,10 +35,10 @@ public class ClientHandler implements Runnable
     private Queue<Pair<Chunk, ActivityStats>> statsQueue;
 
     //
-    private static Statistics statistics = new Statistics();
+    private static final Statistics statistics = new Statistics();
 
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
-    private static HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
+    private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     private final Object writeLock = new Object();
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes)

@@ -82,14 +82,17 @@ public class Waypoint implements Serializable
      * making the assumption that two waypoints will be equal if they are at most 5 metres apart, and if they are at most 5 metres apart in height
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
+        final double gpsError = 5.0;
+
         if (this == o) return true;
         if (!(o instanceof Waypoint waypoint)) return false;
 
-
         Waypoint other = (Waypoint) o;
 
-        ht apart
-        return this.distanceTo(other) <= 5.0 && Math.abs(this.elevation - other.elevation) <= 5.0;
+        // Calculates a distance between two waypoints, and if the distance is less than 5 metres,
+        // and the elevation difference is less than 5 metres, then the waypoints are considered equal
+        return this.distanceTo(other) <= gpsError && Math.abs(this.elevation - other.elevation) <= gpsError;
     }
 }
