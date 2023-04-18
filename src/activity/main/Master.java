@@ -13,7 +13,6 @@ import java.util.Queue;
 
 public class Master
 {
-
     // This is the socket that the client will connect to
     private ServerSocket clientSocket;
     // This is the socket that the worker will connect to
@@ -26,7 +25,7 @@ public class Master
     private HashMap<Integer,ClientHandler> clientMap;
     private int numOfWorkers;
 
-    public Master(int numOfWorkers)
+    public Master()
     {
         try
         {
@@ -35,8 +34,8 @@ public class Master
 
             final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
             final int CLIENT_PORT = Integer.parseInt(config.getProperty("client_port"));
+            this.numOfWorkers = Integer.parseInt(config.getProperty("number_of_workers"));
 
-            this.numOfWorkers = numOfWorkers;
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
             workerHandlers = new LinkedList<>();
@@ -87,7 +86,6 @@ public class Master
                     System.out.println("Could not accept client connection");
                     try
                     {
-
                         clientSocket.close();
 
                     } catch (IOException ex)
@@ -154,7 +152,7 @@ public class Master
 
     public static void main(String[] args)
     {
-        Master master = new Master(5);
+        Master master = new Master();
         master.start();
     }
 

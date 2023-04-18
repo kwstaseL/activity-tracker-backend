@@ -58,7 +58,8 @@ public class UserStatistics
 
     public String toString()
     {
-        return "routesRecorded recorded for " + user + ": " + routesRecorded + ".\n Total Distance: " + totalDistance + " Total Elevation: " + totalElevation + " Total Activity Time: " + totalActivityTime;
+        return "routesRecorded recorded for " + user + ": " + routesRecorded + ".\n Total Distance: " +
+                totalDistance + " Total Elevation: " + totalElevation + " Total Activity Time: " + totalActivityTime;
     }
 
 }

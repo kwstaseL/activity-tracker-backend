@@ -41,10 +41,18 @@ public class Client
         }
     }
 
-    public void sendFile()
+    public void sendFile(boolean isSegment)
     {
         try
         {
+            if (isSegment)
+            {
+                out.writeObject("SEGMENT");
+            }
+            else
+            {
+                out.writeObject("ROUTE");
+            }
             System.out.println("Sending file " + file.getName() + " to master\n");
             out.writeObject(file);
             out.flush();
@@ -114,7 +122,7 @@ public class Client
         }
     }
 
-    public static void main(String[] args)
+    private static void sendRoute()
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -139,7 +147,7 @@ public class Client
             file = new File("./gpxs/route" + choice + ".gpx");
 
             Client client = new Client(file);
-            Thread c1 = new Thread(client::sendFile);
+            Thread c1 = new Thread(() -> client.sendFile(false));
             c1.start();
             client.listenForMessages();
         }
@@ -159,17 +167,17 @@ public class Client
             Client client5 = new Client(file5);
             Client client6 = new Client(file6);
 
-            Thread c1 = new Thread(client::sendFile);
+            Thread c1 = new Thread(() -> client.sendFile(false));
 
-            Thread c2 = new Thread(client2::sendFile);
+            Thread c2 = new Thread(() -> client2.sendFile(false));
 
-            Thread c3 = new Thread(client3::sendFile);
+            Thread c3 = new Thread(() -> client3.sendFile(false));
 
-            Thread c4 = new Thread(client4::sendFile);
+            Thread c4 = new Thread(() -> client4.sendFile(false));
 
-            Thread c5 = new Thread(client5::sendFile);
+            Thread c5 = new Thread(() -> client5.sendFile(false));
 
-            Thread c6 = new Thread(client6::sendFile);
+            Thread c6 = new Thread(() -> client6.sendFile(false));
 
             c1.start();
             c2.start();
@@ -186,6 +194,61 @@ public class Client
             client6.listenForMessages();
         }
         else if (choice > 7)
+        {
+            System.out.println("Invalid choice");
+            System.exit(0);
+        }
+    }
+
+    private static void sendSegment()
+    {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Select a segment: ");
+        System.out.println("1. Segment 1");
+        System.out.println("2. Segment 2");
+
+        int choice = scanner.nextInt();
+
+        File file = null;
+        if (choice >= 1 && choice <= 2)
+        {
+            file = new File("./gpxs/segment" + choice + ".gpx");
+
+            Client client = new Client(file);
+            Thread c1 = new Thread(() -> client.sendFile(true));
+            c1.start();
+            client.listenForMessages();
+        }
+        else
+        {
+            System.out.println("Invalid choice");
+            System.exit(0);
+        }
+
+
+    }
+
+    public static void main(String[] args)
+    {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Select an option: ");
+        System.out.println("1. Send a route");
+        System.out.println("2. Send a segment");
+        System.out.println("Enter your choice:");
+
+        final int choice = scanner.nextInt();
+
+        if (choice == 1)
+        {
+            sendRoute();
+        }
+        else if (choice == 2)
+        {
+            sendSegment();
+        }
+        else
         {
             System.out.println("Invalid choice");
             System.exit(0);
