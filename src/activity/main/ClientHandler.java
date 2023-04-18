@@ -149,11 +149,23 @@ public class ClientHandler implements Runnable
             {
                 // Receive the file object from the client
                 System.out.println("ClientHandler: Waiting for file from client");
-                Object receivedObject = in.readObject();
+                String message = (String) in.readObject();
 
-                if (receivedObject instanceof File receivedFile)
+                File receivedFile = null;
+                if (message.equals("SEGMENT"))
                 {
-                    System.out.println("ClientHandler: Received file from client  " + receivedFile.getName());
+                    System.out.println("ClientHandler: Received segment from client");
+                    // TODO : We need to parse the file and send it the work-dispatcher
+                    // TODO: We could possibly make a class that the segment and the route will extend from
+
+                    System.out.println("NOT IMPLEMENTED YET");
+
+                } else if (message.equals("ROUTE"))
+                {
+                    System.out.println("ClientHandler: Received route from client");
+
+                    receivedFile = (File) in.readObject();
+
                     // Dispatching the file to the workers
                     // Parse the file
                     Route route = GPXParser.parse(receivedFile);
@@ -165,6 +177,7 @@ public class ClientHandler implements Runnable
                         routes.notify();
                     }
                 }
+
             }
 
         } catch (IOException | ClassNotFoundException e)
