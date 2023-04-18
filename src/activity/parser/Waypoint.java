@@ -1,7 +1,6 @@
 package activity.parser;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 public class Waypoint implements Serializable
 {
@@ -87,9 +86,9 @@ public class Waypoint implements Serializable
         final double gpsError = 5.0;
 
         if (this == o) return true;
-        if (!(o instanceof Waypoint other)) return false;
+        if (!(o instanceof Waypoint)) return false;
 
         // Calculates the distance between two waypoints. If the distance is less than 5 metres, the 2 waypoints are considered equal.
-        return this.distanceTo(other) <= gpsError;
+        return this.distanceTo((Waypoint) o) <= gpsError;
     }
 }
