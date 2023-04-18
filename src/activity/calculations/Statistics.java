@@ -9,7 +9,6 @@ import java.util.HashMap;
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded, an archive of
  * the stats recorded, as well as the total distance, elevation and activity time across all users.
  */
-
 public class Statistics {
     private HashMap<String, UserStatistics> userStats = new HashMap<>();
     private ArrayList<Pair<String, ActivityStats>> activityArchive = new ArrayList<>();     // TODO: Possibly unnecessary?

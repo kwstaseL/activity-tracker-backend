@@ -170,7 +170,6 @@ public class ClientHandler implements Runnable
         } catch (IOException | ClassNotFoundException e)
         {
             System.out.println("ClientHandler: Connection to client lost");
-            e.printStackTrace();
         }
         finally
         {
@@ -199,7 +198,6 @@ public class ClientHandler implements Runnable
         } catch (IOException e)
         {
             System.out.println("Could not send object to the client");
-            throw new RuntimeException(e);
         }
     }
 
@@ -232,12 +230,11 @@ public class ClientHandler implements Runnable
             {
                 clientSocket.close();
             }
-
             System.out.println("Client disconnected");
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("Client disconnected");
         }
 
     }

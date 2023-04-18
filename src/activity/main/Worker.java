@@ -5,10 +5,12 @@ import activity.mapreduce.Pair;
 import activity.parser.Chunk;
 import activity.mapreduce.Map;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Properties;
 
 // Worker class responsible for handling the mapping of the data
 public class Worker
@@ -26,8 +28,13 @@ public class Worker
     {
         try
         {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+
+            final String masterIP = config.getProperty("master_ip");
+            final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
             // Creating a socket that will connect to the master and creating the input and output streams
-            connection = new Socket("localhost", Master.WORKER_PORT);
+            connection = new Socket(masterIP, WORKER_PORT);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
         }

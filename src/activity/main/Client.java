@@ -1,10 +1,9 @@
 package activity.main;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
-import java.io.File;
+import java.util.Properties;
+import java.util.Scanner;
 
 public class Client
 {
@@ -23,9 +22,15 @@ public class Client
     {
         try
         {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+
+            final String masterIP = config.getProperty("master_ip");
+            final int client_port = Integer.parseInt(config.getProperty("client_port"));
+
             this.file = file;
             // Create a socket that will connect to the master
-            connection = new Socket("localhost", Master.CLIENT_PORT);
+            connection = new Socket(masterIP, client_port);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
         }
@@ -33,7 +38,6 @@ public class Client
         {
             System.out.println("Could not connect to master");
             shutdown();
-            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -41,16 +45,14 @@ public class Client
     {
         try
         {
-
+            System.out.println("Sending file " + file.getName() + " to master\n");
             out.writeObject(file);
             out.flush();
-
         }
         catch (Exception e)
         {
             System.out.println("Could not send file");
             shutdown();
-            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -61,7 +63,6 @@ public class Client
             {
                 try
                 {
-
                     Object receivedObject = in.readObject();
                     System.out.println("Output for file | " + file.getName() + " | " + receivedObject + "\n");
                 }
@@ -69,7 +70,6 @@ public class Client
                 {
                     System.out.println("Could not receive object");
                     shutdown();
-                    System.out.println("Error: " + e.getMessage());
                 }
 
             }
@@ -88,7 +88,6 @@ public class Client
             catch (IOException e)
             {
                 System.out.println("Could not close connection");
-                throw new RuntimeException(e);
             }
         }
         if (out != null)
@@ -100,7 +99,6 @@ public class Client
             catch (IOException e)
             {
                 System.out.println("Could not close output stream");
-                throw new RuntimeException(e);
             }
         }
         if (in != null)
@@ -112,52 +110,89 @@ public class Client
             catch (IOException e)
             {
                 System.out.println("Could not close input stream");
-                throw new RuntimeException(e);
             }
         }
     }
 
     public static void main(String[] args)
     {
-        File file = new File("./gpxs/route1.gpx");
-        File file2 = new File("./gpxs/route2.gpx");
-        File file3 = new File("./gpxs/route3.gpx");
-        File file4 = new File("./gpxs/route4.gpx");
-        File file5 = new File("./gpxs/route5.gpx");
-        File file6 = new File("./gpxs/route6.gpx");
+        Scanner scanner = new Scanner(System.in);
 
-        Client client = new Client(file);
-        Client client2 = new Client(file2);
-        Client client3 = new Client(file3);
-        Client client4 = new Client(file4);
-        Client client5 = new Client(file5);
-        Client client6 = new Client(file6);
+        // Prompt user to select a route or segment
+        System.out.println("Select a route: ");
+        System.out.println("1. Route 1");
+        System.out.println("2. Route 2");
+        System.out.println("3. Route 3");
+        System.out.println("4. Route 4");
+        System.out.println("5. Route 5");
+        System.out.println("6. Route 6");
+        System.out.println("7. Send all routes");
+        System.out.println("Enter your choice:");
 
-        Thread c1 = new Thread(client::sendFile);
+        // Get user input
+        final int choice = scanner.nextInt();
 
-        Thread c2 = new Thread(client2::sendFile);
+        // Select file based on user choice
+        File file = null;
+        if (choice >= 1 && choice <= 6)
+        {
+            file = new File("./gpxs/route" + choice + ".gpx");
 
-        Thread c3 = new Thread(client3::sendFile);
+            Client client = new Client(file);
+            Thread c1 = new Thread(client::sendFile);
+            c1.start();
+            client.listenForMessages();
+        }
+        else if (choice == 7)
+        {
+            File file1 = new File("./gpxs/route1.gpx");
+            File file2 = new File("./gpxs/route2.gpx");
+            File file3 = new File("./gpxs/route3.gpx");
+            File file4 = new File("./gpxs/route4.gpx");
+            File file5 = new File("./gpxs/route5.gpx");
+            File file6 = new File("./gpxs/route6.gpx");
 
-        Thread c4 = new Thread(client4::sendFile);
+            Client client = new Client(file1);
+            Client client2 = new Client(file2);
+            Client client3 = new Client(file3);
+            Client client4 = new Client(file4);
+            Client client5 = new Client(file5);
+            Client client6 = new Client(file6);
 
-        Thread c5 = new Thread(client5::sendFile);
+            Thread c1 = new Thread(client::sendFile);
 
-        Thread c6 = new Thread(client6::sendFile);
+            Thread c2 = new Thread(client2::sendFile);
 
-        c1.start();
-        c2.start();
-        c3.start();
-        c4.start();
-        c5.start();
-        c6.start();
+            Thread c3 = new Thread(client3::sendFile);
 
+            Thread c4 = new Thread(client4::sendFile);
 
-        client.listenForMessages();
-        client2.listenForMessages();
-        client3.listenForMessages();
-        client4.listenForMessages();
-        client5.listenForMessages();
-        client6.listenForMessages();
+            Thread c5 = new Thread(client5::sendFile);
+
+            Thread c6 = new Thread(client6::sendFile);
+
+            c1.start();
+            c2.start();
+            c3.start();
+            c4.start();
+            c5.start();
+            c6.start();
+
+            client.listenForMessages();
+            client2.listenForMessages();
+            client3.listenForMessages();
+            client4.listenForMessages();
+            client5.listenForMessages();
+            client6.listenForMessages();
+        }
+        else if (choice > 7)
+        {
+            System.out.println("Invalid choice");
+            System.exit(0);
+        }
+
     }
+
+
+
 }

@@ -2,19 +2,18 @@ package activity.main;
 
 import activity.parser.Route;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Queue;
 
 public class Master
 {
-    // This will be the port that the client will connect to
-    public static final int CLIENT_PORT = 4445;
-    // This will be the port that the worker will connect to
-    public static final int WORKER_PORT = 4444;
+
     // This is the socket that the client will connect to
     private ServerSocket clientSocket;
     // This is the socket that the worker will connect to
@@ -31,6 +30,12 @@ public class Master
     {
         try
         {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+
+            final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
+            final int CLIENT_PORT = Integer.parseInt(config.getProperty("client_port"));
+
             this.numOfWorkers = numOfWorkers;
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
@@ -90,7 +95,6 @@ public class Master
                         throw new RuntimeException(ex);
                     }
                     System.out.println("Client connection closed");
-                    System.out.println("Error: " + e.getMessage());
                 }
             }
         });
@@ -119,9 +123,7 @@ public class Master
                     e.printStackTrace();
                     try
                     {
-
                         workerSocket.close();
-
                     } catch (IOException ex)
                     {
                         throw new RuntimeException(ex);
@@ -136,7 +138,7 @@ public class Master
         // Thread that will start dispatching work to the workers
         // We are passing the worker handler so that the work dispatcher can send work to the workers
         // We are also passing the routes, which is a shared memory between the client handler and the work dispatcher
-        // The client-ashandler will upload the routes to the work dispatcher and the work dispatcher will send the routes to the workers
+        // The client-handler will upload the routes to the work dispatcher and the work dispatcher will send the routes to the workers
         Thread dispatchWork = new Thread(() ->
         {
             WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);
@@ -144,9 +146,9 @@ public class Master
             workDispatcherThread.start();
         });
 
-        handleClient.start();
         handleWorker.start();
         dispatchWork.start();
+        handleClient.start();
         init.start();
     }
 

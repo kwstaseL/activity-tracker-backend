@@ -40,7 +40,6 @@ public class WorkDispatcher implements Runnable {
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
-                // TODO: Search if adding a new thread to handle the route could be a good idea (will need synchronization on the workers queue)
                 Route route = filesToWorker.poll();
                 handleRoute(route);
             }
