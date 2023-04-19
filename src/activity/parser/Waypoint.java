@@ -1,7 +1,6 @@
 package activity.parser;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 public class Waypoint implements Serializable
 {
@@ -79,7 +78,7 @@ public class Waypoint implements Serializable
     }
 
     /* equals: Used when calculating segments, and is used to work around a possible GPS drift between two waypoints
-     * making the assumption that two waypoints will be equal if they are at most 5 metres apart, and if they are at most 5 metres apart in height
+     * Making the assumption that two waypoints will be equal if they are at most 5 metres apart.
      */
     @Override
     public boolean equals(Object o)
@@ -87,12 +86,9 @@ public class Waypoint implements Serializable
         final double gpsError = 5.0;
 
         if (this == o) return true;
-        if (!(o instanceof Waypoint waypoint)) return false;
+        if (!(o instanceof Waypoint)) return false;
 
-        Waypoint other = (Waypoint) o;
-
-        // Calculates a distance between two waypoints, and if the distance is less than 5 metres,
-        // and the elevation difference is less than 5 metres, then the waypoints are considered equal
-        return this.distanceTo(other) <= gpsError && Math.abs(this.elevation - other.elevation) <= gpsError;
+        // Calculates the distance between two waypoints. If the distance is less than 5 metres, the 2 waypoints are considered equal.
+        return this.distanceTo((Waypoint) o) <= gpsError;
     }
 }
