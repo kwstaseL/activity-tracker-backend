@@ -24,7 +24,6 @@ public class Master
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
     private int numOfWorkers;
-
     public Master()
     {
         try

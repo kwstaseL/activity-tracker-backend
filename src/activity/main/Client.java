@@ -16,6 +16,8 @@ public class Client
     // This is the file that will be sent to the master
     private File file;
 
+    // TODO: Print the contents of the appropriate folder when asking what route to process
+
     private final Object lock = new Object();
 
     public Client(File file)

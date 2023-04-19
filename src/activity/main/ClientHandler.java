@@ -216,6 +216,7 @@ public class ClientHandler implements Runnable
 
 
     // addStats: Adds the stats to the queue to be processed by the readFromWorkerHandler method
+    // TODO: Remove Chunk as parameter, maybe Pair<Integer, Integer> for chunk id + total chunks expected?
     public void addStats(Pair<Chunk, ActivityStats> stats)
     {
         synchronized (statsQueue)
