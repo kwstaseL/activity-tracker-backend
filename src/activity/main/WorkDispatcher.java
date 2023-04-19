@@ -9,8 +9,8 @@ import java.util.Queue;
 
 // This class is responsible for taking in a route and splitting it into chunks, then sending the chunks to the workers
 // using round-robin
-public class WorkDispatcher implements Runnable {
-
+public class WorkDispatcher implements Runnable
+{
     // This is the queue that contains all the workers
     private final Queue<WorkerHandler> workers;
     // This is the queue that contains all the routes that need to be handled
@@ -49,31 +49,21 @@ public class WorkDispatcher implements Runnable {
     private void handleRoute(Route route)
     {
         ArrayList<Waypoint> waypoints = route.waypoints();
-
-        final int routeID = route.getRouteID();
-        final int clientID = route.getClientID();
-        final String user = route.getUser();
+        final int waypointsSize = waypoints.size();
 
         // n will represent the chunk size
-        int n;
-
-        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2
-        if (waypoints.size() >= workers.size())
-        {
-            n = (int) Math.ceil(waypoints.size() / (workers.size() * 2.0));
-        } else
-        {
-            // making the assumption that if workers are more than the waypoints provided, n will be
-            // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
-            n = 1;  // TODO: Test with custom gpx file
-        }
+        final int n = calculateChunkSize(waypointsSize);
 
         // expectedChunks: determines how many chunks of waypoints the route will be split into
-        final int expectedChunks = (int) Math.ceil(waypoints.size() / (double) n);
+        final int expectedChunks = calculateExpectedChunks(waypointsSize, n);
 
         ArrayList<Waypoint> waypointChunk = new ArrayList<>();
         int chunkIndex = 0;
         int chunks = 0;
+
+        final int routeID = route.getRouteID();
+        final int clientID = route.getClientID();
+        final String user = route.getUser();
 
         for (int i = 0; i < waypoints.size(); i++)
         {
@@ -84,7 +74,7 @@ public class WorkDispatcher implements Runnable {
             {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, workers);
+                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex);
 
                 if (i != waypoints.size() - 1)
                 {
@@ -98,13 +88,13 @@ public class WorkDispatcher implements Runnable {
             {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, workers);
+                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex);
 
             } else if (waypointChunk.size() == n + 1 && chunks != 0)
             {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, workers);
+                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex);
 
                 if (i != waypoints.size() - 1)
                 {
@@ -121,7 +111,7 @@ public class WorkDispatcher implements Runnable {
 
     // Creates the chunk and sends it to a worker
     private void createChunk(ArrayList<Waypoint> chunkWaypoints, int routeID, int clientID, String user,
-                             int expectedChunks, int chunkIndex, Queue<WorkerHandler> workers)
+                             int expectedChunks, int chunkIndex)
     {
         WorkerHandler worker = workers.poll();
         assert worker != null;
@@ -133,4 +123,26 @@ public class WorkDispatcher implements Runnable {
         // adding the worker to the end of the queue
         workers.add(worker);
     }
+
+    private int calculateExpectedChunks(int waypointsSize,int n)
+    {
+        return (int) Math.ceil(waypointsSize / (double) n);
+    }
+
+    private int calculateChunkSize(int numWaypoints)
+    {
+        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2
+        if (numWaypoints >= workers.size())
+        {
+            return (int) Math.ceil(numWaypoints / (workers.size() * 2.0));
+
+        } else
+        {
+            // making the assumption that if workers are more than the waypoints provided, n will be
+            // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
+            return 1;  // TODO: Test with custom gpx file
+        }
+    }
+
+
 }

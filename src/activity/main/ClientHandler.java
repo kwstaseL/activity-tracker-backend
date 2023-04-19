@@ -18,25 +18,18 @@ import java.util.*;
 // This class will handle the client connection
 public class ClientHandler implements Runnable
 {
-
     // This is the socket that the client is connected to
     private final Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-
+    // This is the queue that the routes will be added to
+    private Queue<Route> routes;
+    // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
+    private Queue<Pair<Chunk, ActivityStats>> statsQueue;
+    private static final Statistics statistics = new Statistics();
     // The unique id of the client, generated through a static id generator
     private int clientID;
     private static int clientIDGenerator = 0;
-
-    // This is the queue that the routes will be added to
-    private Queue<Route> routes;
-
-    // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
-    private Queue<Pair<Chunk, ActivityStats>> statsQueue;
-
-    //
-    private static final Statistics statistics = new Statistics();
-
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     private final Object writeLock = new Object();
@@ -65,7 +58,6 @@ public class ClientHandler implements Runnable
     public void run()
     {
         Thread readFromClient = new Thread(this::readFromClient);
-
         Thread readFromWorkerHandler = new Thread(this::readFromWorkerHandler);
 
         readFromClient.start();
@@ -127,8 +119,10 @@ public class ClientHandler implements Runnable
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
                         }
+
                     // Else, we create a new entry in the hashmap for this route
-                    } else
+                    }
+                    else
                     {
                         ArrayList<Pair<Chunk, ActivityStats>> activityList = new ArrayList<>();
                         activityList.add(stats);
@@ -157,7 +151,6 @@ public class ClientHandler implements Runnable
                     System.out.println("ClientHandler: Received segment from client");
                     // TODO : We need to parse the file and send it the work-dispatcher
                     // TODO: We could possibly make a class that the segment and the route will extend from
-
                     System.out.println("NOT IMPLEMENTED YET");
 
                 } else if (message.equals("ROUTE"))

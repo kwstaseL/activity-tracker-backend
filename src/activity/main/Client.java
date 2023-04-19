@@ -228,7 +228,6 @@ public class Client
 
 
     }
-
     public static void main(String[] args)
     {
         Scanner scanner = new Scanner(System.in);
@@ -237,7 +236,6 @@ public class Client
         System.out.println("1. Send a route");
         System.out.println("2. Send a segment");
         System.out.println("Enter your choice:");
-
         final int choice = scanner.nextInt();
 
         if (choice == 1)

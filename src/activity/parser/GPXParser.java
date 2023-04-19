@@ -32,7 +32,8 @@ public class GPXParser
             String creator = null;
 
             // Iterate through all the <wpt> tags
-            for (int i = 0; i < nodeList.getLength(); i++) {
+            for (int i = 0; i < nodeList.getLength(); i++)
+            {
                 // Get the <wpt> tag we are currently processing
                 Element element = (Element) nodeList.item(i);
                 creator = doc.getDocumentElement().getAttribute("creator");
@@ -44,7 +45,6 @@ public class GPXParser
                 // Add the waypoint to the list
                 waypoints.add(new Waypoint(Double.parseDouble(latitude), Double.parseDouble(longitude),
                         Double.parseDouble(elevation), time));
-
             }
 
             if (creator == null || waypoints.isEmpty()) {

@@ -55,7 +55,6 @@ public class UserStatistics
         return totalActivityTime / routesRecorded;
     }
 
-
     public String toString()
     {
         return "routesRecorded recorded for " + user + ": " + routesRecorded + ".\n Total Distance: " +
