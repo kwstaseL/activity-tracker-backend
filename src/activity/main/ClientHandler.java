@@ -143,6 +143,22 @@ public class ClientHandler implements Runnable
             {
                 // Receive the file object from the client
                 System.out.println("ClientHandler: Waiting for file from client");
+
+                File receivedFile = (File) in.readObject();
+
+                // Parse the file
+                Route route = GPXParser.parse(receivedFile);
+                route.setClientID(clientID);
+                // Add the route to the queue
+                synchronized (routes)
+                {
+                    // Dispatching the file to the workers
+                    routes.add(route);
+                    routes.notify();
+                }
+
+                /*
+
                 String message = (String) in.readObject();
 
                 File receivedFile = null;
@@ -170,6 +186,8 @@ public class ClientHandler implements Runnable
                         routes.notify();
                     }
                 }
+
+                 */
 
             }
 
@@ -199,8 +217,6 @@ public class ClientHandler implements Runnable
                 out.writeObject(finalResults);
                 out.flush();
             }
-
-
         } catch (IOException e)
         {
             System.out.println("Could not send object to the client");
@@ -243,7 +259,6 @@ public class ClientHandler implements Runnable
         {
             System.out.println("Client disconnected");
         }
-
     }
 
     public int getClientID()

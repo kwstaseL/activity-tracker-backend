@@ -9,44 +9,77 @@ public class Client
 {
     // This is the socket that the client is connected to with the master
     private Socket connection;
+
     // This is the output stream that will be used to send objects to the master
     private ObjectOutputStream out;
+
     // This is the input stream that will be used to receive objects from the master
     private ObjectInputStream in;
+
     // This is the file that will be sent to the master
     private File file;
 
-    // TODO: Print the contents of the appropriate folder when asking what route to process
+    // initialised: represents the state of Client objects. If false, clients cannot be initialised.
+    private static boolean initialised = false;
 
+    // directory: The directory with all the gpx available for processing
+    private static String directory;
+    private static String masterIP;
+    private static int clientPort;
+
+    // lock: dummy object used for synchronization
     private final Object lock = new Object();
 
     public Client(File file)
     {
-        try
-        {
-            Properties config = new Properties();
-            config.load(new FileInputStream("config.properties"));
+        if (!initialised) {
+            clientInitialisation();
+        }
 
-            final String masterIP = config.getProperty("master_ip");
-            final int client_port = Integer.parseInt(config.getProperty("client_port"));
+        this.file = file;
 
-            this.file = file;
-            // Create a socket that will connect to the master
-            connection = new Socket(masterIP, client_port);
+        // Create a socket that will connect to the master
+        try {
+            connection = new Socket(masterIP, clientPort);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("Could not connect to master");
             shutdown();
+            throw new RuntimeException(e);
         }
     }
 
-    public void sendFile(boolean isSegment)
+    /* clientInitialisation: To be called before the first Client object is instantiated, or during the first Client instantiation.
+     * Initiates all the necessary attributes a Client object should be aware of.
+     */
+    public static void clientInitialisation()
+    {
+        // if the Client class has already been initialised, return
+        if (Client.initialised) {
+            return;
+        }
+
+        Properties config = new Properties();
+        try {
+            config.load(new FileInputStream("config.properties"));
+            masterIP = config.getProperty("master_ip");
+            clientPort = Integer.parseInt(config.getProperty("client_port"));
+            directory = config.getProperty("directory");
+            initialised = true;
+        } catch (Exception e) {
+            System.out.println("Initialisation of clients failed.");
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendFile()
     {
         try
         {
+            // TODO: Cleanup
+            /*
             if (isSegment)
             {
                 out.writeObject("SEGMENT");
@@ -55,6 +88,7 @@ public class Client
             {
                 out.writeObject("ROUTE");
             }
+             */
             System.out.println("Sending file " + file.getName() + " to master\n");
             out.writeObject(file);
             out.flush();
@@ -128,134 +162,83 @@ public class Client
     {
         Scanner scanner = new Scanner(System.in);
 
-        // Prompt user to select a route or segment
-        System.out.println("Select a route: ");
-        System.out.println("1. Route 1");
-        System.out.println("2. Route 2");
-        System.out.println("3. Route 3");
-        System.out.println("4. Route 4");
-        System.out.println("5. Route 5");
-        System.out.println("6. Route 6");
-        System.out.println("7. Send all routes");
-        System.out.println("Enter your choice:");
+        // TODO: Make the following a while(true) loop?
 
-        // Get user input
-        final int choice = scanner.nextInt();
+        System.out.println("Available files:");
+        File directory = new File(Client.directory);
+
+        // directoryContents: Lists all the files (not folders) included in our directory.
+        // (essentially just excluding the segment folder)
+        File[] directoryContents = directory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile();   // file.isFile(): returns false if the file is a directory (like segments)
+            }
+        });
+
+        // if our directory is empty, there is nothing left to process
+        if (directoryContents == null || directoryContents.length == 0)
+        {
+            System.out.println("No routes are available for processing!");
+            return;
+        }
+
+        // list all routes
+        for (int i = 0; i < directoryContents.length; i++) {
+            System.out.println(i + ": " + directoryContents[i].getName());
+        }
+
+
+        // Prompt user to select a route
+        String input = null;
+        Integer choice = null;
+
+        // Acceptable input: all or "all" to send all routes, or anything in the range of 0 to directoryContents.length to send a single route.
+        while (choice == null || choice < 0 || choice >= directoryContents.length)
+        {
+            System.out.println("\nEnter \"all\" to send all routes, or enter a route index (0-" + (directoryContents.length - 1) +") to send a single route.");
+            try
+            {
+                input = scanner.nextLine();
+                choice = Integer.valueOf(input);
+            }
+            catch (NumberFormatException e)
+            {
+                // if the exception was caused by the user typing "all", send all the routes
+                if (input != null && (input.equalsIgnoreCase("all") || input.equalsIgnoreCase("\"all\"")))
+                {
+                    sendAllRoutes(directoryContents);
+                    return;
+                }
+
+                // else, ignore the invalid input and prompt the user to select a route again
+            }
+        }
 
         // Select file based on user choice
-        File file = null;
-        if (choice >= 1 && choice <= 6)
-        {
-            file = new File("./gpxs/route" + choice + ".gpx");
+        File file = directoryContents[choice];
 
-            Client client = new Client(file);
-            Thread c1 = new Thread(() -> client.sendFile(false));
-            c1.start();
-            client.listenForMessages();
-        }
-        else if (choice == 7)
-        {
-            File file1 = new File("./gpxs/route1.gpx");
-            File file2 = new File("./gpxs/route2.gpx");
-            File file3 = new File("./gpxs/route3.gpx");
-            File file4 = new File("./gpxs/route4.gpx");
-            File file5 = new File("./gpxs/route5.gpx");
-            File file6 = new File("./gpxs/route6.gpx");
-
-            Client client = new Client(file1);
-            Client client2 = new Client(file2);
-            Client client3 = new Client(file3);
-            Client client4 = new Client(file4);
-            Client client5 = new Client(file5);
-            Client client6 = new Client(file6);
-
-            Thread c1 = new Thread(() -> client.sendFile(false));
-
-            Thread c2 = new Thread(() -> client2.sendFile(false));
-
-            Thread c3 = new Thread(() -> client3.sendFile(false));
-
-            Thread c4 = new Thread(() -> client4.sendFile(false));
-
-            Thread c5 = new Thread(() -> client5.sendFile(false));
-
-            Thread c6 = new Thread(() -> client6.sendFile(false));
-
-            c1.start();
-            c2.start();
-            c3.start();
-            c4.start();
-            c5.start();
-            c6.start();
-
-            client.listenForMessages();
-            client2.listenForMessages();
-            client3.listenForMessages();
-            client4.listenForMessages();
-            client5.listenForMessages();
-            client6.listenForMessages();
-        }
-        else if (choice > 7)
-        {
-            System.out.println("Invalid choice");
-            System.exit(0);
-        }
+        Client client = new Client(file);
+        Thread clientThread = new Thread(client::sendFile);
+        clientThread.start();
+        client.listenForMessages();
     }
 
-    private static void sendSegment()
+    private static void sendAllRoutes(File[] directoryContents)
     {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Select a segment: ");
-        System.out.println("1. Segment 1");
-        System.out.println("2. Segment 2");
-
-        int choice = scanner.nextInt();
-
-        File file = null;
-        if (choice >= 1 && choice <= 2)
+        for (File file : directoryContents)
         {
-            file = new File("./gpxs/segment" + choice + ".gpx");
-
             Client client = new Client(file);
-            Thread c1 = new Thread(() -> client.sendFile(true));
-            c1.start();
+            Thread clientThread = new Thread(client::sendFile);
+            clientThread.start();
             client.listenForMessages();
         }
-        else
-        {
-            System.out.println("Invalid choice");
-            System.exit(0);
-        }
-
-
     }
+
     public static void main(String[] args)
     {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Select an option: ");
-        System.out.println("1. Send a route");
-        System.out.println("2. Send a segment");
-        System.out.println("Enter your choice:");
-        final int choice = scanner.nextInt();
-
-        if (choice == 1)
-        {
-            sendRoute();
-        }
-        else if (choice == 2)
-        {
-            sendSegment();
-        }
-        else
-        {
-            System.out.println("Invalid choice");
-            System.exit(0);
-        }
-
+        clientInitialisation();
+        sendRoute();
     }
-
-
 
 }
