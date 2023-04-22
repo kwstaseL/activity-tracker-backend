@@ -64,37 +64,39 @@ public class WorkDispatcher implements Runnable
         final int routeID = route.getRouteID();
         final int clientID = route.getClientID();
         final String user = route.getUser();
+        final String fileName = route.getFileName();
 
         for (int i = 0; i < waypoints.size(); i++)
         {
             Waypoint currentWaypoint = waypoints.get(i);
             waypointChunk.add(currentWaypoint);
 
-            if (waypointChunk.size() == n && chunks == 0)
-            {
+            // First condition: Turns true when the first chunk is full.
+            if (waypointChunk.size() == n && chunks == 0) {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex);
+                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, fileName);
 
-                if (i != waypoints.size() - 1)
-                {
+                if (i != waypoints.size() - 1) {
                     // clear the chunk for the next set of waypoints
                     waypointChunk = new ArrayList<>();
                     // adding the last waypoint from the previous chunk, so we do not miss the connection between i and i+1
                     waypointChunk.add(waypoints.get(i));
                 }
 
-            } else if (i == waypoints.size() - 1)
+            } // Second condition: Turns true when we reach the end of the waypoints to be processed, at which point we assign the chunk as is to a worker to process
+            else if (i == waypoints.size() - 1)
             {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex);
+                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, fileName);
 
-            } else if (waypointChunk.size() == n + 1 && chunks != 0)
+            } // Third condition: Turns true when a chunk after the first is full. Size limit is n+1, since it needs to hold the last waypoint of the previous chunk
+            else if (waypointChunk.size() == n + 1 && chunks != 0)
             {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex);
+                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, fileName);
 
                 if (i != waypoints.size() - 1)
                 {
@@ -111,12 +113,12 @@ public class WorkDispatcher implements Runnable
 
     // Creates the chunk and sends it to a worker
     private void createChunk(ArrayList<Waypoint> chunkWaypoints, int routeID, int clientID, String user,
-                             int expectedChunks, int chunkIndex)
+                             int expectedChunks, int chunkIndex, String fileName)
     {
         WorkerHandler worker = workers.poll();
         assert worker != null;
 
-        Route chunkedRoute = new Route(chunkWaypoints, routeID, clientID, user);
+        Route chunkedRoute = new Route(chunkWaypoints, routeID, clientID, user, fileName);
         Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
 
         worker.processJob(chunk);
@@ -140,7 +142,7 @@ public class WorkDispatcher implements Runnable
         {
             // making the assumption that if workers are more than the waypoints provided, n will be
             // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
-            return 1;  // TODO: Test with custom gpx file
+            return 1;
         }
     }
 
