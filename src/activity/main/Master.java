@@ -69,14 +69,17 @@ public class Master
                 try
                 {
                     System.out.println("MASTER: Waiting for client connection");
+
                     // Accept a client connection
                     Socket client = clientSocket.accept();
                     System.out.println("MASTER: Client connected");
+
                     // Create a new thread to handle the client
                     ClientHandler clientHandler = new ClientHandler(client,routes);
+
                     // Add the client handler to the lookup table
                     int clientID = clientHandler.getClientID();
-                    clientMap.put(clientID,clientHandler);
+                    clientMap.put(clientID, clientHandler);
                     Thread clientThread = new Thread(clientHandler);
                     clientThread.start();
 
