@@ -10,7 +10,11 @@ import java.util.HashMap;
  * the stats recorded, as well as the total distance, elevation and activity time across all users.
  */
 public class Statistics {
+
+    // userStats: A hashmap matching each user to their respective statistics.
     private HashMap<String, UserStatistics> userStats = new HashMap<>();
+
+    // activityArchive: An ArrayList consisting of the detailed stats of every route in the system
     private ArrayList<Pair<String, ActivityStats>> activityArchive = new ArrayList<>();     // TODO: Possibly unnecessary?
     private int routesRecorded = 0;
     private double totalDistance = 0;

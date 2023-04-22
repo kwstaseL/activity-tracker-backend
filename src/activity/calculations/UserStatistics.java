@@ -9,8 +9,14 @@ public class UserStatistics
     private double totalDistance;
     private double totalElevation;
     private double totalActivityTime;
+
+    // activityArchive: An ArrayList consisting of the detailed stats of every route for the specific user
     private ArrayList<ActivityStats> activityArchive;      // TODO: Possibly unnecessary
+
+    // routesRecorded: A counter for the amount of routes a user has registered. Eager approach to avoid repetitive activityArchive.length calls
     private int routesRecorded;
+
+    // user: Represents the username as entered on the original gpx file
     private String user;
 
     public UserStatistics(double totalDistance, double totalElevation, double totalActivityTime, String user)
@@ -57,7 +63,7 @@ public class UserStatistics
 
     public String toString()
     {
-        return "routesRecorded recorded for " + user + ": " + routesRecorded + ".\n Total Distance: " +
+        return "Routes recorded for " + user + ": " + routesRecorded + ".\n Total Distance: " +
                 totalDistance + " Total Elevation: " + totalElevation + " Total Activity Time: " + totalActivityTime;
     }
 
