@@ -7,27 +7,37 @@ public class Route implements Serializable
 {
     // Waypoints is the ArrayList of Waypoints that the route contains
     private final ArrayList<Waypoint> waypoints;
+
     // User is the username of the user who recorded the route
     private final String user;
+
     // Route ID is the unique ID of the route
     private final int routeID;
+
     // Client ID is the unique ID of the client-handler who sent the route
     private int clientID;
+
+    // Route file name: The name of the file. Used to move to "processed_gpx" as soon as the Reduce phase is done.
+    private String fileName;
+
     // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
 
-    public Route(ArrayList<Waypoint> waypoints, String user)
+    // TODO: Deprecated?
+    public Route(ArrayList<Waypoint> waypoints, String user, String fileName)
     {
         this.waypoints = waypoints;
         this.user = user;
         this.routeID = idGenerator++;
+        this.fileName = fileName;
     }
 
-    public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user) {
+    public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName) {
         this.waypoints = waypoints;
         this.routeID = routeID;
         this.clientID = clientID;
         this.user = user;
+        this.fileName = fileName;
     }
 
     public ArrayList<Waypoint> waypoints() {
@@ -42,12 +52,17 @@ public class Route implements Serializable
 
     public void setClientID(int clientID) { this.clientID = clientID; }
 
+    public String getFileName()
+    {
+        return fileName;
+    }
+
     public String getUser() {
         return user;
     }
 
     public String toString()
     {
-        return "Route ID: " + routeID + " Username: " + user + " Waypoints: " + waypoints.size() + " First waypoint: " + waypoints.get(0);
+        return "Route: " + fileName + " Username: " + user + " Waypoints: " + waypoints.size() + " First waypoint: " + waypoints.get(0);
     }
 }

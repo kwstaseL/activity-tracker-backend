@@ -50,7 +50,7 @@ public class GPXParser
             if (creator == null || waypoints.isEmpty()) {
                 throw new RuntimeException("Could not parse the file successfully.");
             }
-            route = new Route(waypoints, creator);
+            route = new Route(waypoints, creator, file.getName());
             System.out.println("Parsed: " + route);
         }
         catch (Exception e)
