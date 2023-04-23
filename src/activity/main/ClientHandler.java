@@ -112,7 +112,6 @@ public class ClientHandler implements Runnable
 
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
-                            // TODO: General cleanup
 
                             // fetching a list of all the stats we gathered for this specific route
                             ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
@@ -183,38 +182,6 @@ public class ClientHandler implements Runnable
                     routes.add(route);
                     routes.notify();
                 }
-
-                /*
-
-                String message = (String) in.readObject();
-
-                File receivedFile = null;
-                if (message.equals("SEGMENT"))
-                {
-                    System.out.println("ClientHandler: Received segment from client");
-                    // TODO : We need to parse the file and send it the work-dispatcher
-                    // TODO: We could possibly make a class that the segment and the route will extend from
-                    System.out.println("NOT IMPLEMENTED YET");
-
-                } else if (message.equals("ROUTE"))
-                {
-                    System.out.println("ClientHandler: Received route from client");
-
-                    receivedFile = (File) in.readObject();
-
-                    // Dispatching the file to the workers
-                    // Parse the file
-                    Route route = GPXParser.parse(receivedFile);
-                    route.setClientID(clientID);
-                    // Add the route to the queue
-                    synchronized (routes)
-                    {
-                        routes.add(route);
-                        routes.notify();
-                    }
-                }
-
-                 */
 
             }
 

@@ -78,17 +78,6 @@ public class Client
     {
         try
         {
-            // TODO: Cleanup
-            /*
-            if (isSegment)
-            {
-                out.writeObject("SEGMENT");
-            }
-            else
-            {
-                out.writeObject("ROUTE");
-            }
-             */
             System.out.println("Sending file " + file.getName() + " to master\n");
             out.writeObject(file);
             out.flush();
@@ -208,7 +197,8 @@ public class Client
 
                 input = scanner.nextLine();
 
-                if (input.equals("all")) {
+                if (input.equals("all"))
+                {
                     // send all routes/segments
                     for (File file : directoryContents)
                     {
@@ -219,7 +209,9 @@ public class Client
                         new Client(file).sendFile();
                     }
                     return;
-                } else {
+
+                } else
+                {
                     try {
                         choice = Integer.parseInt(input);
                     } catch (NumberFormatException e) {
@@ -250,7 +242,6 @@ public class Client
             }
         }
     }
-
 
 
     private static void sendAllRoutes(File[] directoryContents)
