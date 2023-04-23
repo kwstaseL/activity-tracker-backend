@@ -22,7 +22,7 @@ public class Client
     // initialised: represents the state of Client objects. If false, clients cannot be initialised.
     private static boolean initialised = false;
 
-    // directory: The directory with all the gpx available for processing
+    // unprocessedDirectory: The directory with all the gpx available for processing
     private static String directory;
     private static String masterIP;
     private static int clientPort;
@@ -65,7 +65,7 @@ public class Client
             config.load(new FileInputStream("config.properties"));
             masterIP = config.getProperty("master_ip");
             clientPort = Integer.parseInt(config.getProperty("client_port"));
-            directory = config.getProperty("directory");
+            directory = config.getProperty("unprocessed_directory");
             initialised = true;
         } catch (Exception e) {
             System.out.println("Initialisation of clients failed.");

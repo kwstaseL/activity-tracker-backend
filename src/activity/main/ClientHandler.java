@@ -8,10 +8,7 @@ import activity.parser.Chunk;
 import activity.parser.GPXParser;
 import activity.parser.Route;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.*;
 
@@ -27,14 +24,20 @@ public class ClientHandler implements Runnable
     // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
     private Queue<Pair<Chunk, ActivityStats>> statsQueue;
     private static final Statistics statistics = new Statistics();
+
     // The unique id of the client, generated through a static id generator
     private int clientID;
     private static int clientIDGenerator = 0;
+
+    // The directories where we keep unprocessed and processed gpx files
+    private String unprocessedDirectory;
+    private String processedDirectory;
+
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     private final Object writeLock = new Object();
 
-    public ClientHandler(Socket clientSocket , Queue<Route> routes)
+    public ClientHandler(Socket clientSocket , Queue<Route> routes, String unprocessedDirectory, String processedDirectory)
     {
         this.clientSocket = clientSocket;
         try
@@ -42,7 +45,8 @@ public class ClientHandler implements Runnable
             this.clientID = clientIDGenerator++;
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
-
+            this.unprocessedDirectory = unprocessedDirectory;
+            this.processedDirectory = processedDirectory;
             this.routes = routes;
             this.statsQueue = new LinkedList<>();
         }
@@ -101,9 +105,11 @@ public class ClientHandler implements Runnable
                         // Else, if we have accumulated all the chunks we need, we can start reducing
                         else if (activityList.size() == (chunk.getTotalChunks() -1))
                         {
+
+                            // TODO: Remove route from "available" directory, move to "processed"
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
-                            // TODO: Cleanup
+                            // TODO: General cleanup
 
                             // fetching a list of all the stats we gathered for this specific route
                             ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
@@ -113,6 +119,26 @@ public class ClientHandler implements Runnable
                             }
                             // Creating a new thread to handle the reducing phase
                             new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
+
+                            /*
+
+                            try {
+                                Files.move(Paths.get(unprocessedDirectory), Paths.get(processedDirectory), StandardCopyOption.REPLACE_EXISTING);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                             */
+
+                            File file = new File(unprocessedDirectory + chunk.getRoute().getFileName());
+                            System.out.println("dir: " + unprocessedDirectory + ", file name: " + chunk.getRoute().getFileName());
+
+                            if (!file.renameTo(new File(processedDirectory + chunk.getRoute().getFileName())))
+                            {
+                                throw new RuntimeException("Could not move file.");
+                            } else {
+                                System.out.println("Done?");
+                            }
+
                         // Else, we just add the chunk to the list
                         } else
                         {

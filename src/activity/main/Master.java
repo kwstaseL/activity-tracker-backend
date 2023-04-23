@@ -2,6 +2,7 @@ package activity.main;
 
 import activity.parser.Route;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,15 +16,25 @@ public class Master
 {
     // This is the socket that the client will connect to
     private ServerSocket clientSocket;
+
     // This is the socket that the worker will connect to
     private ServerSocket workerSocket;
+
     // Queue containing the routes that will be sent to the workers
     private Queue<Route> routes;
+
     // Queue containing all the worker handlers
     private Queue<WorkerHandler> workerHandlers;
+
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
+
+    // The number of workers, as extracted from the config
     private int numOfWorkers;
+
+    // The directories, as extracted from the config
+    private File unprocessedDirectory;
+    private File processedDirectory;
     public Master()
     {
         try
@@ -33,7 +44,9 @@ public class Master
 
             final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
             final int CLIENT_PORT = Integer.parseInt(config.getProperty("client_port"));
-            this.numOfWorkers = Integer.parseInt(config.getProperty("number_of_workers"));
+            numOfWorkers = Integer.parseInt(config.getProperty("number_of_workers"));
+            unprocessedDirectory = new File(config.getProperty("unprocessed_directory"));
+            processedDirectory = new File(config.getProperty("processed_directory"));
 
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
@@ -75,7 +88,7 @@ public class Master
                     System.out.println("MASTER: Client connected");
 
                     // Create a new thread to handle the client
-                    ClientHandler clientHandler = new ClientHandler(client,routes);
+                    ClientHandler clientHandler = new ClientHandler(client, routes, unprocessedDirectory.getAbsolutePath(), processedDirectory.getAbsolutePath());
 
                     // Add the client handler to the lookup table
                     int clientID = clientHandler.getClientID();
