@@ -229,6 +229,7 @@ public class Client
         client.listenForMessages();
     }
 
+    //
     private static void sendAllRoutes(File[] directoryContents)
     {
         for (File file : directoryContents)
