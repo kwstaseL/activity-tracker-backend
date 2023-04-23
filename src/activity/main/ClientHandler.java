@@ -112,7 +112,6 @@ public class ClientHandler implements Runnable
 
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
-                            // TODO: General cleanup
 
                             // fetching a list of all the stats we gathered for this specific route
                             ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
@@ -184,38 +183,6 @@ public class ClientHandler implements Runnable
                     routes.notify();
                 }
 
-                /*
-
-                String message = (String) in.readObject();
-
-                File receivedFile = null;
-                if (message.equals("SEGMENT"))
-                {
-                    System.out.println("ClientHandler: Received segment from client");
-                    // TODO : We need to parse the file and send it the work-dispatcher
-                    // TODO: We could possibly make a class that the segment and the route will extend from
-                    System.out.println("NOT IMPLEMENTED YET");
-
-                } else if (message.equals("ROUTE"))
-                {
-                    System.out.println("ClientHandler: Received route from client");
-
-                    receivedFile = (File) in.readObject();
-
-                    // Dispatching the file to the workers
-                    // Parse the file
-                    Route route = GPXParser.parse(receivedFile);
-                    route.setClientID(clientID);
-                    // Add the route to the queue
-                    synchronized (routes)
-                    {
-                        routes.add(route);
-                        routes.notify();
-                    }
-                }
-
-                 */
-
             }
 
         } catch (IOException | ClassNotFoundException e)
@@ -232,7 +199,6 @@ public class ClientHandler implements Runnable
     {
         System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
 
-        // TODO: Cleanup?
         // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
         ActivityStats finalResults = Reduce.reduce(intermediateResults);
         try
@@ -254,7 +220,6 @@ public class ClientHandler implements Runnable
 
 
     // addStats: Adds the stats to the queue to be processed by the readFromWorkerHandler method
-    // TODO: Remove Chunk as parameter, maybe Pair<Integer, Integer> for chunk id + total chunks expected?
     public void addStats(Pair<Chunk, ActivityStats> stats)
     {
         synchronized (statsQueue)
@@ -294,5 +259,5 @@ public class ClientHandler implements Runnable
     {
         return clientID;
     }
-    
+
 }

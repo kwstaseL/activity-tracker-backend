@@ -193,6 +193,37 @@ public class Statistics implements Serializable
         return this;
     }
 
+    // getAverageDistance: Calculates the average distance recorded across all routes.
+    public double getAverageDistance()
+    {
+        if (routesRecorded == 0)
+        {
+            throw new RuntimeException("No routes have been recorded yet.");
+        }
+        return totalDistance / routesRecorded;
+    }
+
+    // getAverageElevation: Similarly to getAverageDistance
+    public double getAverageElevation()
+    {
+        if (routesRecorded == 0)
+        {
+            throw new RuntimeException("No routes have been recorded yet.");
+        }
+        return totalElevation / routesRecorded;
+    }
+
+    // getAverageDistance: Similarly to getAverageDistance
+    public double getAverageActivityTime()
+    {
+        if (routesRecorded == 0)
+        {
+            throw new RuntimeException("No routes have been recorded yet.");
+        }
+        return totalActivityTime / routesRecorded;
+    }
+
+
     // getAverageDistanceForUser: Calculates the average distance for a user by dividing their total distance with the # of routes they have recorded.
     public double getAverageDistanceForUser(String user)
     {
@@ -224,36 +255,6 @@ public class Statistics implements Serializable
         }
 
         return userStats.get(user).getAverageActivityTime();
-    }
-
-    // getAverageDistance: Calculates the average distance recorded across all routes.
-    public double getAverageDistance()
-    {
-        if (routesRecorded == 0)
-        {
-            throw new RuntimeException("No routes have been recorded yet.");
-        }
-        return totalDistance / routesRecorded;
-    }
-
-    // getAverageElevation: Similarly to getAverageDistance
-    public double getAverageElevation()
-    {
-        if (routesRecorded == 0)
-        {
-            throw new RuntimeException("No routes have been recorded yet.");
-        }
-        return totalElevation / routesRecorded;
-    }
-
-    // getAverageDistance: Similarly to getAverageDistance
-    public double getAverageActivityTime()
-    {
-        if (routesRecorded == 0)
-        {
-            throw new RuntimeException("No routes have been recorded yet.");
-        }
-        return totalActivityTime / routesRecorded;
     }
 
     @Override
