@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class UserStatistics
 {
+    // TODO: Make files out of user statistics
     private double totalDistance;
     private double totalElevation;
     private double totalActivityTime;
@@ -63,8 +64,8 @@ public class UserStatistics
 
     public String toString()
     {
-        return "Routes recorded for " + user + ": " + routesRecorded + ".\n Total Distance: " +
-                totalDistance + " Total Elevation: " + totalElevation + " Total Activity Time: " + totalActivityTime;
+        return "Routes recorded for " + user + ": " + routesRecorded + ".\n Average Distance: " +
+                getAverageDistance() + ", Average Elevation: " + getAverageElevation() + ", Average Activity Time: " + getAverageActivityTime();
     }
 
 }

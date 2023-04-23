@@ -121,7 +121,6 @@ public class ClientHandler implements Runnable
                             new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
 
                             /*
-
                             try {
                                 Files.move(Paths.get(unprocessedDirectory), Paths.get(processedDirectory), StandardCopyOption.REPLACE_EXISTING);
                             } catch (IOException e) {
@@ -159,6 +158,12 @@ public class ClientHandler implements Runnable
             }
         }
     }
+
+    // TODO: Implement the else condition from the method above as a separate method
+    private void registerStats() {
+
+    }
+
     // This method is used to get the file from the client
     // And to send it to the work-dispatcher that will dispatch it to the workers.
     private void readFromClient()

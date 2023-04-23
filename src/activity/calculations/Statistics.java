@@ -34,6 +34,17 @@ public class Statistics {
         totalActivityTime += activityStats.getTime();
         activityArchive.add(new Pair<>(user, activityStats));
         ++routesRecorded;
+
+        System.out.println("Statistics across all users so far: ");
+    }
+
+    // getUserStats: Returns the UserStatistics object associated with a specific user.
+    public UserStatistics getUserStats(String user)
+    {
+        if (!userStats.containsKey(user)) {
+            throw new RuntimeException("User has not been registered.");
+        }
+        return userStats.get(user);
     }
 
     // getAverageDistanceForUser: Calculates the average distance for a user by dividing their total distance with the # of routes they have recorded.
@@ -97,6 +108,13 @@ public class Statistics {
             throw new RuntimeException("No routes have been recorded yet.");
         }
         return totalActivityTime / routesRecorded;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Total routes recorded: " + routesRecorded + ".\n Average Distance: " + getAverageDistance() +
+                ", Average Elevation: " + getAverageElevation() + ", Average Activity Time: " + getAverageActivityTime();
     }
 
 }

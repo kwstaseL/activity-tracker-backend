@@ -109,6 +109,8 @@ public class Client
                 {
                     Object receivedObject = in.readObject();
                     System.out.println("Output for file | " + file.getName() + " | " + receivedObject + "\n");
+                    System.out.println("Statistics for user: ");
+                    System.out.println("Statistics across all users: ");
                 }
                 catch (Exception e)
                 {
