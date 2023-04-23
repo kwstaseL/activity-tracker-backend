@@ -124,7 +124,7 @@ public class Statistics implements Serializable
 
                 UserStatistics statisticsForUser = userStats.get(user);
 
-                Element routeElement = doc.createElement("Number_Of_Routes");
+                Element routeElement = doc.createElement("Routes_Recorded");
                 Text routesForUser = doc.createTextNode(String.valueOf(statisticsForUser.getRoutesRecorded()));
                 routeElement.appendChild(routesForUser);
                 userElement.appendChild(routeElement);
@@ -146,6 +146,31 @@ public class Statistics implements Serializable
 
                 root.appendChild(userElement);
             }
+
+            // now, writing the statistics for all users
+            Element total = doc.createElement("Total");
+
+            Element totalRoutes = doc.createElement("Total_Routes_Recorded");
+            Text totalRoutesText = doc.createTextNode(String.valueOf(routesRecorded));
+            totalRoutes.appendChild(totalRoutesText);
+            total.appendChild(totalRoutes);
+
+            Element totalDistanceElement = doc.createElement("Total_Distance");
+            Text totalDistanceText = doc.createTextNode(String.valueOf(totalDistance));
+            totalDistanceElement.appendChild(totalDistanceText);
+            total.appendChild(totalDistanceElement);
+
+            Element totalElevationElement = doc.createElement("Total_Elevation");
+            Text totalElevationText = doc.createTextNode(String.valueOf(totalElevation));
+            totalElevationElement.appendChild(totalElevationText);
+            total.appendChild(totalElevationElement);
+
+            Element totalActivityTimeElement = doc.createElement("Total_Activity_Time");
+            Text totalActivityTimeText = doc.createTextNode(String.valueOf(totalActivityTime));
+            totalActivityTimeElement.appendChild(totalActivityTimeText);
+            total.appendChild(totalActivityTimeElement);
+
+            root.appendChild(total);
 
             DOMSource source = new DOMSource(doc);
             Properties config = new Properties();
