@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <User_Statistics>
     <User>
-        <Username>user2</Username>
+        <Username>user1</Username>
         <Number_Of_Routes>1</Number_Of_Routes>
-        <Total_Distance>2.203633118053569</Total_Distance>
-        <Total_Elevation>31.239999999999995</Total_Elevation>
-        <Total_Activity_Time>16.25</Total_Activity_Time>
+        <Total_Distance>2.7988538142210233</Total_Distance>
+        <Total_Elevation>8.619999999999997</Total_Elevation>
+        <Total_Activity_Time>18.349999999999998</Total_Activity_Time>
+    </User>
+    <User>
+        <Username>user2</Username>
+        <Number_Of_Routes>2</Number_Of_Routes>
+        <Total_Distance>3.920595545234863</Total_Distance>
+        <Total_Elevation>38.22</Total_Elevation>
+        <Total_Activity_Time>23.46666666666666</Total_Activity_Time>
     </User>
 </User_Statistics>
