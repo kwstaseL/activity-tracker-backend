@@ -19,7 +19,7 @@ public class UserStatistics implements Serializable
     private int routesRecorded;
 
     // user: Represents the username as entered on the original gpx file
-    private String user;
+    private final String user;
 
     public UserStatistics(double totalDistance, double totalElevation, double totalActivityTime, String user)
     {

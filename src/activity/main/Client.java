@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.util.Properties;
 import java.util.Scanner;
 
+// Represents the client which is basically the user of the application
+// He will be able to send files to the master and receive the results of his statistics back
 public class Client
 {
     // This is the socket that the client is connected to with the master
@@ -32,18 +34,19 @@ public class Client
 
     public Client(File file)
     {
-        if (!initialised) {
+        if (!initialised)
+        {
             clientInitialisation();
         }
-
         this.file = file;
-
         // Create a socket that will connect to the master
-        try {
+        try
+        {
             connection = new Socket(masterIP, clientPort);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             System.out.println("Could not connect to master");
             shutdown();
             throw new RuntimeException(e);
@@ -60,6 +63,7 @@ public class Client
             return;
         }
 
+        // otherwise, initialise the Client class
         Properties config = new Properties();
         try {
             config.load(new FileInputStream("config.properties"));
@@ -74,6 +78,7 @@ public class Client
         }
     }
 
+    // This method will be used to send the file to the master
     public void sendFile()
     {
         try
@@ -89,14 +94,18 @@ public class Client
         }
     }
 
+    // This method will be used to receive the statistics from the master
     public void listenForMessages()
     {
         try
         {
+            // routeStats: contains the statistics for the route that was sent to the master
             Object routeStats = in.readObject();
             System.out.println("Output for file | " + file.getName() + " | " + routeStats + "\n");
+            // userStats: contains the overall statistics for the user that sent the route to the master
             Object userStats = in.readObject();
             System.out.println(userStats + "\n");
+            // allUsersStats: contains the overall statistics for all users that have sent routes to the master
             Object allUsersStats = in.readObject();
             System.out.println(allUsersStats + "\n");
         }
@@ -108,6 +117,131 @@ public class Client
 
     }
 
+    // This is the UI for the client
+    // It will allow the user to select a route to be send for processing and will display the results
+    // It will also allow him to select a segment that he will decide, and find the statistics for that segment for all users
+    private static void sendRoute()
+    {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true)
+        {
+            System.out.println("Available files:");
+            File directory = new File(Client.directory);
+
+            // directoryContents: Lists all the files (not folders) included in our directory.
+            // (essentially just excluding the segment folder)
+            File[] directoryContents = directory.listFiles(new FileFilter()
+            {
+                @Override
+                public boolean accept(File file) {
+                    return file.isFile();   // file.isFile(): returns false if the file is a directory (like segments)
+                }
+            });
+
+            // if our directory is empty, there is nothing left to process
+            if (directoryContents == null || directoryContents.length == 0)
+            {
+                System.out.println("No routes are available for processing!");
+                return;
+            }
+
+            // list all routes
+            for (int i = 0; i < directoryContents.length; i++)
+            {
+                System.out.println(i + ": " + directoryContents[i].getName());
+            }
+
+            // list all segments
+            File segmentsDirectory = new File(Client.directory + "/segments");
+            File[] segmentContents = segmentsDirectory.listFiles(new FileFilter()
+            {
+                @Override
+                public boolean accept(File file) {
+                    return file.isFile();
+                }
+            });
+
+            System.out.println("Available segments:");
+            for (int i = 0; i < segmentContents.length; i++)
+            {
+                System.out.println((i + directoryContents.length) + ": " + segmentContents[i].getName());
+            }
+
+            // Prompt user to select a route or segment
+            String input = null;
+            Integer choice = null;
+
+            // Acceptable input: all or "all" to send all routes/segments, or anything in the range of 0 to the total number
+            // of routes/segments to send a single route/segment.
+            while (choice == null || choice < 0 || choice >= directoryContents.length + segmentContents.length)
+            {
+                System.out.println("\nEnter \"all\" to send all routes/segments, or enter a file index (0-"
+                        + (directoryContents.length + segmentContents.length - 1) +") to send a single route/segment:");
+
+                input = scanner.nextLine();
+
+                if (input.equals("all"))
+                {
+                    // send all routes/segments
+                    for (File file : directoryContents)
+                    {
+                        new Client(file).sendFile();
+                    }
+                    for (File file : segmentContents)
+                    {
+                        new Client(file).sendFile();
+                    }
+                    return;
+
+                } else
+                {
+                    try
+                    {
+                        choice = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input. Please enter a valid file index or \"all\".");
+                        continue;
+                    }
+
+                    if (choice < 0 || choice >= directoryContents.length + segmentContents.length) {
+                        System.out.println("Invalid input. Please enter a valid file index or \"all\".");
+                        choice = null;
+                        continue;
+                    }
+
+                    File file;
+                    if (choice < directoryContents.length) {
+                        // user selected a route
+                        file = directoryContents[choice];
+                    } else {
+                        // user selected a segment
+                        file = segmentContents[choice - directoryContents.length];
+                    }
+
+                    // send the selected route/segment
+                    Client client = new Client(file);
+                    client.sendFile();
+                    client.listenForMessages();
+                }
+            }
+        }
+    }
+
+    // This method will be used to send all routes to the master
+    private static void sendAllRoutes(File[] directoryContents)
+    {
+        for (File file : directoryContents)
+        {
+            Client client = new Client(file);
+            Thread clientThread = new Thread(client::sendFile);
+            clientThread.start();
+            client.listenForMessages();
+        }
+    }
+
+
+    // This method will be used to close the connection with the master and the streams
     private void shutdown()
     {
         if (connection != null)
@@ -142,116 +276,6 @@ public class Client
             {
                 System.out.println("Could not close input stream");
             }
-        }
-    }
-
-    private static void sendRoute() {
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            System.out.println("Available files:");
-            File directory = new File(Client.directory);
-
-            // directoryContents: Lists all the files (not folders) included in our directory.
-            // (essentially just excluding the segment folder)
-            File[] directoryContents = directory.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return file.isFile();   // file.isFile(): returns false if the file is a directory (like segments)
-                }
-            });
-
-            // if our directory is empty, there is nothing left to process
-            if (directoryContents == null || directoryContents.length == 0) {
-                System.out.println("No routes are available for processing!");
-                return;
-            }
-
-            // list all routes
-            for (int i = 0; i < directoryContents.length; i++) {
-                System.out.println(i + ": " + directoryContents[i].getName());
-            }
-
-            // list all segments
-            File segmentsDirectory = new File(Client.directory + "/segments");
-            File[] segmentContents = segmentsDirectory.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return file.isFile();
-                }
-            });
-            System.out.println("Available segments:");
-            for (int i = 0; i < segmentContents.length; i++) {
-                System.out.println((i + directoryContents.length) + ": " + segmentContents[i].getName());
-            }
-
-            // Prompt user to select a route or segment
-            String input = null;
-            Integer choice = null;
-
-            // Acceptable input: all or "all" to send all routes/segments, or anything in the range of 0 to the total number
-            // of routes/segments to send a single route/segment.
-            while (choice == null || choice < 0 || choice >= directoryContents.length + segmentContents.length) {
-                System.out.println("\nEnter \"all\" to send all routes/segments, or enter a file index (0-"
-                        + (directoryContents.length + segmentContents.length - 1) +") to send a single route/segment:");
-
-                input = scanner.nextLine();
-
-                if (input.equals("all"))
-                {
-                    // send all routes/segments
-                    for (File file : directoryContents)
-                    {
-                        new Client(file).sendFile();
-                    }
-                    for (File file : segmentContents)
-                    {
-                        new Client(file).sendFile();
-                    }
-                    return;
-
-                } else
-                {
-                    try {
-                        choice = Integer.parseInt(input);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid input. Please enter a valid file index or \"all\".");
-                        continue;
-                    }
-
-                    if (choice < 0 || choice >= directoryContents.length + segmentContents.length) {
-                        System.out.println("Invalid input. Please enter a valid file index or \"all\".");
-                        choice = null;
-                        continue;
-                    }
-
-                    File file;
-                    if (choice < directoryContents.length) {
-                        // user selected a route
-                        file = directoryContents[choice];
-                    } else {
-                        // user selected a segment
-                        file = segmentContents[choice - directoryContents.length];
-                    }
-
-                    // send the selected route/segment
-                    Client client = new Client(file);
-                    client.sendFile();
-                    client.listenForMessages();
-                }
-            }
-        }
-    }
-
-
-    private static void sendAllRoutes(File[] directoryContents)
-    {
-        for (File file : directoryContents)
-        {
-            Client client = new Client(file);
-            Thread clientThread = new Thread(client::sendFile);
-            clientThread.start();
-            client.listenForMessages();
         }
     }
 
