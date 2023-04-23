@@ -100,29 +100,23 @@ public class Client
         }
     }
 
-    // TODO: Receive also the statistics from the master for the user and for all users
     public void listenForMessages()
     {
-        new Thread(() -> {
-            while (!connection.isClosed())
-            {
-                try
-                {
-                    Object routeStats = in.readObject();
-                    System.out.println("Output for file | " + file.getName() + " | " + routeStats + "\n");
-                    Object userStats = in.readObject();
-                    System.out.println(userStats + "\n");
-                    Object allUsersStats = in.readObject();
-                    System.out.println(allUsersStats + "\n");
-                }
-                catch (Exception e)
-                {
-                    System.out.println("Could not receive object");
-                    shutdown();
-                }
 
-            }
-        }).start();
+        try
+        {
+            Object routeStats = in.readObject();
+            System.out.println("Output for file | " + file.getName() + " | " + routeStats + "\n");
+            Object userStats = in.readObject();
+            System.out.println(userStats + "\n");
+            Object allUsersStats = in.readObject();
+            System.out.println(allUsersStats + "\n");
+        }
+        catch (Exception e)
+        {
+            System.out.println("Could not receive object");
+            shutdown();
+        }
 
     }
 
@@ -167,67 +161,68 @@ public class Client
     {
         Scanner scanner = new Scanner(System.in);
 
-        // TODO: Make the following a while(true) loop?
-
-        System.out.println("Available files:");
-        File directory = new File(Client.directory);
-
-        // directoryContents: Lists all the files (not folders) included in our directory.
-        // (essentially just excluding the segment folder)
-        File[] directoryContents = directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile();   // file.isFile(): returns false if the file is a directory (like segments)
-            }
-        });
-
-        // if our directory is empty, there is nothing left to process
-        if (directoryContents == null || directoryContents.length == 0)
+        while (true)
         {
-            System.out.println("No routes are available for processing!");
-            return;
-        }
+            System.out.println("Available files:");
+            File directory = new File(Client.directory);
 
-        // list all routes
-        for (int i = 0; i < directoryContents.length; i++) {
-            System.out.println(i + ": " + directoryContents[i].getName());
-        }
-
-
-        // Prompt user to select a route
-        String input = null;
-        Integer choice = null;
-
-        // Acceptable input: all or "all" to send all routes, or anything in the range of 0 to directoryContents.length to send a single route.
-        while (choice == null || choice < 0 || choice >= directoryContents.length)
-        {
-            System.out.println("\nEnter \"all\" to send all routes, or enter a route index (0-" + (directoryContents.length - 1) +") to send a single route.");
-            try
-            {
-                input = scanner.nextLine();
-                choice = Integer.valueOf(input);
-            }
-            catch (NumberFormatException e)
-            {
-                // if the exception was caused by the user typing "all", send all the routes
-                if (input != null && (input.equalsIgnoreCase("all") || input.equalsIgnoreCase("\"all\"")))
-                {
-                    sendAllRoutes(directoryContents);
-                    return;
+            // directoryContents: Lists all the files (not folders) included in our directory.
+            // (essentially just excluding the segment folder)
+            File[] directoryContents = directory.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isFile();   // file.isFile(): returns false if the file is a directory (like segments)
                 }
+            });
 
-                // else, ignore the invalid input and prompt the user to select a route again
+            // if our directory is empty, there is nothing left to process
+            if (directoryContents == null || directoryContents.length == 0)
+            {
+                System.out.println("No routes are available for processing!");
+                return;
             }
+
+            // list all routes
+            for (int i = 0; i < directoryContents.length; i++) {
+                System.out.println(i + ": " + directoryContents[i].getName());
+            }
+
+
+            // Prompt user to select a route
+            String input = null;
+            Integer choice = null;
+
+            // Acceptable input: all or "all" to send all routes, or anything in the range of 0 to directoryContents.length to send a single route.
+            while (choice == null || choice < 0 || choice >= directoryContents.length)
+            {
+                System.out.println("\nEnter \"all\" to send all routes, or enter a route index (0-" + (directoryContents.length - 1) +") to send a single route.");
+                try
+                {
+                    input = scanner.nextLine();
+                    choice = Integer.valueOf(input);
+                }
+                catch (NumberFormatException e)
+                {
+                    // if the exception was caused by the user typing "all", send all the routes
+                    if (input != null && (input.equalsIgnoreCase("all") || input.equalsIgnoreCase("\"all\"")))
+                    {
+                        sendAllRoutes(directoryContents);
+                        return;
+                    }
+
+                    // else, ignore the invalid input and prompt the user to select a route again
+                }
+            }
+
+            // Select file based on user choice
+            File file = directoryContents[choice];
+
+            Client client = new Client(file);
+            client.sendFile();
+            client.listenForMessages();
         }
-
-        // Select file based on user choice
-        File file = directoryContents[choice];
-
-        Client client = new Client(file);
-        Thread clientThread = new Thread(client::sendFile);
-        clientThread.start();
-        client.listenForMessages();
     }
+
 
     //
     private static void sendAllRoutes(File[] directoryContents)
@@ -240,6 +235,7 @@ public class Client
             client.listenForMessages();
         }
     }
+
 
     public static void main(String[] args)
     {
