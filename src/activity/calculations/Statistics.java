@@ -51,8 +51,10 @@ public class Statistics implements Serializable
         updateStats(user);
     }
 
+    // updateStats: Updates the xml file accordingly
     private void updateStats(String user)
     {
+        // if the file does not already exist, create it and update it with the statistics currently registered
         if (!fileExists())
         {
             createFile();
@@ -61,6 +63,7 @@ public class Statistics implements Serializable
 
     }
 
+    // fileExists: Returns true if the statistics file already exists, false otherwise.
     private boolean fileExists()
     {
         try
@@ -95,6 +98,7 @@ public class Statistics implements Serializable
         }
     }
 
+    // createFile: Called when first creating the file. Writes down the statistics for all users currently registered
     private void createFile()
     {
         try
@@ -108,7 +112,7 @@ public class Statistics implements Serializable
             Element root = doc.createElement("User_Statistics");
             doc.appendChild(root);
 
-            // for all the users currently registered, write their statistics to our xml file
+            // for all the users currently registered, write their statistics to the xml file
             for (String user : userStats.keySet())
             {
                 Element userElement = doc.createElement("User");
