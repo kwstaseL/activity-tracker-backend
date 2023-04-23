@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <User_Statistics>
     <User>
-        <Username>user3</Username>
+        <Username>user2</Username>
         <Number_Of_Routes>1</Number_Of_Routes>
-        <Total_Distance>5.16831285906785</Total_Distance>
-        <Total_Elevation>56.03000000000003</Total_Elevation>
-        <Total_Activity_Time>20.933333333333334</Total_Activity_Time>
+        <Total_Distance>2.203633118053569</Total_Distance>
+        <Total_Elevation>31.239999999999995</Total_Elevation>
+        <Total_Activity_Time>16.25</Total_Activity_Time>
     </User>
 </User_Statistics>
