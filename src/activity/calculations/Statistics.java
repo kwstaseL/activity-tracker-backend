@@ -1,10 +1,21 @@
 package activity.calculations;
 
 import activity.mapreduce.Pair;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
-import java.io.Serializable;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
 /* Statistics: The class that will be in charge of handling all the related statistics.
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded, an archive of
@@ -37,7 +48,135 @@ public class Statistics implements Serializable
         activityArchive.add(new Pair<>(user, activityStats));
         ++routesRecorded;
 
-        System.out.println("Statistics across all users so far: ");
+        updateStats(user);
+    }
+
+    private void updateStats(String user)
+    {
+        if (!fileExists())
+        {
+            createFile();
+            return;
+        }
+
+    }
+
+    private boolean fileExists()
+    {
+        try
+        {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+            File statisticsPath = new File(config.getProperty("statistics_directory"));
+            File[] directoryContents = statisticsPath.listFiles();
+            if (directoryContents == null)
+            {
+                if (!new File(config.getProperty("statistics_directory")).mkdirs())
+                {
+                    throw new RuntimeException("Could not find the directory, and could not make a new directory.");
+                }
+                directoryContents = new File[0];
+                statisticsPath = new File(config.getProperty("statistics_directory"));
+            }
+
+            for (File file : directoryContents)
+            {
+                if (file.getName().equals(config.getProperty("statistics_file")))
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createFile()
+    {
+        try
+        {
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document doc = builder.newDocument();
+
+            // root node
+            Element root = doc.createElement("User_Statistics");
+            doc.appendChild(root);
+
+            // for all the users currently registered, write their statistics to our xml file
+            for (String user : userStats.keySet())
+            {
+                Element userElement = doc.createElement("User");
+
+                Element usernameElement = doc.createElement("Username");
+                Text nameOfUser = doc.createTextNode(user);
+                usernameElement.appendChild(nameOfUser);
+                userElement.appendChild(usernameElement);
+
+                UserStatistics statisticsForUser = userStats.get(user);
+
+                Element routeElement = doc.createElement("Number_Of_Routes");
+                Text routesForUser = doc.createTextNode(String.valueOf(statisticsForUser.getRoutesRecorded()));
+                routeElement.appendChild(routesForUser);
+                userElement.appendChild(routeElement);
+
+                Element totalDistanceElement = doc.createElement("Total_Distance");
+                Text totalDistanceOfUser = doc.createTextNode(String.valueOf(statisticsForUser.getTotalDistance()));
+                totalDistanceElement.appendChild(totalDistanceOfUser);
+                userElement.appendChild(totalDistanceElement);
+
+                Element totalElevationElement = doc.createElement("Total_Elevation");
+                Text totalElevationOfUser = doc.createTextNode(String.valueOf(statisticsForUser.getTotalElevation()));
+                totalElevationElement.appendChild(totalElevationOfUser);
+                userElement.appendChild(totalElevationElement);
+
+                Element totalActivityTimeElement = doc.createElement("Total_Activity_Time");
+                Text totalActivityTimeOfUser = doc.createTextNode(String.valueOf(statisticsForUser.getTotalActivityTime()));
+                totalActivityTimeElement.appendChild(totalActivityTimeOfUser);
+                userElement.appendChild(totalActivityTimeElement);
+
+                root.appendChild(userElement);
+            }
+
+            DOMSource source = new DOMSource(doc);
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+            String path = config.getProperty("statistics_directory") + File.pathSeparator + config.getProperty("statistics_file");
+            File file = new File(path);
+
+            Result result = new StreamResult(file);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(source, result);
+
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Could not load config.");
+        }
+        catch (FactoryConfigurationError e)
+        {
+            throw new RuntimeException("Could not create a DBF instance.");
+        }
+        catch (ParserConfigurationException e)
+        {
+            throw new RuntimeException("Could not create a DB builder.");
+        }
+        catch (TransformerConfigurationException e)
+        {
+            throw new RuntimeException("Could not create a TF instance.");
+        }
+        catch (TransformerException e)
+        {
+            throw new RuntimeException("Could not transform file.");
+        }
     }
 
     // getUserStats: Returns the UserStatistics object associated with a specific user.

@@ -45,6 +45,23 @@ public class UserStatistics implements Serializable
         ++routesRecorded;
     }
 
+    public double getTotalDistance() {
+        return totalDistance;
+    }
+
+    public double getTotalElevation() {
+        return totalElevation;
+    }
+
+    public double getTotalActivityTime() {
+        return totalActivityTime;
+    }
+
+    public int getRoutesRecorded()
+    {
+        return routesRecorded;
+    }
+
     public double getAverageDistance()
     {
         assert routesRecorded >= 1;
