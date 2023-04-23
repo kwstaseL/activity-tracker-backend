@@ -7,9 +7,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
-public class ResetDirectories {
-    public static void main(String[] args) {
-        try {
+public class ResetDirectories
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             Properties config = new Properties();
             config.load(new FileInputStream("config.properties"));
             File unprocessedDirectory = new File(config.getProperty("unprocessed_directory"));
@@ -34,13 +37,16 @@ public class ResetDirectories {
                 try
                 {
                     Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e)
+                }
+                catch (IOException e)
                 {
                     throw new RuntimeException("Could not move file.");
                 }
             }
 
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new RuntimeException(e);
         }
     }
