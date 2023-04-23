@@ -10,6 +10,10 @@ import activity.parser.Route;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 // This class will handle the client connection
@@ -106,7 +110,6 @@ public class ClientHandler implements Runnable
                         else if (activityList.size() == (chunk.getTotalChunks() -1))
                         {
 
-                            // TODO: Remove route from "available" directory, move to "processed"
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
                             // TODO: General cleanup
@@ -120,22 +123,14 @@ public class ClientHandler implements Runnable
                             // Creating a new thread to handle the reducing phase
                             new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
 
-                            /*
+                            // Finds the path of the file we want to move and the path of the destination
+                            // And then moves the already processed file from the unprocessed directory to the processed directory
+                            Path sourcePath = Paths.get(unprocessedDirectory + File.separator + chunk.getRoute().getFileName());
+                            Path destPath = Paths.get(processedDirectory + File.separator + chunk.getRoute().getFileName());
                             try {
-                                Files.move(Paths.get(unprocessedDirectory), Paths.get(processedDirectory), StandardCopyOption.REPLACE_EXISTING);
+                                Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
-                            }
-                             */
-
-                            File file = new File(unprocessedDirectory + chunk.getRoute().getFileName());
-                            System.out.println("dir: " + unprocessedDirectory + ", file name: " + chunk.getRoute().getFileName());
-
-                            if (!file.renameTo(new File(processedDirectory + chunk.getRoute().getFileName())))
-                            {
-                                throw new RuntimeException("Could not move file.");
-                            } else {
-                                System.out.println("Done?");
                             }
 
                         // Else, we just add the chunk to the list
@@ -160,7 +155,8 @@ public class ClientHandler implements Runnable
     }
 
     // TODO: Implement the else condition from the method above as a separate method
-    private void registerStats() {
+    private void registerStats()
+    {
 
     }
 
@@ -246,6 +242,8 @@ public class ClientHandler implements Runnable
             {
                 statistics.registerRoute(user, finalResults);
                 out.writeObject(finalResults);
+                out.writeObject(statistics.getUserStats(user));
+                out.writeObject(statistics.getGlobalStats());
                 out.flush();
             }
         } catch (IOException e)

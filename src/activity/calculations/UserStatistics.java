@@ -2,9 +2,10 @@ package activity.calculations;
 
 // UserStatistics: Contains the total distance, elevation and activity time recorded for a specific user. Also keeps track of how many routesRecorded they have registered.
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class UserStatistics
+public class UserStatistics implements Serializable
 {
     // TODO: Make files out of user statistics
     private double totalDistance;
@@ -62,10 +63,11 @@ public class UserStatistics
         return totalActivityTime / routesRecorded;
     }
 
+    @Override
     public String toString()
     {
-        return "Routes recorded for " + user + ": " + routesRecorded + ".\n Average Distance: " +
-                getAverageDistance() + ", Average Elevation: " + getAverageElevation() + ", Average Activity Time: " + getAverageActivityTime();
+        return String.format("All stats recorded for %s:\nAverage Distance: %.2f km\nAverage Elevation: %.2f m\nAverage Work Out Time: %.2f minutes",
+                user,getAverageDistance(), getAverageElevation(), getAverageActivityTime());
     }
 
 }

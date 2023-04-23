@@ -44,6 +44,7 @@ public class Master
 
             final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
             final int CLIENT_PORT = Integer.parseInt(config.getProperty("client_port"));
+
             numOfWorkers = Integer.parseInt(config.getProperty("number_of_workers"));
             unprocessedDirectory = new File(config.getProperty("unprocessed_directory"));
             processedDirectory = new File(config.getProperty("processed_directory"));

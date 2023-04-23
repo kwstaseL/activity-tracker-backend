@@ -100,6 +100,7 @@ public class Client
         }
     }
 
+    // TODO: Receive also the statistics from the master for the user and for all users
     public void listenForMessages()
     {
         new Thread(() -> {
@@ -107,10 +108,12 @@ public class Client
             {
                 try
                 {
-                    Object receivedObject = in.readObject();
-                    System.out.println("Output for file | " + file.getName() + " | " + receivedObject + "\n");
-                    System.out.println("Statistics for user: ");
-                    System.out.println("Statistics across all users: ");
+                    Object routeStats = in.readObject();
+                    System.out.println("Output for file | " + file.getName() + " | " + routeStats + "\n");
+                    Object userStats = in.readObject();
+                    System.out.println(userStats + "\n");
+                    Object allUsersStats = in.readObject();
+                    System.out.println(allUsersStats + "\n");
                 }
                 catch (Exception e)
                 {

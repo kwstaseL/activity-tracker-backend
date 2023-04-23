@@ -2,6 +2,7 @@ package activity.calculations;
 
 import activity.mapreduce.Pair;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,7 +10,8 @@ import java.util.HashMap;
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded, an archive of
  * the stats recorded, as well as the total distance, elevation and activity time across all users.
  */
-public class Statistics {
+public class Statistics implements Serializable
+{
 
     // userStats: A hashmap matching each user to their respective statistics.
     private HashMap<String, UserStatistics> userStats = new HashMap<>();
@@ -45,6 +47,11 @@ public class Statistics {
             throw new RuntimeException("User has not been registered.");
         }
         return userStats.get(user);
+    }
+
+    public Statistics getGlobalStats()
+    {
+        return this;
     }
 
     // getAverageDistanceForUser: Calculates the average distance for a user by dividing their total distance with the # of routes they have recorded.
@@ -113,8 +120,8 @@ public class Statistics {
     @Override
     public String toString()
     {
-        return "Total routes recorded: " + routesRecorded + ".\n Average Distance: " + getAverageDistance() +
-                ", Average Elevation: " + getAverageElevation() + ", Average Activity Time: " + getAverageActivityTime();
+        return String.format("Statistics across all users:\nAverage Distance: %.2f km\nAverage Elevation: %.2f m\nAverage Work Out Time: %.2f minutes",
+                getAverageDistance(), getAverageElevation(), getAverageActivityTime());
     }
 
 }

@@ -45,6 +45,7 @@ public class ResultDispatcher
                 // fetching the results from the WorkerHandler
                 Pair<Integer, Pair<Chunk, ActivityStats>> activityStatsPair = intermediateResults.poll();
 
+
                 // extracting the pair associated with the client
                 Pair<Chunk, ActivityStats> stats = activityStatsPair.getValue();
 
