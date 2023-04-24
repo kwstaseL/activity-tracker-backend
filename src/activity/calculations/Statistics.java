@@ -33,7 +33,6 @@ public class Statistics implements Serializable
     private double totalDistance = 0;
     private double totalElevation = 0;
     private double totalActivityTime = 0;
-    private transient final Object lock = new Object();
     public void registerRoute(String user, ActivityStats activityStats)
     {
         // first, updating the user specific stats
@@ -49,10 +48,10 @@ public class Statistics implements Serializable
         activityArchive.add(new Pair<>(user, activityStats));
         ++routesRecorded;
 
-        synchronized (lock)
-        {
-            updateStats(user);
-        }
+
+
+        updateStats(user);
+
     }
 
     // updateStats: Updates the xml file accordingly
