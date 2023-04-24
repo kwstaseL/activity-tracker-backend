@@ -50,7 +50,6 @@ public class Worker
     public void start()
     {
         Thread readData = new Thread(this::readForData);
-
         readData.start();
     }
 
@@ -152,6 +151,12 @@ public class Worker
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public static void main(String[] args)
+    {
+        Worker worker = new Worker();
+        worker.start();
     }
 
 }

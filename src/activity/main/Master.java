@@ -29,9 +29,6 @@ public class Master
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
 
-    // The number of workers, as extracted from the config
-    private int numOfWorkers;
-
     // The directories, as extracted from the config
     private File unprocessedDirectory;
     private File processedDirectory;
@@ -45,7 +42,6 @@ public class Master
             final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
             final int CLIENT_PORT = Integer.parseInt(config.getProperty("client_port"));
 
-            numOfWorkers = Integer.parseInt(config.getProperty("number_of_workers"));
             unprocessedDirectory = new File(config.getProperty("unprocessed_directory"));
             processedDirectory = new File(config.getProperty("processed_directory"));
 
@@ -65,16 +61,6 @@ public class Master
     // This method will start the master and all the threads
     private void start()
     {
-        // Thread that will create and start the workers
-        Thread init = new Thread(() ->
-        {
-            for (int i = 0; i < numOfWorkers; i++)
-            {
-                Worker worker = new Worker();
-                worker.start();
-            }
-        });
-
         // Thread that will handle the clients
         Thread handleClient = new Thread(() ->
         {
@@ -163,7 +149,6 @@ public class Master
         handleWorker.start();
         dispatchWork.start();
         handleClient.start();
-        init.start();
     }
 
     public static void main(String[] args)

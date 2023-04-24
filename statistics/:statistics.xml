@@ -3,21 +3,21 @@
     <User>
         <Username>user1</Username>
         <Routes_Recorded>3</Routes_Recorded>
-        <Total_Distance>13.117587741268338</Total_Distance>
+        <Total_Distance>13.11758774126834</Total_Distance>
         <Total_Elevation>119.84000000000003</Total_Elevation>
-        <Total_Activity_Time>55.88333333333333</Total_Activity_Time>
+        <Total_Activity_Time>55.883333333333326</Total_Activity_Time>
     </User>
     <User>
         <Username>user2</Username>
         <Routes_Recorded>2</Routes_Recorded>
-        <Total_Distance>3.920595545234863</Total_Distance>
+        <Total_Distance>3.9205955452348626</Total_Distance>
         <Total_Elevation>38.22</Total_Elevation>
         <Total_Activity_Time>23.46666666666667</Total_Activity_Time>
     </User>
     <User>
         <Username>user3</Username>
         <Routes_Recorded>1</Routes_Recorded>
-        <Total_Distance>5.16831285906785</Total_Distance>
+        <Total_Distance>5.168312859067851</Total_Distance>
         <Total_Elevation>56.03000000000003</Total_Elevation>
         <Total_Activity_Time>20.93333333333333</Total_Activity_Time>
     </User>
@@ -25,6 +25,6 @@
         <Total_Routes_Recorded>6</Total_Routes_Recorded>
         <Total_Distance>22.20649614557105</Total_Distance>
         <Total_Elevation>214.09000000000003</Total_Elevation>
-        <Total_Activity_Time>100.28333333333333</Total_Activity_Time>
+        <Total_Activity_Time>100.28333333333332</Total_Activity_Time>
     </Total>
 </User_Statistics>
