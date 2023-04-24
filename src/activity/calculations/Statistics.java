@@ -102,7 +102,7 @@ public class Statistics implements Serializable
     }
 
     // createFile: Called when first creating the file. Writes down the statistics for all users currently registered
-    private void createFile()
+    public void createFile()
     {
         try
         {

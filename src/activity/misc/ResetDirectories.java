@@ -1,5 +1,7 @@
 package activity.misc;
 
+import activity.calculations.Statistics;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,7 +11,7 @@ import java.util.Properties;
 
 public class ResetDirectories
 {
-    public static void main(String[] args)
+    private static void resetFileDirectory()
     {
         try
         {
@@ -50,4 +52,49 @@ public class ResetDirectories
             throw new RuntimeException(e);
         }
     }
+
+    private static void resetXMLStats()
+    {
+        try
+        {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+            File statisticsPath = new File(config.getProperty("statistics_directory"));
+            File[] directoryContents = statisticsPath.listFiles();
+            if (directoryContents == null)
+            {
+                throw new RuntimeException("Could not find the directory.");
+            }
+
+            for (File file : directoryContents)
+            {
+                System.out.println(file.getName());
+                if (file.getName().equals(":statistics.xml"))
+                {
+                    boolean deleted = file.delete();
+                    if (!deleted)
+                    {
+                        throw new RuntimeException("Could not delete file.");
+                    }
+                    else
+                    {
+                        System.out.println("Deleted stats file.");
+                    }
+                    break;
+                }
+            }
+
+        } catch (IOException e)
+        {
+
+            throw new RuntimeException("Could not load config.");
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        resetFileDirectory();
+        resetXMLStats();
+    }
+
 }
