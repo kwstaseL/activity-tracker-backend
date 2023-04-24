@@ -43,7 +43,7 @@ public class ResetDirectories
                     throw new RuntimeException("Could not move file.");
                 }
             }
-
+            System.out.println("Successfully moved all files from processed directory to unprocessed directory.");
         }
         catch (IOException e)
         {

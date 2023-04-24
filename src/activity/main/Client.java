@@ -176,7 +176,7 @@ public class Client
             // of routes/segments to send a single route/segment.
             while (choice == null || choice < 0 || choice >= directoryContents.length + segmentContents.length)
             {
-                System.out.println("\nEnter \"all\" to send all routes/segments, or enter a file index (0-"
+                System.out.println("\nEnter \"all\" to send all routes, or enter a file index (0-"
                         + (directoryContents.length + segmentContents.length - 1) +") to send a single route/segment:");
 
                 input = scanner.nextLine();
@@ -185,10 +185,6 @@ public class Client
                 {
                     // send all routes/segments
                     for (File file : directoryContents)
-                    {
-                        new Client(file).sendFile();
-                    }
-                    for (File file : segmentContents)
                     {
                         new Client(file).sendFile();
                     }
