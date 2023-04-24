@@ -1,4 +1,4 @@
-package activity.mapreduce;
+package activity.misc;
 
 import java.io.Serializable;
 
