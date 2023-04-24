@@ -2,7 +2,7 @@ package activity.main;
 
 import activity.calculations.ActivityStats;
 import activity.calculations.Statistics;
-import activity.mapreduce.Pair;
+import activity.misc.Pair;
 import activity.mapreduce.Reduce;
 import activity.parser.Chunk;
 import activity.parser.GPXParser;
@@ -133,7 +133,8 @@ public class ClientHandler implements Runnable
                             }
 
                         // Else, we just add the chunk to the list
-                        } else
+                        }
+                        else
                         {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);

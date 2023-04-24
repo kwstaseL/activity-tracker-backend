@@ -1,7 +1,5 @@
 package activity.misc;
 
-import activity.calculations.Statistics;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,8 +66,7 @@ public class ResetDirectories
 
             for (File file : directoryContents)
             {
-                System.out.println(file.getName());
-                if (file.getName().equals(":statistics.xml"))
+                if (file.getName().equals("statistics.xml"))
                 {
                     boolean deleted = file.delete();
                     if (!deleted)

@@ -1,6 +1,7 @@
 package activity.mapreduce;
 
 import activity.calculations.ActivityStats;
+import activity.misc.Pair;
 
 import java.util.ArrayList;
 

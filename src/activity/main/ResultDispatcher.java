@@ -1,7 +1,7 @@
 package activity.main;
 
 import activity.calculations.ActivityStats;
-import activity.mapreduce.Pair;
+import activity.misc.Pair;
 import activity.parser.Chunk;
 
 import java.util.HashMap;

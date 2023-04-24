@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import activity.calculations.ActivityCalculator;
 import activity.calculations.ActivityStats;
 
+import activity.misc.Pair;
 import activity.parser.Waypoint;
 import activity.parser.Route;
 import activity.parser.Chunk;
