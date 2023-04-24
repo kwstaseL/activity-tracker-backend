@@ -1,6 +1,6 @@
 package activity.calculations;
 
-import activity.mapreduce.Pair;
+import activity.misc.Pair;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -178,7 +178,7 @@ public class Statistics implements Serializable
             DOMSource source = new DOMSource(doc);
             Properties config = new Properties();
             config.load(new FileInputStream("config.properties"));
-            String path = config.getProperty("statistics_directory") + File.pathSeparator + config.getProperty("statistics_file");
+            String path = config.getProperty("statistics_directory") + File.separator + config.getProperty("statistics_file");
             File file = new File(path);
 
             Result result = new StreamResult(file);

@@ -1,7 +1,7 @@
 package activity.main;
 
 import activity.calculations.ActivityStats;
-import activity.mapreduce.Pair;
+import activity.misc.Pair;
 import activity.parser.Chunk;
 import activity.mapreduce.Map;
 
@@ -53,7 +53,7 @@ public class Worker
         readData.start();
     }
 
-    // This method will read for data from the master and handle the mapping of the data
+    // This method will read data from master and handle the mapping of the data.
     // For each chunk that is received, a new thread will be created to handle the mapping of the data
     private void readForData()
     {
@@ -61,9 +61,7 @@ public class Worker
         {
             try
             {
-                //System.out.println("WORKER: Waiting for job from master");
                 Object receivedObject = in.readObject();
-                //System.out.println("WORKER: Received job from master");
                 Chunk chunk;
 
                 // If the received object is a chunk, a new thread will be created to handle the mapping of the data

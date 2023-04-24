@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<User_Statistics>
+    <User>
+        <Username>user1</Username>
+        <Routes_Recorded>1</Routes_Recorded>
+        <Total_Distance>2.7988538142210238</Total_Distance>
+        <Total_Elevation>8.619999999999997</Total_Elevation>
+        <Total_Activity_Time>18.349999999999994</Total_Activity_Time>
+    </User>
+    <User>
+        <Username>user2</Username>
+        <Routes_Recorded>1</Routes_Recorded>
+        <Total_Distance>1.716962427181293</Total_Distance>
+        <Total_Elevation>6.98</Total_Elevation>
+        <Total_Activity_Time>7.216666666666667</Total_Activity_Time>
+    </User>
+    <Total>
+        <Total_Routes_Recorded>2</Total_Routes_Recorded>
+        <Total_Distance>4.515816241402317</Total_Distance>
+        <Total_Elevation>15.599999999999998</Total_Elevation>
+        <Total_Activity_Time>25.566666666666663</Total_Activity_Time>
+    </Total>
+</User_Statistics>
