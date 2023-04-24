@@ -33,8 +33,7 @@ public class Statistics implements Serializable
     private double totalDistance = 0;
     private double totalElevation = 0;
     private double totalActivityTime = 0;
-
-    private final Object lock = new Object();
+    private transient final Object lock = new Object();
     public void registerRoute(String user, ActivityStats activityStats)
     {
         // first, updating the user specific stats

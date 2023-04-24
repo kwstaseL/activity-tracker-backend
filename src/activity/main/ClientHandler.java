@@ -208,7 +208,9 @@ public class ClientHandler implements Runnable
             {
                 statistics.registerRoute(user, finalResults);
                 out.writeObject(finalResults);
+                out.flush();
                 out.writeObject(statistics.getUserStats(user));
+                out.flush();
                 out.writeObject(statistics.getGlobalStats());
                 out.flush();
             }

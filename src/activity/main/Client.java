@@ -112,6 +112,7 @@ public class Client
         catch (Exception e)
         {
             System.out.println("Could not receive object");
+            e.printStackTrace();
             shutdown();
         }
 
@@ -181,13 +182,9 @@ public class Client
 
                 input = scanner.nextLine();
 
-                if (input.equals("all"))
+                if (input.equalsIgnoreCase("all"))
                 {
-                    // send all routes/segments
-                    for (File file : directoryContents)
-                    {
-                        new Client(file).sendFile();
-                    }
+                    sendAllRoutes(directoryContents);
                     return;
 
                 } else
