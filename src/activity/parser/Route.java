@@ -23,7 +23,7 @@ public class Route implements Serializable
 
     // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
-    private HashMap<Integer,Segment> segmentsContained = new HashMap<>();
+    private ArrayList<Segment> segmentsContained;
 
     public Route(ArrayList<Waypoint> waypoints, String user, String fileName)
     {
@@ -31,7 +31,7 @@ public class Route implements Serializable
         this.user = user;
         this.routeID = idGenerator++;
         this.fileName = fileName;
-        this.segmentsContained = new HashMap<>();
+        this.segmentsContained = new ArrayList<>();
     }
 
     public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName)
@@ -43,9 +43,9 @@ public class Route implements Serializable
         this.fileName = fileName;
     }
 
-    public void addSegment(int segmentID, Segment segment)
+    public void addSegment(Segment segment)
     {
-        segmentsContained.put(segmentID, segment);
+        segmentsContained.add(segment);
     }
 
     public ArrayList<Waypoint> waypoints() {
