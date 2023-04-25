@@ -94,7 +94,7 @@ public class Client
         }
     }
 
-    // This method will be used to receive the statistics from the master
+    // This method will be used to receive the statistics from the master.
     public void listenForMessages()
     {
         try
