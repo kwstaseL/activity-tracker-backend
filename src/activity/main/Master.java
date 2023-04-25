@@ -68,7 +68,6 @@ public class Master
                 try
                 {
                     System.out.println("MASTER: Waiting for client connection");
-
                     // Accept a client connection
                     Socket client = clientSocket.accept();
                     System.out.println("MASTER: Client connected");

@@ -50,7 +50,7 @@ public class Statistics implements Serializable {
         updateStats();
     }
 
-    // updateStats: Updates the xml file accordingly
+    // updateStats: Updates the xml file accordingly.
     private void updateStats()
     {
         // TODO: Optimise this method, to avoid updating the entire file every time
