@@ -101,8 +101,25 @@ public class Statistics implements Serializable {
     // createFile: Called when first creating the file. Writes down the statistics for all users currently registered
     public void createFile()
     {
+        try {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+            File statisticsPath = new File(config.getProperty("statistics_directory"));
+            File[] directoryContents = statisticsPath.listFiles();
+            if (directoryContents == null)
+            {
+                if (!new File(config.getProperty("statistics_directory")).mkdirs())
+                {
+                    throw new RuntimeException("Could not find the directory, and could not make a new directory.");
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         try
         {
+
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.newDocument();

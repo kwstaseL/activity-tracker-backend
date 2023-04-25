@@ -119,7 +119,7 @@ public class Client
     }
 
     // This is the UI for the client
-    // It will allow the user to select a route to be send for processing and will display the results
+    // It will allow the user to select a route to be sent for processing and will display the results
     // It will also allow him to select a segment that he will decide, and find the statistics for that segment for all users
     private static void sendRoute()
     {
@@ -153,32 +153,16 @@ public class Client
                 System.out.println(i + ": " + directoryContents[i].getName());
             }
 
-            // list all segments
-            File segmentsDirectory = new File(Client.directory + "/segments");
-            File[] segmentContents = segmentsDirectory.listFiles(new FileFilter()
-            {
-                @Override
-                public boolean accept(File file) {
-                    return file.isFile();
-                }
-            });
-
-            System.out.println("Available segments:");
-            for (int i = 0; i < segmentContents.length; i++)
-            {
-                System.out.println((i + directoryContents.length) + ": " + segmentContents[i].getName());
-            }
-
             // Prompt user to select a route or segment
             String input = null;
             Integer choice = null;
 
             // Acceptable input: all or "all" to send all routes/segments, or anything in the range of 0 to the total number
             // of routes/segments to send a single route/segment.
-            while (choice == null || choice < 0 || choice >= directoryContents.length + segmentContents.length)
+            while (choice == null || choice < 0 || choice >= directoryContents.length)
             {
                 System.out.println("\nEnter \"all\" to send all routes, or enter a file index (0-"
-                        + (directoryContents.length + segmentContents.length - 1) +") to send a single route/segment:");
+                        + (directoryContents.length - 1) +") to send a single route/segment:");
 
                 input = scanner.nextLine();
 
@@ -186,37 +170,29 @@ public class Client
                 {
                     sendAllRoutes(directoryContents);
                     return;
-
-                } else
-                {
-                    try
-                    {
-                        choice = Integer.parseInt(input);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid input. Please enter a valid file index or \"all\".");
-                        continue;
-                    }
-
-                    if (choice < 0 || choice >= directoryContents.length + segmentContents.length) {
-                        System.out.println("Invalid input. Please enter a valid file index or \"all\".");
-                        choice = null;
-                        continue;
-                    }
-
-                    File file;
-                    if (choice < directoryContents.length) {
-                        // user selected a route
-                        file = directoryContents[choice];
-                    } else {
-                        // user selected a segment
-                        file = segmentContents[choice - directoryContents.length];
-                    }
-
-                    // send the selected route/segment
-                    Client client = new Client(file);
-                    client.sendFile();
-                    client.listenForMessages();
                 }
+
+                try
+                {
+                    choice = Integer.parseInt(input);
+                } catch (NumberFormatException e)
+                {
+                    System.out.println("Invalid input. Please enter a valid file index or \"all\".");
+                    continue;
+                }
+
+                if (choice < 0 || choice >= directoryContents.length) {
+                    System.out.println("Invalid input. Please enter a valid file index or \"all\".");
+                    choice = null;
+                    continue;
+                }
+
+                File file = directoryContents[choice];
+
+                // send the selected route/segment
+                Client client = new Client(file);
+                client.sendFile();
+                client.listenForMessages();
             }
         }
     }
