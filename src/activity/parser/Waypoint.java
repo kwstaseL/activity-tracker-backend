@@ -84,7 +84,6 @@ public class Waypoint implements Serializable
     public boolean equals(Object o)
     {
         final double gpsError = 5.0;
-
         if (this == o) return true;
         if (!(o instanceof Waypoint)) return false;
 

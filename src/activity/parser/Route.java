@@ -18,7 +18,7 @@ public class Route implements Serializable
     private int clientID;
 
     // Route file name: The name of the file. Used to move to "processed_gpx" as soon as the Reduce phase is done.
-    private String fileName;
+    private final String fileName;
 
     // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
@@ -32,7 +32,8 @@ public class Route implements Serializable
         this.fileName = fileName;
     }
 
-    public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName) {
+    public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName)
+    {
         this.waypoints = waypoints;
         this.routeID = routeID;
         this.clientID = clientID;

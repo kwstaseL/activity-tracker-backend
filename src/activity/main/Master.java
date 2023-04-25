@@ -28,7 +28,6 @@ public class Master
 
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
-
     // The directories, as extracted from the config
     private File unprocessedDirectory;
     private File processedDirectory;
@@ -131,7 +130,6 @@ public class Master
                     System.out.println("Worker connection closed");
                     System.out.println("Error: " + e.getMessage());
                 }
-
             }
         });
 

@@ -13,6 +13,7 @@ public class GPXParser
 {
     public static Route parse(File file)
     {
+
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Route route = null;
         try
@@ -34,7 +35,7 @@ public class GPXParser
             // Iterate through all the <wpt> tags
             for (int i = 0; i < nodeList.getLength(); i++)
             {
-                // Get the <wpt> tag we are currently processing
+                // Get the <wpt> tag we are currently processing.
                 Element element = (Element) nodeList.item(i);
                 creator = doc.getDocumentElement().getAttribute("creator");
                 String latitude = element.getAttribute("lat");
@@ -46,6 +47,8 @@ public class GPXParser
                 waypoints.add(new Waypoint(Double.parseDouble(latitude), Double.parseDouble(longitude),
                         Double.parseDouble(elevation), time));
             }
+
+            waypoints.contains(waypoints);
 
             if (creator == null || waypoints.isEmpty()) {
                 throw new RuntimeException("Could not parse the file successfully.");
