@@ -109,7 +109,6 @@ public class ClientHandler implements Runnable
                         // Else, if we have accumulated all the chunks we need, we can start reducing
                         else if (activityList.size() == (chunk.getTotalChunks() -1))
                         {
-
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
 
@@ -126,7 +125,8 @@ public class ClientHandler implements Runnable
                             // And then moves the already processed file from the unprocessed directory to the processed directory
                             Path sourcePath = Paths.get(unprocessedDirectory + File.separator + chunk.getRoute().getFileName());
                             Path destPath = Paths.get(processedDirectory + File.separator + chunk.getRoute().getFileName());
-                            try {
+                            try
+                            {
                                 Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);

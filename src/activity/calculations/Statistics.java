@@ -1,9 +1,8 @@
 package activity.calculations;
 
 import activity.misc.Pair;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,6 +12,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -21,8 +21,7 @@ import java.util.Properties;
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded, an archive of
  * the stats recorded, as well as the total distance, elevation and activity time across all users.
  */
-public class Statistics implements Serializable
-{
+public class Statistics implements Serializable {
 
     // userStats: A hashmap matching each user to their respective statistics.
     private HashMap<String, UserStatistics> userStats = new HashMap<>();
@@ -33,8 +32,8 @@ public class Statistics implements Serializable
     private double totalDistance = 0;
     private double totalElevation = 0;
     private double totalActivityTime = 0;
-    public void registerRoute(String user, ActivityStats activityStats)
-    {
+
+    public void registerRoute(String user, ActivityStats activityStats) {
         // first, updating the user specific stats
         if (!userStats.containsKey(user)) {
             userStats.put(user, new UserStatistics(user));
@@ -48,21 +47,19 @@ public class Statistics implements Serializable
         activityArchive.add(new Pair<>(user, activityStats));
         ++routesRecorded;
 
-
-
-        updateStats(user);
-
+        updateStats();
     }
 
     // updateStats: Updates the xml file accordingly
-    private void updateStats(String user)
+    private void updateStats()
     {
-        // if the file does not already exist, create it and update it with the statistics currently registered
-        if (!fileExists())
-        {
-            createFile();
-            return;
-        }
+        // TODO: Optimise this method, to avoid updating the entire file every time
+        createFile();
+
+    }
+
+    private void updateFile()
+    {
 
     }
 
@@ -106,7 +103,6 @@ public class Statistics implements Serializable
     {
         try
         {
-
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.newDocument();
@@ -178,9 +174,9 @@ public class Statistics implements Serializable
             DOMSource source = new DOMSource(doc);
             Properties config = new Properties();
             config.load(new FileInputStream("config.properties"));
-            String path = config.getProperty("statistics_directory") + File.separator + config.getProperty("statistics_file");
-            File file = new File(path);
+            String path = Paths.get(config.getProperty("statistics_directory"), config.getProperty("statistics_file")).toString();
 
+            File file = new File(path);
             Result result = new StreamResult(file);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
