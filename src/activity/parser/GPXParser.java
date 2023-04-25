@@ -32,7 +32,7 @@ public class GPXParser
 
             String creator = null;
 
-            // Iterate through all the <wpt> tags
+            // Iterate through all the <wpt> tags.
             for (int i = 0; i < nodeList.getLength(); i++)
             {
                 // Get the <wpt> tag we are currently processing.
