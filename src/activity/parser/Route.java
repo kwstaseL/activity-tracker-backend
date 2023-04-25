@@ -2,6 +2,7 @@ package activity.parser;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Route implements Serializable
 {
@@ -22,7 +23,6 @@ public class Route implements Serializable
 
     // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
-
     private ArrayList<Segment> segmentsContained;
 
     public Route(ArrayList<Waypoint> waypoints, String user, String fileName)
@@ -31,6 +31,7 @@ public class Route implements Serializable
         this.user = user;
         this.routeID = idGenerator++;
         this.fileName = fileName;
+        this.segmentsContained = new ArrayList<>();
     }
 
     public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName)
@@ -40,6 +41,11 @@ public class Route implements Serializable
         this.clientID = clientID;
         this.user = user;
         this.fileName = fileName;
+    }
+
+    public void addSegment(Segment segment)
+    {
+        segmentsContained.add(segment);
     }
 
     public ArrayList<Waypoint> waypoints() {

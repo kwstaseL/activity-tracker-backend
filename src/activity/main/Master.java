@@ -1,6 +1,8 @@
 package activity.main;
 
+import activity.parser.GPXParser;
 import activity.parser.Route;
+import activity.parser.Segment;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +33,7 @@ public class Master
     // The directories, as extracted from the config
     private File unprocessedDirectory;
     private File processedDirectory;
+    private Queue<Segment> segments;
     public Master()
     {
         try
@@ -49,6 +52,7 @@ public class Master
             workerHandlers = new LinkedList<>();
             clientMap = new HashMap<>();
             routes = new LinkedList<>();
+            segments = new LinkedList<>();
         }
         catch (Exception e)
         {
@@ -73,7 +77,7 @@ public class Master
                     System.out.println("MASTER: Client connected");
 
                     // Create a new thread to handle the client
-                    ClientHandler clientHandler = new ClientHandler(client, routes, unprocessedDirectory.getAbsolutePath(), processedDirectory.getAbsolutePath());
+                    ClientHandler clientHandler = new ClientHandler(client, routes, unprocessedDirectory.getAbsolutePath(), processedDirectory.getAbsolutePath(),segments);
 
                     // Add the client handler to the lookup table
                     int clientID = clientHandler.getClientID();
@@ -144,6 +148,41 @@ public class Master
             workDispatcherThread.start();
         });
 
+        Thread createSegments = new Thread(() ->
+        {
+            // Get the segment files from the directory.
+            Properties config = new Properties();
+            try
+            {
+                config.load(new FileInputStream("config.properties"));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            String segmentDirectory = config.getProperty("segment_directory");
+
+            File directory = new File(segmentDirectory);
+            File[] files = directory.listFiles();
+
+            // Print the name of each file in the directory.
+            assert files != null;
+            for (File file : files)
+            {
+                Segment segment = GPXParser.parseSegment(file);
+                segments.add(segment);
+            }
+        });
+
+        createSegments.start();
+        try
+        {
+            createSegments.join();
+
+        } catch (InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
         handleWorker.start();
         dispatchWork.start();
         handleClient.start();

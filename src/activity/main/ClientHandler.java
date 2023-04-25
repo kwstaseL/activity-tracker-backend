@@ -7,6 +7,7 @@ import activity.mapreduce.Reduce;
 import activity.parser.Chunk;
 import activity.parser.GPXParser;
 import activity.parser.Route;
+import activity.parser.Segment;
 
 import java.io.*;
 import java.net.Socket;
@@ -37,11 +38,13 @@ public class ClientHandler implements Runnable
     private String unprocessedDirectory;
     private String processedDirectory;
 
+    private Queue<Segment> segments;
+
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     private final Object writeLock = new Object();
 
-    public ClientHandler(Socket clientSocket , Queue<Route> routes, String unprocessedDirectory, String processedDirectory)
+    public ClientHandler(Socket clientSocket , Queue<Route> routes, String unprocessedDirectory, String processedDirectory,Queue<Segment> segments)
     {
         this.clientSocket = clientSocket;
         try
@@ -52,7 +55,7 @@ public class ClientHandler implements Runnable
             this.unprocessedDirectory = unprocessedDirectory;
             this.processedDirectory = processedDirectory;
             this.routes = routes;
-            //this.statsQueue = new LinkedList<>();
+            this.segments = segments;
         }
         catch (IOException e)
         {
@@ -174,7 +177,7 @@ public class ClientHandler implements Runnable
                 File receivedFile = (File) in.readObject();
 
                 // Parse the file
-                Route route = GPXParser.parseRoute(receivedFile);
+                Route route = GPXParser.parseRoute(receivedFile,segments);
                 route.setClientID(clientID);
                 // Add the route to the queue
                 synchronized (routes)
