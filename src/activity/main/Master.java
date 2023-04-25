@@ -96,6 +96,7 @@ public class Master
                 }
             }
         });
+
         // Thread that will handle the workers
         Thread handleWorker = new Thread(() ->
         {
