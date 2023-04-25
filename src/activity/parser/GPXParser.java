@@ -60,7 +60,7 @@ public class GPXParser
             {
                 if (segment.containsRoute(route))
                 {
-                    route.addSegment(segment.getSegmentID(), segment.getWaypoints());
+                    route.addSegment(segment.getSegmentID(), segment);
                 }
             }
         }
