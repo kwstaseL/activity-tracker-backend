@@ -119,7 +119,6 @@ public class Statistics implements Serializable {
 
         try
         {
-
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.newDocument();
