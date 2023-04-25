@@ -26,7 +26,7 @@ public class ClientHandler implements Runnable
     // This is the queue that the routes will be added to
     private Queue<Route> routes;
     // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
-    private Queue<Pair<Chunk, ActivityStats>> statsQueue;
+    private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     private static final Statistics statistics = new Statistics();
 
     // The unique id of the client, generated through a static id generator
@@ -52,7 +52,7 @@ public class ClientHandler implements Runnable
             this.unprocessedDirectory = unprocessedDirectory;
             this.processedDirectory = processedDirectory;
             this.routes = routes;
-            this.statsQueue = new LinkedList<>();
+            //this.statsQueue = new LinkedList<>();
         }
         catch (IOException e)
         {
