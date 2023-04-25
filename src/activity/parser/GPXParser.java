@@ -48,8 +48,6 @@ public class GPXParser
                         Double.parseDouble(elevation), time));
             }
 
-            waypoints.contains(waypoints);
-
             if (creator == null || waypoints.isEmpty()) {
                 throw new RuntimeException("Could not parse the file successfully.");
             }
