@@ -23,7 +23,8 @@ public class Route implements Serializable
     // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
 
-    // TODO: Deprecated?
+    private ArrayList<Segment> segmentsContained;
+
     public Route(ArrayList<Waypoint> waypoints, String user, String fileName)
     {
         this.waypoints = waypoints;

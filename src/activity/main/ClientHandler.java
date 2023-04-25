@@ -174,7 +174,7 @@ public class ClientHandler implements Runnable
                 File receivedFile = (File) in.readObject();
 
                 // Parse the file
-                Route route = GPXParser.parse(receivedFile);
+                Route route = GPXParser.parseRoute(receivedFile);
                 route.setClientID(clientID);
                 // Add the route to the queue
                 synchronized (routes)
@@ -196,11 +196,13 @@ public class ClientHandler implements Runnable
         }
     }
     // This is the method that will handle the reducing phase and send the result back to the client
+
+    // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
     private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
     {
         System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
 
-        // intermediate_result: the mapping process returns a key-value pair, where key is the client id, and the value is another pair of chunk, activityStats
+        // finalResults: The reduce process returns the final ActivityStats associated with a specific route.
         ActivityStats finalResults = Reduce.reduce(intermediateResults);
         try
         {

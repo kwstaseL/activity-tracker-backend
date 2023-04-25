@@ -39,7 +39,9 @@ public class Map
         averageSpeed = (totalTime > 0) ? totalDistance / (totalTime / 60.0) : 0.0;
         ActivityStats finalStats = new ActivityStats(totalDistance, averageSpeed, totalElevation, totalTime);
 
+        // statsPair: Represents a pair of chunk and the activity stats calculated for it
         Pair<Chunk, ActivityStats> statsPair = new Pair<>(chunk, finalStats);
+
         return new Pair<>(clientID, statsPair);
     }
 

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class GPXParser
 {
-    public static Route parse(File file)
+    public static Route parseRoute(File file)
     {
 
         ArrayList<Waypoint> waypoints = new ArrayList<>();
@@ -48,7 +48,8 @@ public class GPXParser
                         Double.parseDouble(elevation), time));
             }
 
-            if (creator == null || waypoints.isEmpty()) {
+            if (creator == null || waypoints.isEmpty())
+            {
                 throw new RuntimeException("Could not parse the file successfully.");
             }
             route = new Route(waypoints, creator, file.getName());
@@ -62,4 +63,9 @@ public class GPXParser
         return route;
     }
 
+    // TODO: Implement
+    public static Segment parseSegment()
+    {
+        return new Segment();
+    }
 }
