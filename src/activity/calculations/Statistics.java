@@ -1,6 +1,5 @@
 package activity.calculations;
 
-import activity.misc.Pair;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -13,7 +12,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -21,19 +19,90 @@ import java.util.Properties;
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded, an archive of
  * the stats recorded, as well as the total distance, elevation and activity time across all users.
  */
-public class Statistics implements Serializable {
+public class Statistics implements Serializable
+{
 
     // userStats: A hashmap matching each user to their respective statistics.
-    private HashMap<String, UserStatistics> userStats = new HashMap<>();
+    private final HashMap<String, UserStatistics> userStats;
+    private int routesRecorded;
+    private double totalDistance;
+    private double totalElevation;
+    private double totalActivityTime;
 
-    // activityArchive: An ArrayList consisting of the detailed stats of every route in the system
-    private ArrayList<Pair<String, ActivityStats>> activityArchive = new ArrayList<>();     // TODO: Possibly unnecessary?
-    private int routesRecorded = 0;
-    private double totalDistance = 0;
-    private double totalElevation = 0;
-    private double totalActivityTime = 0;
+    public Statistics()
+    {
+        this.userStats = new HashMap<>();
+        this.routesRecorded = 0;
+        this.totalDistance = 0;
+        this.totalElevation = 0;
+        this.totalActivityTime = 0;
+
+        // if we find a file with pre-existing stats, we load them.
+        if (fileExists())
+        {
+            loadStats();
+            for (String user : userStats.keySet()) {
+                System.out.println("\n" + userStats.get(user) + "\n");
+            }
+            System.out.println(this + "\n");
+        }
+    }
+
+    // initialise: Called upon Statistics initialisation, loads data from our "statistics.xml" file
+    public void loadStats()
+    {
+        try {
+
+            // first, loading the appropriate info from the config and initialising a new DocumentBuilder
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+            String statisticsPath = config.getProperty("statistics_directory");
+            String statisticsFilename = config.getProperty("statistics_file");
+
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(new File(statisticsPath + File.separator + statisticsFilename));
+
+            // Normalizing the XML structure to prevent errors
+            doc.getDocumentElement().normalize();
+
+            NodeList nodeList = doc.getElementsByTagName("User");
+
+            for (int i = 0; i < nodeList.getLength(); i++)
+            {
+                Element currentElement = (Element) nodeList.item(i);
+                String user = currentElement.getAttribute("Username");
+                int routesForUser = Integer.parseInt(currentElement.getAttribute("Routes_Recorded"));
+                double totalDistance = Double.parseDouble(currentElement.getAttribute("Total_Distance"));
+                double totalElevation = Double.parseDouble(currentElement.getAttribute("Total_Elevation"));
+                double totalActivityTime = Double.parseDouble(currentElement.getAttribute("Total_Activity_Time"));
+
+                UserStatistics userStatistics = new UserStatistics(user, routesForUser, totalDistance, totalElevation, totalActivityTime);
+                userStats.put(user, userStatistics);
+                registerStatistics(userStatistics);
+            }
+
+        }
+        catch (ParserConfigurationException e)
+        {
+            throw new RuntimeException("Could not configure parser.");
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new RuntimeException("Could not find the file");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("An error occurred during the I/O process while initialising Statistics.");
+        }
+        catch (SAXException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void registerRoute(String user, ActivityStats activityStats) {
+
         // first, updating the user specific stats
         if (!userStats.containsKey(user)) {
             userStats.put(user, new UserStatistics(user));
@@ -44,16 +113,24 @@ public class Statistics implements Serializable {
         totalDistance += activityStats.getDistance();
         totalElevation += activityStats.getElevation();
         totalActivityTime += activityStats.getTime();
-        activityArchive.add(new Pair<>(user, activityStats));
         ++routesRecorded;
 
         updateStats();
     }
 
+    // registerStatistics: Called when adding a new UserStatistics instance to our database, when loading stats from the XML file.
+    public void registerStatistics(UserStatistics userStatistics)
+    {
+        this.routesRecorded += userStatistics.getRoutesRecorded();
+        this.totalDistance += userStatistics.getTotalDistance();
+        this.totalElevation += userStatistics.getTotalElevation();
+        this.totalActivityTime += userStatistics.getTotalActivityTime();
+    }
+
     // updateStats: Updates the xml file accordingly.
     private void updateStats()
     {
-        // TODO: Optimise this method, to avoid updating the entire file every time
+        // TODO: Optimise this method, to avoid creating the entire file every time
         createFile();
 
     }
@@ -72,14 +149,15 @@ public class Statistics implements Serializable {
             config.load(new FileInputStream("config.properties"));
             File statisticsPath = new File(config.getProperty("statistics_directory"));
             File[] directoryContents = statisticsPath.listFiles();
+
             if (directoryContents == null)
             {
+                // if directoryContents == null (meaning we could not find the file), we create the directory so that we can create the file later
                 if (!new File(config.getProperty("statistics_directory")).mkdirs())
                 {
                     throw new RuntimeException("Could not find the directory, and could not make a new directory.");
                 }
-                directoryContents = new File[0];
-                statisticsPath = new File(config.getProperty("statistics_directory"));
+                return false;
             }
 
             for (File file : directoryContents)
@@ -101,22 +179,6 @@ public class Statistics implements Serializable {
     // createFile: Called when first creating the file. Writes down the statistics for all users currently registered
     public void createFile()
     {
-        try {
-            Properties config = new Properties();
-            config.load(new FileInputStream("config.properties"));
-            File statisticsPath = new File(config.getProperty("statistics_directory"));
-            File[] directoryContents = statisticsPath.listFiles();
-            if (directoryContents == null)
-            {
-                if (!new File(config.getProperty("statistics_directory")).mkdirs())
-                {
-                    throw new RuntimeException("Could not find the directory, and could not make a new directory.");
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         try
         {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -128,64 +190,19 @@ public class Statistics implements Serializable {
             doc.appendChild(root);
 
             // for all the users currently registered, write their statistics to the xml file
-            for (String user : userStats.keySet())
-            {
-                Element userElement = doc.createElement("User");
-
-                Element usernameElement = doc.createElement("Username");
-                Text nameOfUser = doc.createTextNode(user);
-                usernameElement.appendChild(nameOfUser);
-                userElement.appendChild(usernameElement);
-
+            for (String user : userStats.keySet()) {
                 UserStatistics statisticsForUser = userStats.get(user);
 
-                Element routeElement = doc.createElement("Routes_Recorded");
-                Text routesForUser = doc.createTextNode(String.valueOf(statisticsForUser.getRoutesRecorded()));
-                routeElement.appendChild(routesForUser);
-                userElement.appendChild(routeElement);
-
-                Element totalDistanceElement = doc.createElement("Total_Distance");
-                Text totalDistanceOfUser = doc.createTextNode(String.valueOf(statisticsForUser.getTotalDistance()));
-                totalDistanceElement.appendChild(totalDistanceOfUser);
-                userElement.appendChild(totalDistanceElement);
-
-                Element totalElevationElement = doc.createElement("Total_Elevation");
-                Text totalElevationOfUser = doc.createTextNode(String.valueOf(statisticsForUser.getTotalElevation()));
-                totalElevationElement.appendChild(totalElevationOfUser);
-                userElement.appendChild(totalElevationElement);
-
-                Element totalActivityTimeElement = doc.createElement("Total_Activity_Time");
-                Text totalActivityTimeOfUser = doc.createTextNode(String.valueOf(statisticsForUser.getTotalActivityTime()));
-                totalActivityTimeElement.appendChild(totalActivityTimeOfUser);
-                userElement.appendChild(totalActivityTimeElement);
+                Element userElement = doc.createElement("User");
+                userElement.setAttribute("Username", user);
+                userElement.setIdAttribute("Username", true);
+                userElement.setAttribute("Routes_Recorded", String.valueOf(statisticsForUser.getRoutesRecorded()));
+                userElement.setAttribute("Total_Distance", String.valueOf(statisticsForUser.getTotalDistance()));
+                userElement.setAttribute("Total_Elevation", String.valueOf(statisticsForUser.getTotalElevation()));
+                userElement.setAttribute("Total_Activity_Time", String.valueOf(statisticsForUser.getTotalActivityTime()));
 
                 root.appendChild(userElement);
             }
-
-            // now, writing the statistics for all users
-            Element total = doc.createElement("Total");
-
-            Element totalRoutes = doc.createElement("Total_Routes_Recorded");
-            Text totalRoutesText = doc.createTextNode(String.valueOf(routesRecorded));
-            totalRoutes.appendChild(totalRoutesText);
-            total.appendChild(totalRoutes);
-
-            Element totalDistanceElement = doc.createElement("Total_Distance");
-            Text totalDistanceText = doc.createTextNode(String.valueOf(totalDistance));
-            totalDistanceElement.appendChild(totalDistanceText);
-            total.appendChild(totalDistanceElement);
-
-            Element totalElevationElement = doc.createElement("Total_Elevation");
-            Text totalElevationText = doc.createTextNode(String.valueOf(totalElevation));
-            totalElevationElement.appendChild(totalElevationText);
-            total.appendChild(totalElevationElement);
-
-            Element totalActivityTimeElement = doc.createElement("Total_Activity_Time");
-            Text totalActivityTimeText = doc.createTextNode(String.valueOf(totalActivityTime));
-            totalActivityTimeElement.appendChild(totalActivityTimeText);
-            total.appendChild(totalActivityTimeElement);
-
-            root.appendChild(total);
 
             DOMSource source = new DOMSource(doc);
             Properties config = new Properties();
