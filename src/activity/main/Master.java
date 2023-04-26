@@ -73,7 +73,6 @@ public class Master
                     // Accept a client connection
                     Socket client = clientSocket.accept();
                     System.out.println("MASTER: Client connected");
-
                     // Create a new thread to handle the client
                     ClientHandler clientHandler = new ClientHandler(client, routes, unprocessedDirectory.getAbsolutePath(), processedDirectory.getAbsolutePath(),segments);
 

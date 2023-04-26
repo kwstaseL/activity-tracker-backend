@@ -83,7 +83,7 @@ public class Waypoint implements Serializable
     @Override
     public boolean equals(Object o)
     {
-        final double gpsError = 5.0;
+        final double gpsError = 10;
         if (this == o) return true;
         if (!(o instanceof Waypoint)) return false;
 
