@@ -41,10 +41,6 @@ public class Statistics implements Serializable
         if (fileExists())
         {
             loadStats();
-            for (String user : userStats.keySet()) {
-                System.out.println("\n" + userStats.get(user) + "\n");
-            }
-            System.out.println(this + "\n");
         }
     }
 
