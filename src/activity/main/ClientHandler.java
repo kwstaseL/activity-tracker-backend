@@ -37,9 +37,8 @@ public class ClientHandler implements Runnable
     // The directories where we keep unprocessed and processed gpx files
     private String unprocessedDirectory;
     private String processedDirectory;
-
+    // segments: a queue containing all the segments to be checked for intersections with the routes of users.
     private Queue<Segment> segments;
-
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     private final Object writeLock = new Object();

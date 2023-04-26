@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 public class Reduce
 {
+    // This is the method that will reduce all the intermediate results received from the workers
+    // into a single result that will be sent to the client
     public synchronized static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediateResults)
     {
         assert intermediateResults.getValue() != null && intermediateResults.getValue().size()>0;

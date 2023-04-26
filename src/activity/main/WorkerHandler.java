@@ -20,10 +20,7 @@ public class WorkerHandler implements Runnable
     private ObjectOutputStream out;
     // This is the socket that the worker is connected to
     private final Socket workerSocket;
-    private ResultDispatcher resultDispatcher;
-    // This is the queue that will hold the intermediate results from the workers
-    // The results will be sent to the appropriate client-handler
-    private Queue<Pair<Integer, Pair<Chunk, ActivityStats>>> intermediateResults;
+    private HashMap<Integer,ClientHandler> clients;
 
     public WorkerHandler(Socket workerSocket,HashMap<Integer,ClientHandler> clients)
     {
@@ -34,10 +31,7 @@ public class WorkerHandler implements Runnable
             // Creating the input and output streams for the worker
             this.in = new ObjectInputStream(workerSocket.getInputStream());
             this.out = new ObjectOutputStream(workerSocket.getOutputStream());
-            this.intermediateResults = new LinkedList<>();
-
-            // initialising a ResultDispatcher with the clients matched to their unique IDs
-            this.resultDispatcher = new ResultDispatcher(clients,intermediateResults);
+            this.clients = clients;
         }
         catch (IOException e)
         {
@@ -52,13 +46,11 @@ public class WorkerHandler implements Runnable
     public void run()
     {
         Thread listenToWorker = new Thread(this::listenToWorker);
-        Thread handleResults = new Thread(() -> resultDispatcher.handleResults());
 
         listenToWorker.start();
-        handleResults.start();
     }
     // This method will listen for messages from the worker
-    // and add the intermediate results to the queue for the ResultDispatcher to handle
+    // and add the intermediate results to the appropriate client-handler that send them
     @SuppressWarnings("unchecked")
     private void listenToWorker()
     {
@@ -68,13 +60,14 @@ public class WorkerHandler implements Runnable
             {
                 // Receive message from worker
                 Object receivedObject = in.readObject();
-                Pair<Integer, Pair<Chunk, ActivityStats>> stats = (Pair<Integer, Pair<Chunk, ActivityStats>>) receivedObject;
+                Pair<Integer, Pair<Chunk, ActivityStats>> activityStatsPair = (Pair<Integer, Pair<Chunk, ActivityStats>>) receivedObject;
 
-                synchronized (intermediateResults)
-                {
-                    intermediateResults.add(stats);
-                    intermediateResults.notify();
-                }
+                // extracting the pair associated with the client
+                Pair<Chunk, ActivityStats> stats = activityStatsPair.getValue();
+
+                ClientHandler appropriateHandler = clients.get(activityStatsPair.getKey());
+                // sending the results to the appropriate client by writing them to shared memory
+                appropriateHandler.addStats(stats);
             }
 
         } catch (IOException | ClassNotFoundException e)

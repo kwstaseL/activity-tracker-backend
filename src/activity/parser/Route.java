@@ -33,7 +33,6 @@ public class Route implements Serializable
         this.fileName = fileName;
         this.segmentsContained = new ArrayList<>();
     }
-
     public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName)
     {
         this.waypoints = waypoints;
@@ -42,12 +41,10 @@ public class Route implements Serializable
         this.user = user;
         this.fileName = fileName;
     }
-
     public void addSegment(Segment segment)
     {
         segmentsContained.add(segment);
     }
-
     public ArrayList<Waypoint> waypoints() {
         return this.waypoints;
     }

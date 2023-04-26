@@ -10,8 +10,23 @@ import java.time.format.DateTimeFormatter;
 // It will calculate for a chunk of data the distance,time ,speed and elevation
 public class ActivityCalculator
 {
+    // This is the method that will be called during the mapping phase
+    // to calculate the stats for a chunk of data
+    public static ActivityStats calculateStats(Waypoint w1, Waypoint w2)
+    {
+        ActivityStats stats = new ActivityStats();
+        double distance = calculateDistance(w1, w2);
+        double time = calculateTime(w1, w2);
+        double speed = calculateSpeed(distance, time);
+        double elevation = calculateElevation(w1, w2);
 
-    // TODO: Possibly rework all methods into Waypoint?
+        stats.setDistance(distance);
+        stats.setSpeed(speed);
+        stats.setElevation(elevation);
+        stats.setTime(time);
+
+        return stats;
+    }
 
     // Calculating the distance between two waypoints
     private static double calculateDistance(Waypoint w1, Waypoint w2)
@@ -75,21 +90,5 @@ public class ActivityCalculator
 
         return 0;
     }
-    // This is the method that will be called during the mapping phase
-    // to calculate the stats for a chunk of data
-    public static ActivityStats calculateStats(Waypoint w1, Waypoint w2)
-    {
-        ActivityStats stats = new ActivityStats();
-        double distance = calculateDistance(w1, w2);
-        double time = calculateTime(w1, w2);
-        double speed = calculateSpeed(distance, time);
-        double elevation = calculateElevation(w1, w2);
 
-        stats.setDistance(distance);
-        stats.setSpeed(speed);
-        stats.setElevation(elevation);
-        stats.setTime(time);
-
-        return stats;
-    }
 }

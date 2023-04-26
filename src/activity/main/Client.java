@@ -23,14 +23,10 @@ public class Client
 
     // initialised: represents the state of Client objects. If false, clients cannot be initialised.
     private static boolean initialised = false;
-
     // unprocessedDirectory: The directory with all the gpx available for processing
     private static String directory;
     private static String masterIP;
     private static int clientPort;
-
-    // lock: dummy object used for synchronization
-    private final Object lock = new Object();
 
     public Client(File file)
     {
@@ -65,7 +61,8 @@ public class Client
 
         // otherwise, initialise the Client class
         Properties config = new Properties();
-        try {
+        try
+        {
             config.load(new FileInputStream("config.properties"));
             masterIP = config.getProperty("master_ip");
             clientPort = Integer.parseInt(config.getProperty("client_port"));
@@ -78,50 +75,10 @@ public class Client
         }
     }
 
-    // This method will be used to send the file to the master
-    public void sendFile()
-    {
-        try
-        {
-            System.out.println("Sending file " + file.getName() + " to master\n");
-            out.writeObject(file);
-            out.flush();
-        }
-        catch (Exception e)
-        {
-            System.out.println("Could not send file");
-            shutdown();
-        }
-    }
-
-    // This method will be used to receive the statistics from the master.
-    public void listenForMessages()
-    {
-        try
-        {
-            // routeStats: contains the statistics for the route that was sent to the master
-            Object routeStats = in.readObject();
-            System.out.println("Output for file | " + file.getName() + " | " + routeStats + "\n");
-            // userStats: contains the overall statistics for the user that sent the route to the master
-            Object userStats = in.readObject();
-            System.out.println(userStats + "\n");
-            // allUsersStats: contains the overall statistics for all users that have sent routes to the master
-            Object allUsersStats = in.readObject();
-            System.out.println(allUsersStats + "\n");
-        }
-        catch (Exception e)
-        {
-            System.out.println("Could not receive object");
-            e.printStackTrace();
-            shutdown();
-        }
-
-    }
-
     // This is the UI for the client
     // It will allow the user to select a route to be sent for processing and will display the results
     // It will also allow him to select a segment that he will decide, and find the statistics for that segment for all users
-    private static void sendRoute()
+    private static void startMessageLoop()
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -197,6 +154,46 @@ public class Client
         }
     }
 
+    // This method will be used to receive the statistics from the master.
+    public void listenForMessages()
+    {
+        try
+        {
+            // routeStats: contains the statistics for the route that was sent to the master
+            Object routeStats = in.readObject();
+            System.out.println("Output for file | " + file.getName() + " | " + routeStats + "\n");
+            // userStats: contains the overall statistics for the user that sent the route to the master
+            Object userStats = in.readObject();
+            System.out.println(userStats + "\n");
+            // allUsersStats: contains the overall statistics for all users that have sent routes to the master
+            Object allUsersStats = in.readObject();
+            System.out.println(allUsersStats + "\n");
+        }
+        catch (Exception e)
+        {
+            System.out.println("Could not receive object");
+            e.printStackTrace();
+            shutdown();
+        }
+
+    }
+
+    // This method will be used to send the file to the master
+    public void sendFile()
+    {
+        try
+        {
+            System.out.println("Sending file " + file.getName() + " to master\n");
+            out.writeObject(file);
+            out.flush();
+        }
+        catch (Exception e)
+        {
+            System.out.println("Could not send file");
+            shutdown();
+        }
+    }
+
     // This method will be used to send all routes to the master
     private static void sendAllRoutes(File[] directoryContents)
     {
@@ -248,11 +245,10 @@ public class Client
         }
     }
 
-
     public static void main(String[] args)
     {
         clientInitialisation();
-        sendRoute();
+        startMessageLoop();
     }
 
 }

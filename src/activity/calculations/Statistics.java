@@ -21,7 +21,6 @@ import java.util.Properties;
  */
 public class Statistics implements Serializable
 {
-
     // userStats: A hashmap matching each user to their respective statistics.
     private final HashMap<String, UserStatistics> userStats;
     private int routesRecorded;
@@ -47,8 +46,8 @@ public class Statistics implements Serializable
     // initialise: Called upon Statistics initialisation, loads data from our "statistics.xml" file
     public void loadStats()
     {
-        try {
-
+        try
+        {
             // first, loading the appropriate info from the config and initialising a new DocumentBuilder
             Properties config = new Properties();
             config.load(new FileInputStream("config.properties"));
@@ -97,7 +96,8 @@ public class Statistics implements Serializable
         }
     }
 
-    public void registerRoute(String user, ActivityStats activityStats) {
+    public void registerRoute(String user, ActivityStats activityStats)
+    {
 
         // first, updating the user specific stats
         if (!userStats.containsKey(user)) {

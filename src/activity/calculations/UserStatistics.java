@@ -6,7 +6,6 @@ import java.io.Serializable;
 
 public class UserStatistics implements Serializable
 {
-    // TODO: Make files out of user statistics
     private double totalDistance;
     private double totalElevation;
     private double totalActivityTime;
