@@ -43,6 +43,42 @@ public class Statistics implements Serializable
         }
     }
 
+    // fileExists: Returns true if the statistics file already exists, false otherwise.
+    private boolean fileExists()
+    {
+        try
+        {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+            File statisticsPath = new File(config.getProperty("statistics_directory"));
+            File[] directoryContents = statisticsPath.listFiles();
+
+            if (directoryContents == null)
+            {
+                // if directoryContents == null (meaning we could not find the file), we create the directory so that we can create the file later
+                if (!new File(config.getProperty("statistics_directory")).mkdirs())
+                {
+                    throw new RuntimeException("Could not find the directory, and could not make a new directory.");
+                }
+                return false;
+            }
+
+            for (File file : directoryContents)
+            {
+                if (file.getName().equals(config.getProperty("statistics_file")))
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     // initialise: Called upon Statistics initialisation, loads data from our "statistics.xml" file
     public void loadStats()
     {
@@ -76,7 +112,6 @@ public class Statistics implements Serializable
                 userStats.put(user, userStatistics);
                 registerStatistics(userStatistics);
             }
-
         }
         catch (ParserConfigurationException e)
         {
@@ -121,55 +156,6 @@ public class Statistics implements Serializable
         this.totalDistance += userStatistics.getTotalDistance();
         this.totalElevation += userStatistics.getTotalElevation();
         this.totalActivityTime += userStatistics.getTotalActivityTime();
-    }
-
-    // updateStats: Updates the xml file accordingly.
-    private void updateStats()
-    {
-        // TODO: Optimise this method, to avoid creating the entire file every time
-        createFile();
-
-    }
-
-    private void updateFile()
-    {
-
-    }
-
-    // fileExists: Returns true if the statistics file already exists, false otherwise.
-    private boolean fileExists()
-    {
-        try
-        {
-            Properties config = new Properties();
-            config.load(new FileInputStream("config.properties"));
-            File statisticsPath = new File(config.getProperty("statistics_directory"));
-            File[] directoryContents = statisticsPath.listFiles();
-
-            if (directoryContents == null)
-            {
-                // if directoryContents == null (meaning we could not find the file), we create the directory so that we can create the file later
-                if (!new File(config.getProperty("statistics_directory")).mkdirs())
-                {
-                    throw new RuntimeException("Could not find the directory, and could not make a new directory.");
-                }
-                return false;
-            }
-
-            for (File file : directoryContents)
-            {
-                if (file.getName().equals(config.getProperty("statistics_file")))
-                {
-                    return true;
-                }
-            }
-            return false;
-
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     // createFile: Called when first creating the file. Writes down the statistics for all users currently registered
@@ -234,6 +220,19 @@ public class Statistics implements Serializable
         {
             throw new RuntimeException("Could not transform file.");
         }
+    }
+
+    // updateStats: Updates the xml file accordingly.
+    private void updateStats()
+    {
+        // TODO: Optimise this method, to avoid creating the entire file every time
+        createFile();
+
+    }
+
+    private void updateFile()
+    {
+
     }
 
     // getUserStats: Returns the UserStatistics object associated with a specific user.

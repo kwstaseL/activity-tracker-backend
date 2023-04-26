@@ -130,7 +130,9 @@ public class ClientHandler implements Runnable
                             try
                             {
                                 Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
-                            } catch (IOException e) {
+                            }
+                            catch (IOException e)
+                            {
                                 throw new RuntimeException(e);
                             }
 
@@ -197,8 +199,8 @@ public class ClientHandler implements Runnable
             shutdown();
         }
     }
-    // This is the method that will handle the reducing phase and send the result back to the client
 
+    // This is the method that will handle the reducing phase and send the result back to the client
     // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
     private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
     {
@@ -219,7 +221,8 @@ public class ClientHandler implements Runnable
                 out.writeObject(statistics.getGlobalStats());
                 out.flush();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             System.out.println("Could not send object to the client");
         }

@@ -206,7 +206,6 @@ public class Client
         }
     }
 
-
     // This method will be used to close the connection with the master and the streams
     private void shutdown()
     {
@@ -221,6 +220,7 @@ public class Client
                 System.out.println("Could not close connection");
             }
         }
+
         if (out != null)
         {
             try
@@ -232,6 +232,7 @@ public class Client
                 System.out.println("Could not close output stream");
             }
         }
+
         if (in != null)
         {
             try

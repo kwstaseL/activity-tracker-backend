@@ -45,6 +45,7 @@ public class WorkDispatcher implements Runnable
             }
         }
     }
+
     // Takes in a route and splits it into chunks, then sends the chunks to the workers using round-robin
     private void handleRoute(Route route)
     {
@@ -137,8 +138,8 @@ public class WorkDispatcher implements Runnable
         if (numWaypoints >= workers.size())
         {
             return (int) Math.ceil(numWaypoints / (workers.size() * 2.0));
-
-        } else
+        }
+        else
         {
             // making the assumption that if workers are more than the waypoints provided, n will be
             // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers

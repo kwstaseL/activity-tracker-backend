@@ -46,7 +46,6 @@ public class WorkerHandler implements Runnable
     public void run()
     {
         Thread listenToWorker = new Thread(this::listenToWorker);
-
         listenToWorker.start();
     }
     // This method will listen for messages from the worker
