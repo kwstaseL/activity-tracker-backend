@@ -38,6 +38,7 @@ public class Route implements Serializable
         this.routeID = idGenerator++;
         this.fileName = fileName;
         this.segments = new ArrayList<>();
+        this.segmentStartingIndices = new ArrayList<>();
     }
     public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName)
     {
