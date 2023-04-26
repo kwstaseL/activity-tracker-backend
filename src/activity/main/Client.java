@@ -55,7 +55,8 @@ public class Client
     public static void clientInitialisation()
     {
         // if the Client class has already been initialised, return
-        if (Client.initialised) {
+        if (Client.initialised)
+        {
             return;
         }
 

@@ -32,10 +32,9 @@ public class WorkDispatcher implements Runnable
                 {
                     try
                     {
-
                         filesToWorker.wait();
-
-                    } catch (InterruptedException e)
+                    }
+                    catch (InterruptedException e)
                     {
                         System.out.println("Error: " + e.getMessage());
                     }

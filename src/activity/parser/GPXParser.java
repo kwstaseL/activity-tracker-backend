@@ -60,12 +60,11 @@ public class GPXParser
             {
                 if (route.containsSegment(segment))
                 {
-                    System.out.println("Route " + route + " is inside segment " + segment);
-                    route.addSegment(segment);
+                    System.out.println("Segment " + segment + " is inside route " + route);
                 }
                 else
                 {
-                    System.out.println("Route " + route + " is NOT inside segment " + segment);
+                    System.out.println("Segment " + segment + " is NOT inside route " + route);
                 }
             }
 
@@ -78,7 +77,7 @@ public class GPXParser
         return route;
     }
 
-    // TODO: Implement
+
     public static Segment parseSegment(File file)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<>();

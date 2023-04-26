@@ -24,8 +24,12 @@ public class ClientHandler implements Runnable
     private final Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+
     // This is the queue that the routes will be added to
-    private Queue<Route> routes;
+    private Queue<Route> routeQueue;
+
+    // routes: Represents all routes received
+    private ArrayList<Route> routes;
     // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
     private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     private static final Statistics statistics = new Statistics();
@@ -39,6 +43,7 @@ public class ClientHandler implements Runnable
     private String processedDirectory;
     // segments: a queue containing all the segments to be checked for intersections with the routes of users.
     private Queue<Segment> segments;
+
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     private final Object writeLock = new Object();
@@ -53,7 +58,7 @@ public class ClientHandler implements Runnable
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
             this.unprocessedDirectory = unprocessedDirectory;
             this.processedDirectory = processedDirectory;
-            this.routes = routes;
+            this.routeQueue = routes;
             this.segments = segments;
         }
         catch (IOException e)
@@ -181,16 +186,18 @@ public class ClientHandler implements Runnable
                 Route route = GPXParser.parseRoute(receivedFile,segments);
                 route.setClientID(clientID);
                 // Add the route to the queue
-                synchronized (routes)
+                synchronized (routeQueue)
                 {
                     // Dispatching the file to the workers
                     routes.add(route);
-                    routes.notify();
+                    routeQueue.add(route);
+                    routeQueue.notify();
                 }
 
             }
 
-        } catch (IOException | ClassNotFoundException e)
+        }
+        catch (IOException | ClassNotFoundException e)
         {
             System.out.println("ClientHandler: Connection to client lost");
         }
