@@ -24,10 +24,8 @@ public class Master
 
     // Queue containing the routes that will be sent to the workers
     private Queue<Route> routes;
-
     // Queue containing all the worker handlers
     private Queue<WorkerHandler> workerHandlers;
-
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
     // The directories, as extracted from the config
@@ -184,8 +182,8 @@ public class Master
             throw new RuntimeException(e);
         }
         handleWorker.start();
-        dispatchWork.start();
         handleClient.start();
+        dispatchWork.start();
     }
 
     public static void main(String[] args)

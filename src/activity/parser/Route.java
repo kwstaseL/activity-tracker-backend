@@ -2,6 +2,7 @@ package activity.parser;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class Route implements Serializable
@@ -40,6 +41,10 @@ public class Route implements Serializable
         this.clientID = clientID;
         this.user = user;
         this.fileName = fileName;
+    }
+    public boolean containsSegment(Segment segment)
+    {
+        return Collections.indexOfSubList(waypoints, segment.getWaypoints()) != -1;
     }
     public void addSegment(Segment segment)
     {

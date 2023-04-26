@@ -58,11 +58,17 @@ public class GPXParser
             // Check for all the segments if the route is inside of them
             for (Segment segment : segments)
             {
-                if (segment.containsRoute(route))
+                if (route.containsSegment(segment))
                 {
+                    System.out.println("Route " + route + " is inside segment " + segment);
                     route.addSegment(segment);
                 }
+                else
+                {
+                    System.out.println("Route " + route + " is NOT inside segment " + segment);
+                }
             }
+
         }
         catch (Exception e)
         {

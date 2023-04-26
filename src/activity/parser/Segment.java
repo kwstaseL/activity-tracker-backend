@@ -1,6 +1,8 @@
 package activity.parser;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Segment
 {
@@ -18,28 +20,8 @@ public class Segment
     {
         ArrayList<Waypoint> segmentWaypoints = getWaypoints();
         ArrayList<Waypoint> routeWaypoints = route.waypoints();
-
-        // Use a sliding window of length equal to the number of segment waypoints
-        for (int i = 0; i <= routeWaypoints.size() - segmentWaypoints.size(); i++) {
-            // Check if the segment waypoints match the route waypoints starting at index i
-            boolean match = true;
-            for (int j = 0; j < segmentWaypoints.size(); j++)
-            {
-                if (!routeWaypoints.get(i + j).equals(segmentWaypoints.get(j)))
-                {
-                    match = false;
-                    break;
-                }
-            }
-            if (match)
-            {
-                // The segment matches the route
-                return true;
-            }
-        }
-
-        // The segment does not match the route
-        return false;
+        System.out.println(Collections.indexOfSubList(segmentWaypoints, routeWaypoints));
+        return true;
     }
 
     public ArrayList<Waypoint> getWaypoints()
