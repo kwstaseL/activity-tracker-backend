@@ -1,5 +1,7 @@
 package activity.parser;
 
+import activity.misc.Pair;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +26,10 @@ public class Route implements Serializable
 
     // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
-    private ArrayList<Segment> segmentsContained;
+
+    // segmentsContained: An arraylist, containing a pair of segments and the index of the route where the segment begins
+    private ArrayList<Segment> segments;
+    private ArrayList<Integer> segmentStartingIndices;
 
     public Route(ArrayList<Waypoint> waypoints, String user, String fileName)
     {
@@ -32,7 +37,7 @@ public class Route implements Serializable
         this.user = user;
         this.routeID = idGenerator++;
         this.fileName = fileName;
-        this.segmentsContained = new ArrayList<>();
+        this.segments = new ArrayList<>();
     }
     public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName)
     {
@@ -44,12 +49,36 @@ public class Route implements Serializable
     }
     public boolean containsSegment(Segment segment)
     {
-        return Collections.indexOfSubList(waypoints, segment.getWaypoints()) != -1;
+        int segmentIndex = Collections.indexOfSubList(waypoints, segment.getWaypoints());
+
+        if (segmentIndex == -1)
+        {
+            return false;
+        }
+
+        addSegment(segment, segmentIndex);
+        return true;
     }
-    public void addSegment(Segment segment)
+
+    private void addSegment(Segment segment, int index)
     {
-        segmentsContained.add(segment);
+        if (!segments.contains(segment))
+        {
+            segments.add(segment);
+            segmentStartingIndices.add(index);
+        }
     }
+
+    public int getSegmentStartingIndex(Segment segment)
+    {
+        if (segments.contains(segment))
+        {
+            int index = segments.indexOf(segment);
+            return segmentStartingIndices.get(index);
+        }
+        return -1;
+    }
+
     public ArrayList<Waypoint> waypoints() {
         return this.waypoints;
     }
@@ -58,9 +87,15 @@ public class Route implements Serializable
         return routeID;
     }
 
-    public int getClientID() { return clientID; }
+    public int getClientID()
+    {
+        return clientID;
+    }
 
-    public void setClientID(int clientID) { this.clientID = clientID; }
+    public void setClientID(int clientID)
+    {
+        this.clientID = clientID;
+    }
 
     public String getFileName()
     {
