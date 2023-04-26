@@ -99,6 +99,7 @@ public class Statistics implements Serializable
 
             NodeList nodeList = doc.getElementsByTagName("User");
 
+            // for all the users in our database, write their respective stats to the XML file
             for (int i = 0; i < nodeList.getLength(); i++)
             {
                 Element currentElement = (Element) nodeList.item(i);
@@ -135,7 +136,8 @@ public class Statistics implements Serializable
     {
 
         // first, updating the user specific stats
-        if (!userStats.containsKey(user)) {
+        if (!userStats.containsKey(user))
+        {
             userStats.put(user, new UserStatistics(user));
         }
         userStats.get(user).registerRoute(activityStats);
@@ -172,7 +174,8 @@ public class Statistics implements Serializable
             doc.appendChild(root);
 
             // for all the users currently registered, write their statistics to the xml file
-            for (String user : userStats.keySet()) {
+            for (String user : userStats.keySet())
+            {
                 UserStatistics statisticsForUser = userStats.get(user);
 
                 Element userElement = doc.createElement("User");
@@ -226,6 +229,7 @@ public class Statistics implements Serializable
     private void updateStats()
     {
         // TODO: Optimise this method, to avoid creating the entire file every time
+        // TODO: Make a similar segmentstatistics.xml file and update it likewise, elements segment name, child element user with attributes activity time, speed
         createFile();
 
     }
