@@ -1,5 +1,7 @@
 package activity.main;
 
+import activity.calculations.Statistics;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Properties;
@@ -69,7 +71,9 @@ public class Client
             clientPort = Integer.parseInt(config.getProperty("client_port"));
             directory = config.getProperty("unprocessed_directory");
             initialised = true;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.out.println("Initialisation of clients failed.");
             System.out.println(e.getMessage());
             throw new RuntimeException(e);
@@ -78,7 +82,6 @@ public class Client
 
     // This is the UI for the client
     // It will allow the user to select a route to be sent for processing and will display the results
-    // It will also allow him to select a segment that he will decide, and find the statistics for that segment for all users
     private static void startMessageLoop()
     {
         Scanner scanner = new Scanner(System.in);
@@ -133,7 +136,8 @@ public class Client
                 try
                 {
                     choice = Integer.parseInt(input);
-                } catch (NumberFormatException e)
+                }
+                catch (NumberFormatException e)
                 {
                     System.out.println("Invalid input. Please enter a valid file index or \"all\".");
                     continue;
