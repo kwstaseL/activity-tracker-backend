@@ -29,7 +29,7 @@ public class ClientHandler implements Runnable
     private Queue<Route> routeQueue;
 
     // routes: Represents all routes received
-    private ArrayList<Route> routes;
+    private static final ArrayList<Route> routes = new ArrayList<>();
     // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
     private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     private static final Statistics statistics = new Statistics();
