@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Properties;
 
 /* Statistics: The class that will be in charge of handling all the related statistics.
- * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded, an archive of
- * the stats recorded, as well as the total distance, elevation and activity time across all users.
+ * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded,
+ * as well as the total distance, elevation and activity time across all users.
  */
 public class Statistics implements Serializable
 {
