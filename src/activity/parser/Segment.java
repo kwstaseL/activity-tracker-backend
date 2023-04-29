@@ -15,14 +15,6 @@ public class Segment
         segmentID = segmentIDGenerator++;
     }
 
-    public boolean containsRoute(Route route)
-    {
-        ArrayList<Waypoint> segmentWaypoints = getWaypoints();
-        ArrayList<Waypoint> routeWaypoints = route.waypoints();
-        System.out.println(Collections.indexOfSubList(segmentWaypoints, routeWaypoints));
-        return true;
-    }
-
     public ArrayList<Waypoint> getWaypoints()
     {
         return waypoints;
