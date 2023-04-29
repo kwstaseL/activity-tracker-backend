@@ -86,7 +86,7 @@ public class Master
 
                 } catch (Exception e)
                 {
-                    System.out.println("Could not accept client connection");
+                    System.out.println("MASTER: Could not accept client connection");
                     try
                     {
                         clientSocket.close();
@@ -95,12 +95,13 @@ public class Master
                     {
                         throw new RuntimeException(ex);
                     }
-                    System.out.println("Client connection closed");
+                    System.out.println("MASTER: Client connection closed");
                 }
             }
         });
 
         // Thread that will handle the workers
+        //TODO: After reaching the max number of workers, make the master wait for a worker to disconnect before accepting a new worker
         Thread handleWorker = new Thread(() ->
         {
             while (!workerSocket.isClosed())
@@ -121,7 +122,7 @@ public class Master
 
                 } catch (Exception e)
                 {
-                    System.out.println("Could not accept worker connection");
+                    System.out.println("MASTER: Could not accept worker connection");
                     e.printStackTrace();
                     try
                     {
@@ -130,8 +131,8 @@ public class Master
                     {
                         throw new RuntimeException(ex);
                     }
-                    System.out.println("Worker connection closed");
-                    System.out.println("Error: " + e.getMessage());
+                    System.out.println("MASTER: Worker connection closed");
+                    System.out.println("MASTER: Error: " + e.getMessage());
                 }
             }
         });

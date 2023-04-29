@@ -257,40 +257,25 @@ public class Client
     // This method will be used to close the connection with the master and the streams
     private void shutdown()
     {
-        if (connection != null)
+        try
         {
-            try
-            {
-                connection.close();
-            }
-            catch (IOException e)
-            {
-                System.out.println("Could not close connection");
-            }
-        }
-
-        if (out != null)
-        {
-            try
-            {
-                out.close();
-            }
-            catch (IOException e)
-            {
-                System.out.println("Could not close output stream");
-            }
-        }
-
-        if (in != null)
-        {
-            try
+            if (in != null)
             {
                 in.close();
             }
-            catch (IOException e)
+            if (out != null)
             {
-                System.out.println("Could not close input stream");
+                out.close();
             }
+            if (connection != null)
+            {
+                connection.close();
+            }
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not close connection");
+            e.printStackTrace();
         }
     }
     public static void main(String[] args)
