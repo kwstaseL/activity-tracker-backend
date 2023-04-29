@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 // Represents the client which is basically the user of the application
 // He will be able to send files to the master and receive the results of his statistics back
-public class Client<Path>
+public class Client
 {
     // This is the socket that the client is connected to with the master
     private Socket connection;
@@ -199,8 +199,8 @@ public class Client<Path>
             shutdown();
         }
 
-        java.nio.file.Path sourcePath = Paths.get(unprocessedDirectory + File.separator + selectedGPX.getName());
-        java.nio.file.Path destPath = Paths.get(completedDirectory + File.separator + selectedGPX.getName());
+        Path sourcePath = Paths.get(unprocessedDirectory + File.separator + selectedGPX.getName());
+        Path destPath = Paths.get(completedDirectory + File.separator + selectedGPX.getName());
         try
         {
             Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
