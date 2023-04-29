@@ -16,7 +16,7 @@ public class ResetDirectories
             Properties config = new Properties();
             config.load(new FileInputStream("config.properties"));
             File unprocessedDirectory = new File(config.getProperty("unprocessed_directory"));
-            File processedDirectory = new File(config.getProperty("processed_directory"));
+            File processedDirectory = new File(config.getProperty("completed_directory"));
             File[] processedDirectoryContents = processedDirectory.listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File file)
