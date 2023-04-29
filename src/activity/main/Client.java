@@ -1,6 +1,5 @@
 package activity.main;
 
-import activity.calculations.Statistics;
 import activity.misc.GPXData;
 
 import java.io.*;
@@ -26,24 +25,11 @@ public class Client
     private static String directory;
     private static String masterIP;
     private static int clientPort;
-    private Object messageLock = new Object();
+    private final Object messageLock = new Object();
 
     public Client()
     {
         clientInitialisation();
-        // Create a socket that will connect to the master
-        try
-        {
-            connection = new Socket(masterIP, clientPort);
-            out = new ObjectOutputStream(connection.getOutputStream());
-            in = new ObjectInputStream(connection.getInputStream());
-
-        } catch (Exception e)
-        {
-            System.out.println("Could not connect to master");
-            shutdown();
-            throw new RuntimeException(e);
-        }
     }
 
     /* clientInitialisation: To be called before the first Client object is instantiated, or during the first Client instantiation.
@@ -101,7 +87,7 @@ public class Client
             File[] filteredFiles = filterFilesByUsername(directoryContents, username);
 
             // if no files match the username, inform the user and exit
-            if (filteredFiles == null || filteredFiles.length == 0) {
+            if (filteredFiles.length == 0) {
                 System.out.println("No routes are available for processing!");
                 return;
             }
@@ -132,16 +118,32 @@ public class Client
                 try
                 {
                     choice = Integer.parseInt(input);
-                } catch (NumberFormatException e)
+                }
+                catch (NumberFormatException e)
                 {
                     System.out.println("Invalid input. Please enter a valid file index.");
                     continue;
                 }
 
-                if (choice < 0 || choice >= filteredFiles.length) {
+                if (choice < 0 || choice >= filteredFiles.length)
+                {
                     System.out.println("Invalid input. Please enter a valid file index.");
                     choice = null;
                     continue;
+                }
+
+                // Create a socket that will connect to the master
+                try
+                {
+                    connection = new Socket(masterIP, clientPort);
+                    out = new ObjectOutputStream(connection.getOutputStream());
+                    in = new ObjectInputStream(connection.getInputStream());
+                }
+                catch (Exception e)
+                {
+                    System.out.println("Could not connect to master");
+                    shutdown();
+                    throw new RuntimeException(e);
                 }
 
                 File selectedGPX = filteredFiles[choice];
@@ -155,13 +157,14 @@ public class Client
     {
         try
         {
-            System.out.println("Waiting for message from master...");
             // routeStats: contains the statistics for the route that was sent to the master
             Object routeStats = in.readObject();
             System.out.println("Output for file | " + selectedGPX.getName() + " | " + routeStats + "\n");
+
             // userStats: contains the overall statistics for the user that sent the route to the master
             Object userStats = in.readObject();
             System.out.println(userStats + "\n");
+
             // allUsersStats: contains the overall statistics for all users that have sent routes to the master
             Object allUsersStats = in.readObject();
             System.out.println(allUsersStats + "\n");
@@ -194,7 +197,8 @@ public class Client
             out.flush();
             System.out.println("File " + selectedGPX.getName() + " sent to master");
 
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             System.out.println("Could not send file");
             shutdown();
