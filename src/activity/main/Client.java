@@ -5,6 +5,10 @@ import activity.misc.GPXData;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Scanner;
@@ -12,7 +16,7 @@ import java.util.Scanner;
 // Represents the client which is basically the user of the application
 // He will be able to send files to the master and receive the results of his statistics back
 // TODO: Cleanup the code
-public class Client
+public class Client<Path>
 {
     // This is the socket that the client is connected to with the master
     private Socket connection;
@@ -26,6 +30,8 @@ public class Client
     private static String directory;
     private static String masterIP;
     private static int clientPort;
+    private String unprocessedDirectory;
+    private String completedDirectory;
     private Object messageLock = new Object();
 
     public Client()
@@ -51,11 +57,15 @@ public class Client
      */
     private void clientInitialisation()
     {
-        // otherwise, initialise the Client class
-        Properties config = new Properties();
-
         try
         {
+            Properties config = new Properties();
+            config.load(new FileInputStream("config.properties"));
+
+            unprocessedDirectory = (new File(config.getProperty("unprocessed_directory"))).getAbsolutePath();
+            // TODO: Catch the exception if the directory does not exist and create it
+            completedDirectory = (new File(config.getProperty("completed_directory"))).getAbsolutePath();
+
             config.load(new FileInputStream("config.properties"));
             masterIP = config.getProperty("master_ip");
             clientPort = Integer.parseInt(config.getProperty("client_port"));
@@ -147,16 +157,15 @@ public class Client
                     choice = null;
                     continue;
                 }
-
                 File selectedGPX = filteredFiles[choice];
                 // Create a new thread that will send the file to the master and listen for the results
                 sendFile(selectedGPX);
                 // Create a new ObjectInputStream for each iteration
-                listenForMessages();
+                listenForMessages(selectedGPX);
             }
         }
     }
-    private void listenForMessages()
+    private void listenForMessages(File selectedGPX)
     {
         try {
 
@@ -166,15 +175,28 @@ public class Client
             Object allUsersStats = in.readObject();
 
             // Print the received statistics
-            System.out.println("Output for file | " + routeStats + "\n");
+            System.out.println("Output for file | " + selectedGPX.getName() + "| " + routeStats + "\n");
             System.out.println(userStats + "\n");
             System.out.println(allUsersStats + "\n");
+
         } catch (Exception e)
         {
             System.out.println("Could not receive objects");
             e.printStackTrace();
             shutdown();
         }
+
+        java.nio.file.Path sourcePath = Paths.get(unprocessedDirectory + File.separator + selectedGPX.getName());
+        java.nio.file.Path destPath = Paths.get(completedDirectory + File.separator + selectedGPX.getName());
+        try
+        {
+            Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
     }
 
 

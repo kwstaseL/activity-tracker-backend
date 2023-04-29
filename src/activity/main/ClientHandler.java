@@ -230,6 +230,7 @@ public class ClientHandler implements Runnable
                 out.flush();
                 out.writeObject(statistics.getGlobalStats());
                 out.flush();
+                // This will reset the stream so that we can send another object
                 out.reset();
             }
         }
