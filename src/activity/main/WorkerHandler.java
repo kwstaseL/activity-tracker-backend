@@ -69,11 +69,12 @@ public class WorkerHandler implements Runnable
                 appropriateHandler.addStats(stats);
             }
 
-        } catch (IOException | ClassNotFoundException e)
+        }
+        catch (IOException | ClassNotFoundException e)
         {
             System.out.println("WorkerHandler: Connection to worker lost");
-            e.printStackTrace();
-        } finally
+        }
+        finally
         {
             shutdown();
         }
@@ -89,8 +90,7 @@ public class WorkerHandler implements Runnable
         }
         catch (IOException e)
         {
-            System.out.println("WorkerHandler: Could not send route to worker");
-            e.printStackTrace();
+            System.out.println("WorkerHandler: Could not send route to worker because the connection is lost");
         }
     }
     // This method will close the connection to the worker
@@ -111,7 +111,6 @@ public class WorkerHandler implements Runnable
             {
                 workerSocket.close();
             }
-
             System.out.println("Worker disconnected");
         }
         catch (IOException e)

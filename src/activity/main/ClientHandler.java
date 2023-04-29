@@ -2,6 +2,7 @@ package activity.main;
 
 import activity.calculations.ActivityStats;
 import activity.calculations.Statistics;
+import activity.misc.GPXData;
 import activity.misc.Pair;
 import activity.mapreduce.Reduce;
 import activity.parser.Chunk;
@@ -11,10 +12,6 @@ import activity.parser.Segment;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 // This class will handle the client connection
@@ -24,31 +21,29 @@ public class ClientHandler implements Runnable
     private final Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-
-    // This is the queue that the routes will be added to
-    private Queue<Route> routeQueue;
-
-    // routes: Represents all routes received
-    private static final ArrayList<Route> routes = new ArrayList<>();
-    // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
-    private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
-    private static final Statistics statistics = new Statistics();
-
     // The unique id of the client, generated through a static id generator
     private int clientID;
+    // Used to generate the clientID
     private static int clientIDGenerator = 0;
-
     // The directories where we keep unprocessed and processed gpx files
     private String unprocessedDirectory;
     private String processedDirectory;
-    // segments: a queue containing all the segments to be checked for intersections with the routes of users.
-    private Queue<Segment> segments;
-
+    // This is the queue that the routes will be added to and
+    // the worker dispatcher will take from
+    private Queue<Route> routeQueue;
+    // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
+    private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
+    // routes: Represents all routes received
+    private static final ArrayList<Route> routes = new ArrayList<>();
+    // segments: a queue containing all the segments to be checked for intersections with the routes of users.
+    private Queue<Segment> segments;
     private final Object writeLock = new Object();
+    private static final Statistics statistics = new Statistics();
 
-    public ClientHandler(Socket clientSocket , Queue<Route> routes, String unprocessedDirectory, String processedDirectory,Queue<Segment> segments)
+    public ClientHandler(Socket clientSocket , Queue<Route> routes,
+                         String unprocessedDirectory, String processedDirectory,Queue<Segment> segments)
     {
         this.clientSocket = clientSocket;
         try
@@ -114,7 +109,7 @@ public class ClientHandler implements Runnable
                             throw new RuntimeException("Found more chunks than expected!");
                         }
                         // Else, if we have accumulated all the chunks we need, we can start reducing
-                        else if (activityList.size() == (chunk.getTotalChunks() -1))
+                        else if (activityList.size() == (chunk.getTotalChunks() - 1))
                         {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
@@ -130,6 +125,10 @@ public class ClientHandler implements Runnable
 
                             // Finds the path of the file we want to move and the path of the destination
                             // And then moves the already processed file from the unprocessed directory to the processed directory
+                            //TODO: This file should not be moved, but just added to the processed directory of the master server
+                            // Because the master, does not about the available gpx's that reside in the user's directory
+                            /*
+                            System.out.println("Moving file: " + chunk.getRoute().getFileName());
                             Path sourcePath = Paths.get(unprocessedDirectory + File.separator + chunk.getRoute().getFileName());
                             Path destPath = Paths.get(processedDirectory + File.separator + chunk.getRoute().getFileName());
                             try
@@ -140,6 +139,7 @@ public class ClientHandler implements Runnable
                             {
                                 throw new RuntimeException(e);
                             }
+                            */
 
                         // Else, we just add the chunk to the list
                         }
@@ -149,7 +149,7 @@ public class ClientHandler implements Runnable
                             routeHashmap.put(routeID, activityList);
                         }
 
-                    // Else, we create a new entry in the hashmap for this route
+                    // Else if the route does not exist in the hashmap, we create a new list and add the chunk to it
                     }
                     else
                     {
@@ -158,7 +158,6 @@ public class ClientHandler implements Runnable
                         routeHashmap.put(routeID, activityList);
                     }
                 }
-
             }
         }
     }
@@ -180,20 +179,24 @@ public class ClientHandler implements Runnable
                 // Receive the file object from the client
                 System.out.println("ClientHandler: Waiting for file from client");
 
-                File receivedFile = (File) in.readObject();
+                Object obj = in.readObject();
 
-                // Parse the file
-                Route route = GPXParser.parseRoute(receivedFile,segments);
-                route.setClientID(clientID);
-                // Add the route to the queue
-                synchronized (routeQueue)
+                if (obj instanceof GPXData gpxData)
                 {
-                    // Dispatching the file to the workers
-                    routes.add(route);
-                    routeQueue.add(route);
-                    routeQueue.notify();
+                    ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
+                    // Parse the file
+                    // Create a new thread to handle the parsing of the file
+                    Route route = GPXParser.parseRoute(gpxContent,segments);
+                    route.setClientID(clientID);
+                    // Add the route to the queue
+                    synchronized (routeQueue)
+                    {
+                        // Add the route to the queue and notify the dispatcher
+                        routes.add(route);
+                        routeQueue.add(route);
+                        routeQueue.notify();
+                    }
                 }
-
             }
 
         }
@@ -217,7 +220,7 @@ public class ClientHandler implements Runnable
         ActivityStats finalResults = Reduce.reduce(intermediateResults);
         try
         {
-            // Send the result back to the worker-handler
+            // Send the result back to the client
             synchronized (writeLock)
             {
                 statistics.registerRoute(user, finalResults);

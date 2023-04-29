@@ -9,27 +9,24 @@ import java.util.HashMap;
 
 public class Route implements Serializable
 {
-    // Waypoints is the ArrayList of Waypoints that the route contains
-    private final ArrayList<Waypoint> waypoints;
-
     // User is the username of the user who recorded the route
     private final String user;
-
     // Route ID is the unique ID of the route
     private final int routeID;
-
     // Client ID is the unique ID of the client-handler who sent the route
     private int clientID;
+    // Waypoints is the ArrayList of Waypoints that the route contains
+    private final ArrayList<Waypoint> waypoints;
+    // segmentsContained: An arraylist, containing a pair of segments and the index of the route where the segment begins
+    private ArrayList<Segment> segments;
+    // segmentStartingIndices: An arraylist, containing the index of the route where the segment begins
+    private ArrayList<Integer> segmentStartingIndices;
 
     // Route file name: The name of the file. Used to move to "processed_gpx" as soon as the Reduce phase is done.
     private final String fileName;
 
     // ID generator is a static variable that is used to generate unique IDs for each route
     private static int idGenerator = 0;
-
-    // segmentsContained: An arraylist, containing a pair of segments and the index of the route where the segment begins
-    private ArrayList<Segment> segments;
-    private ArrayList<Integer> segmentStartingIndices;
 
     public Route(ArrayList<Waypoint> waypoints, String user, String fileName)
     {

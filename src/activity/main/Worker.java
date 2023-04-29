@@ -90,7 +90,6 @@ public class Worker
     private void handleMapping(Chunk chunk)
     {
         System.out.println("WORKER: " + "Route: " + chunk.getRoute().getRouteID() + " Received chunk " + chunk.getChunkIndex() + " of " + chunk.getTotalChunks());
-
         // intermediate_result: the mapping process returns a key-value pair,
         // where key is the client id, and the value is another pair of chunk, activityStats
         Pair<Integer, Pair<Chunk, ActivityStats>> intermediate_result = Map.map(chunk.getRoute().getClientID(), chunk);
@@ -113,41 +112,25 @@ public class Worker
     // This method will close the connection to the master and close the input and output streams
     private void shutdown()
     {
-        if (connection != null)
+        try
         {
-            try
-            {
-                connection.close();
-
-            } catch (IOException e)
-            {
-                System.out.println("Could not close connection");
-                throw new RuntimeException(e);
-            }
-        }
-        if (in != null)
-        {
-            try
+            if (in != null)
             {
                 in.close();
-
-            } catch (IOException e)
-            {
-                System.out.println("Could not close input stream");
-                throw new RuntimeException(e);
             }
-        }
-        if (out != null)
-        {
-            try
+            if (out != null)
             {
                 out.close();
             }
-            catch (IOException e)
+            if (connection != null)
             {
-                System.out.println("Could not close output stream");
-                throw new RuntimeException(e);
+                connection.close();
             }
+        }
+        catch (IOException e)
+        {
+            System.out.println("Worker: Could not close connection to master");
+            System.out.println("Error: " + e.getMessage());
         }
     }
 

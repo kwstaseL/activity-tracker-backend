@@ -24,6 +24,8 @@ public class Master
 
     // Queue containing the routes that will be sent to the workers
     private Queue<Route> routes;
+    // Queue containing the segments
+    private Queue<Segment> segments;
     // Queue containing all the worker handlers
     private Queue<WorkerHandler> workerHandlers;
     // Lookup table that will map the client id to the appropriate client handler
@@ -31,7 +33,7 @@ public class Master
     // The directories, as extracted from the config
     private File unprocessedDirectory;
     private File processedDirectory;
-    private Queue<Segment> segments;
+
     public Master()
     {
         try
@@ -84,7 +86,7 @@ public class Master
 
                 } catch (Exception e)
                 {
-                    System.out.println("Could not accept client connection");
+                    System.out.println("MASTER: Could not accept client connection");
                     try
                     {
                         clientSocket.close();
@@ -93,12 +95,13 @@ public class Master
                     {
                         throw new RuntimeException(ex);
                     }
-                    System.out.println("Client connection closed");
+                    System.out.println("MASTER: Client connection closed");
                 }
             }
         });
 
         // Thread that will handle the workers
+        //TODO: After reaching the max number of workers, make the master wait for a worker to disconnect before accepting a new worker
         Thread handleWorker = new Thread(() ->
         {
             while (!workerSocket.isClosed())
@@ -119,7 +122,7 @@ public class Master
 
                 } catch (Exception e)
                 {
-                    System.out.println("Could not accept worker connection");
+                    System.out.println("MASTER: Could not accept worker connection");
                     e.printStackTrace();
                     try
                     {
@@ -128,8 +131,8 @@ public class Master
                     {
                         throw new RuntimeException(ex);
                     }
-                    System.out.println("Worker connection closed");
-                    System.out.println("Error: " + e.getMessage());
+                    System.out.println("MASTER: Worker connection closed");
+                    System.out.println("MASTER: Error: " + e.getMessage());
                 }
             }
         });
@@ -180,6 +183,7 @@ public class Master
         {
             throw new RuntimeException(e);
         }
+
         handleWorker.start();
         handleClient.start();
         dispatchWork.start();
