@@ -21,12 +21,13 @@ import java.util.Properties;
  */
 public class Statistics implements Serializable
 {
-    // userStats: A hashmap matching each user to their respective statistics.
-    private final HashMap<String, UserStatistics> userStats;
     private int routesRecorded;
     private double totalDistance;
     private double totalElevation;
     private double totalActivityTime;
+
+    // userStats: A hashmap matching each user to their respective statistics.
+    private final HashMap<String, UserStatistics> userStats;
 
     public Statistics()
     {

@@ -29,7 +29,7 @@ public class ActivityCalculator
     }
 
     // Calculating the distance between two waypoints
-    private static double calculateDistance(Waypoint w1, Waypoint w2)
+    public static double calculateDistance(Waypoint w1, Waypoint w2)
     {
         // Convert degrees to radians
         double lat1 = w1.getLatitude();

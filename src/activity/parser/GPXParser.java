@@ -68,7 +68,8 @@ public class GPXParser {
         return route;
     }
 
-    public static Segment parseSegment(File inputStream) {
+    public static Segment parseSegment(File inputStream)
+    {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Segment segment = null;
         try {

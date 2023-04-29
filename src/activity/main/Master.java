@@ -24,6 +24,8 @@ public class Master
 
     // Queue containing the routes that will be sent to the workers
     private Queue<Route> routes;
+    // Queue containing the segments
+    private Queue<Segment> segments;
     // Queue containing all the worker handlers
     private Queue<WorkerHandler> workerHandlers;
     // Lookup table that will map the client id to the appropriate client handler
@@ -31,7 +33,7 @@ public class Master
     // The directories, as extracted from the config
     private File unprocessedDirectory;
     private File processedDirectory;
-    private Queue<Segment> segments;
+
     public Master()
     {
         try
