@@ -26,7 +26,6 @@ public class ClientHandler implements Runnable
     // Used to generate the clientID
     private static int clientIDGenerator = 0;
     // The directories where we keep unprocessed and processed gpx files
-    private String unprocessedDirectory;
     private String processedDirectory;
     // This is the queue that the routes will be added to and
     // the worker dispatcher will take from
@@ -42,8 +41,7 @@ public class ClientHandler implements Runnable
     private final Object writeLock = new Object();
     private static Statistics statistics = new Statistics();
 
-    public ClientHandler(Socket clientSocket , Queue<Route> routes,
-                         String unprocessedDirectory, String processedDirectory,Queue<Segment> segments)
+    public ClientHandler(Socket clientSocket , Queue<Route> routes, String processedDirectory,Queue<Segment> segments)
     {
         this.clientSocket = clientSocket;
         try
@@ -51,7 +49,6 @@ public class ClientHandler implements Runnable
             this.clientID = clientIDGenerator++;
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
-            this.unprocessedDirectory = unprocessedDirectory;
             this.processedDirectory = processedDirectory;
             this.routeQueue = routes;
             this.segments = segments;
@@ -113,36 +110,9 @@ public class ClientHandler implements Runnable
                         {
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
-
-                            // fetching a list of all the stats we gathered for this specific route
-                            ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
-                            for (Pair<Chunk, ActivityStats> pair : activityList)
-                            {
-                                statsArrayList.add(pair.getValue());
-                            }
-                            // Creating a new thread to handle the reducing phase
-                            new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
-
-                            // Finds the path of the file we want to move and the path of the destination
-                            // And then moves the already processed file from the unprocessed directory to the processed directory
-                            //TODO: This file should not be moved, but just added to the processed directory of the master server
-                            // Because the master, does not about the available gpx's that reside in the user's directory
-                            /*
-                            System.out.println("Moving file: " + chunk.getRoute().getFileName());
-                            Path sourcePath = Paths.get(unprocessedDirectory + File.separator + chunk.getRoute().getFileName());
-                            Path destPath = Paths.get(processedDirectory + File.separator + chunk.getRoute().getFileName());
-                            try
-                            {
-                                Files.move(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
-                            }
-                            catch (IOException e)
-                            {
-                                throw new RuntimeException(e);
-                            }
-                            */
-
-                        // Else, we just add the chunk to the list
+                            processChunks(stats,activityList);
                         }
+                        // Else, we just add the chunk to the list
                         else
                         {
                             activityList.add(stats);
@@ -162,10 +132,71 @@ public class ClientHandler implements Runnable
         }
     }
 
-    // TODO: Implement the else condition from the method above as a separate method
-    private void registerStats()
+    private void processChunks(Pair<Chunk, ActivityStats> stats,ArrayList<Pair<Chunk, ActivityStats>> activityList)
     {
+        Chunk chunk = stats.getKey();
+        int routeID = chunk.getRoute().getRouteID();
 
+        // fetching a list of all the stats we gathered for this specific route
+        ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
+        for (Pair<Chunk, ActivityStats> pair : activityList)
+        {
+            statsArrayList.add(pair.getValue());
+        }
+        // Creating a new thread to handle the reducing phase
+        new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
+
+        // Finds the path of the file we want to move and the path of the destination
+        String fileName = chunk.getRoute().getFileName();
+        String processedFilePath = processedDirectory + File.separator + fileName;
+        try
+        {
+            // Create the processed file in the processed directory
+            File processedFile = new File(processedFilePath);
+            if (processedFile.createNewFile())
+            {
+                System.out.println("ClientHandler: File added to processed directory: " + fileName);
+            } else
+            {
+                System.out.println("ClientHandler: File already exists in processed directory: " + fileName);
+            }
+
+        } catch (IOException e)
+        {
+            throw new RuntimeException("Could not add file to processed directory: " + fileName, e);
+        }
+
+    }
+
+    // This is the method that will handle the reducing phase and send the result back to the client
+    // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
+    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
+    {
+        System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
+
+        // finalResults: The reduce process returns the final ActivityStats associated with a specific route.
+        ActivityStats finalResults = Reduce.reduce(intermediateResults);
+        try
+        {
+            // Send the result back to the client
+            synchronized (writeLock)
+            {
+                statistics.registerRoute(user, finalResults);
+                out.writeObject(finalResults);
+                out.flush();
+                out.writeObject(statistics.getUserStats(user));
+                out.flush();
+                out.writeObject(statistics.getGlobalStats());
+                out.flush();
+                // Here we reset the output stream to make sure
+                // that the object is sent with all the changes we made
+                out.reset();
+            }
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not send object to the client");
+        }
     }
 
     // This method is used to get the file from the client
@@ -210,35 +241,6 @@ public class ClientHandler implements Runnable
         }
     }
 
-    // This is the method that will handle the reducing phase and send the result back to the client
-    // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
-    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
-    {
-        System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
-
-        // finalResults: The reduce process returns the final ActivityStats associated with a specific route.
-        ActivityStats finalResults = Reduce.reduce(intermediateResults);
-        try
-        {
-            // Send the result back to the client
-            synchronized (writeLock)
-            {
-                statistics.registerRoute(user, finalResults);
-                out.writeObject(finalResults);
-                out.flush();
-                out.writeObject(statistics.getUserStats(user));
-                out.flush();
-                out.writeObject(statistics.getGlobalStats());
-                out.flush();
-                // This will reset the stream so that we can send another object
-                out.reset();
-            }
-        }
-        catch (IOException e)
-        {
-            System.out.println("Could not send object to the client");
-        }
-    }
 
 
     // addStats: Adds the stats to the queue to be processed by the readFromWorkerHandler method

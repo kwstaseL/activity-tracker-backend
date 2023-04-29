@@ -15,7 +15,6 @@ import java.util.Scanner;
 
 // Represents the client which is basically the user of the application
 // He will be able to send files to the master and receive the results of his statistics back
-// TODO: Cleanup the code
 public class Client<Path>
 {
     // This is the socket that the client is connected to with the master

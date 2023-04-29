@@ -231,6 +231,17 @@ public class Statistics implements Serializable
         // TODO: Optimise this method, to avoid creating the entire file every time
         // TODO: Make a similar segmentstatistics.xml file and update it likewise, elements segment name, child element user with attributes activity time, speed
         createFile();
+        /*
+        if (!fileExists())
+        {
+            createFile();
+        }
+        else
+        {
+            updateFile();
+        }
+         */
+
     }
 
     private void updateFile()
