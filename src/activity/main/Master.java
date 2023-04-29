@@ -28,9 +28,7 @@ public class Master
     private Queue<WorkerHandler> workerHandlers;
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
-    // The directories, as extracted from the config
-    private File unprocessedDirectory;
-    private File processedDirectory;
+    private int max_workers;
 
     public Master()
     {
@@ -42,8 +40,7 @@ public class Master
             final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
             final int CLIENT_PORT = Integer.parseInt(config.getProperty("client_port"));
 
-            unprocessedDirectory = new File(config.getProperty("unprocessed_directory"));
-            processedDirectory = new File(config.getProperty("processed_directory"));
+            max_workers = Integer.parseInt(config.getProperty("number_of_workers"));
 
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
@@ -74,7 +71,7 @@ public class Master
                     Socket client = clientSocket.accept();
                     System.out.println("MASTER: Client connected");
                     // Create a new thread to handle the client
-                    ClientHandler clientHandler = new ClientHandler(client, routes, unprocessedDirectory.getAbsolutePath(), processedDirectory.getAbsolutePath(),segments);
+                    ClientHandler clientHandler = new ClientHandler(client, routes, segments);
 
                     // Add the client handler to the lookup table
                     int clientID = clientHandler.getClientID();
@@ -82,7 +79,8 @@ public class Master
                     Thread clientThread = new Thread(clientHandler);
                     clientThread.start();
 
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     System.out.println("MASTER: Could not accept client connection");
                     try
@@ -99,10 +97,9 @@ public class Master
         });
 
         // Thread that will handle the workers
-        //TODO: After reaching the max number of workers, make the master wait for a worker to disconnect before accepting a new worker
         Thread handleWorker = new Thread(() ->
         {
-            while (!workerSocket.isClosed())
+            while (workerHandlers.size() != max_workers)
             {
                 try
                 {
@@ -114,7 +111,6 @@ public class Master
                     // so that the worker can send the results to the appropriate client
                     WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
                     workerHandlers.add(workerHandler);
-
                     Thread workerThread = new Thread(workerHandler);
                     workerThread.start();
 

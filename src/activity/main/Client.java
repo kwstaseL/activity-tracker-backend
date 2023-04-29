@@ -1,6 +1,5 @@
 package activity.main;
 
-import activity.calculations.Statistics;
 import activity.misc.GPXData;
 
 import java.io.*;
@@ -18,20 +17,19 @@ import java.util.Scanner;
 public class Client
 {
     // This is the socket that the client is connected to with the master
-    private Socket connection;
+    private final Socket connection;
 
     // This is the output stream that will be used to send objects to the master
-    private ObjectOutputStream out;
+    private final ObjectOutputStream out;
 
     // This is the input stream that will be used to receive objects from the master
-    private ObjectInputStream in;
+    private final ObjectInputStream in;
+
     // unprocessedDirectory: The directory with all the gpx available for processing
-    private static String directory;
-    private static String masterIP;
-    private static int clientPort;
     private String unprocessedDirectory;
     private String completedDirectory;
-    private Object messageLock = new Object();
+    private static String masterIP;
+    private static int clientPort;
 
     public Client()
     {
@@ -69,12 +67,13 @@ public class Client
                 File directory = new File(completedDirectory);
                 if (!directory.exists())
                 {
-                    directory.mkdirs();
+                    if (!directory.mkdirs()) {
+                        throw new RuntimeException("Could not create the directory for the completed gpx.");
+                    }
                 }
             }
             catch (Exception e)
             {
-                System.out.println("Could not create the directory for the completed gpx.");
                 System.out.println(e.getMessage());
                 throw new RuntimeException(e);
             }
@@ -82,7 +81,6 @@ public class Client
             config.load(new FileInputStream("config.properties"));
             masterIP = config.getProperty("master_ip");
             clientPort = Integer.parseInt(config.getProperty("client_port"));
-            directory = config.getProperty("unprocessed_directory");
         }
         catch (Exception e)
         {
@@ -109,17 +107,10 @@ public class Client
         while (true)
         {
             System.out.println("Available files:");
-            File directory = new File(Client.directory);
+            File directory = new File(unprocessedDirectory);
 
             // Get all the files in the directory
-            File[] directoryContents = directory.listFiles(new FileFilter()
-            {
-                @Override
-                public boolean accept(File file)
-                {
-                    return file.isFile();
-                }
-            });
+            File[] directoryContents = directory.listFiles(File::isFile);
             // Filter the files based on the username
             File[] filteredFiles = filterFilesByUsername(directoryContents, username);
 
@@ -137,7 +128,6 @@ public class Client
             }
 
             // Prompt user to select a route
-            String input = null;
             Integer choice = null;
 
             while (choice == null || choice < 0 || choice >= filteredFiles.length)
@@ -145,7 +135,7 @@ public class Client
                 System.out.println("\nEnter a file index (0-"
                         + (filteredFiles.length - 1) +") to send a single route/segment:");
 
-                input = scanner.nextLine();
+                String input = scanner.nextLine();
                 // TODO: Implement sending all routes
                 /*
                 if (input.equalsIgnoreCase("all"))
@@ -170,6 +160,7 @@ public class Client
                     choice = null;
                     continue;
                 }
+
                 File selectedGPX = filteredFiles[choice];
                 // Create a new thread that will send the file to the master and listen for the results
                 sendFile(selectedGPX);
@@ -188,11 +179,12 @@ public class Client
             Object allUsersStats = in.readObject();
 
             // Print the received statistics
-            System.out.println("Output for file | " + selectedGPX.getName() + "| " + routeStats + "\n");
+            System.out.println("Output for file | " + selectedGPX.getName() + " | " + routeStats + "\n");
             System.out.println(userStats + "\n");
             System.out.println(allUsersStats + "\n");
 
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             System.out.println("Could not receive objects");
             e.printStackTrace();
@@ -209,7 +201,6 @@ public class Client
         {
             throw new RuntimeException(e);
         }
-
     }
 
 
@@ -222,8 +213,10 @@ public class Client
             // Creating a byte buffer array with the same size as the file
             // This will be used to store the contents of the file
             byte[] buffer = new byte[(int) selectedGPX.length()];
+
             // The read() method will read the contents of the file into the buffer
             int bytesRead = fileInputStream.read(buffer);
+
             // Creating a GPXData object with the name of the file and the contents of the file
             // and sending it to the master
             GPXData gpx = new GPXData(selectedGPX.getName(), buffer);
@@ -238,23 +231,6 @@ public class Client
         }
     }
 
-
-    /*
-    // This method will be used to send all routes to the master
-    private void sendAllRoutes(File[] filteredFiles)
-    {
-        for (File file : filteredFiles)
-        {
-            Thread clientThread = new Thread(() ->
-            {
-                setFile(file);
-                sendFile();
-                listenForMessages();
-            });
-            clientThread.start();
-        }
-    }
-    */
 
     // The Arrays.stream() method will convert the array into a stream
     // The filter() method will filter the stream based on the username in the creator attribute for each file in the directory
@@ -281,7 +257,8 @@ public class Client
                     return true;
                 }
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             System.out.println("Could not read file");
             e.printStackTrace();
