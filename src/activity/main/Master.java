@@ -28,7 +28,7 @@ public class Master
     private Queue<WorkerHandler> workerHandlers;
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
-    private int max_workers;
+    private int maxWorkers;
 
     public Master()
     {
@@ -40,7 +40,7 @@ public class Master
             final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
             final int CLIENT_PORT = Integer.parseInt(config.getProperty("client_port"));
 
-            max_workers = Integer.parseInt(config.getProperty("number_of_workers"));
+            maxWorkers = Integer.parseInt(config.getProperty("number_of_workers"));
 
             clientSocket = new ServerSocket(CLIENT_PORT);
             workerSocket = new ServerSocket(WORKER_PORT);
@@ -99,7 +99,7 @@ public class Master
         // Thread that will handle the workers
         Thread handleWorker = new Thread(() ->
         {
-            while (workerHandlers.size() != max_workers)
+            while (workerHandlers.size() != maxWorkers)
             {
                 try
                 {
@@ -114,7 +114,8 @@ public class Master
                     Thread workerThread = new Thread(workerHandler);
                     workerThread.start();
 
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     System.out.println("MASTER: Could not accept worker connection");
                     e.printStackTrace();
@@ -122,7 +123,8 @@ public class Master
                     {
                         workerSocket.close();
 
-                    } catch (IOException ex)
+                    }
+                    catch (IOException ex)
                     {
                         throw new RuntimeException(ex);
                     }
