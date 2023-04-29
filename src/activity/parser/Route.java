@@ -1,11 +1,8 @@
 package activity.parser;
 
-import activity.misc.Pair;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 
 public class Route implements Serializable
 {
@@ -58,6 +55,12 @@ public class Route implements Serializable
         return true;
     }
 
+    // chunkIndex: Returns the starting index of a chunk of a route
+    public int getChunkStartingIndex(Chunk chunk)
+    {
+        return Collections.indexOfSubList(waypoints, chunk.getRoute().getWaypoints());
+    }
+
     private void addSegment(Segment segment, int index)
     {
         if (!segments.contains(segment))
@@ -77,7 +80,7 @@ public class Route implements Serializable
         return -1;
     }
 
-    public ArrayList<Waypoint> waypoints() {
+    public ArrayList<Waypoint> getWaypoints() {
         return this.waypoints;
     }
 
