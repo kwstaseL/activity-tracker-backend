@@ -5,6 +5,7 @@ import activity.misc.GPXData;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -42,9 +43,11 @@ public class Client
         // Create a socket that will connect to the master
         try
         {
+
             connection = new Socket(masterIP, clientPort);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
+
         } catch (Exception e)
         {
             System.out.println("Could not connect to master");
@@ -88,70 +91,69 @@ public class Client
     {
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Enter your username:");
+        String username = scanner.nextLine().trim().toLowerCase();
+
         while (true)
         {
             System.out.println("Available files:");
             File directory = new File(Client.directory);
 
-            // directoryContents: Lists all the files (not folders) included in our directory.
-            // (essentially just excluding the segment folder)
+            // Get all the files in the directory
             File[] directoryContents = directory.listFiles(new FileFilter()
             {
                 @Override
-                public boolean accept(File file) {
-                    return file.isFile();   // file.isFile(): returns false if the file is a directory (like segments)
+                public boolean accept(File file)
+                {
+                    return file.isFile();
                 }
             });
 
-            // if our directory is empty, there is nothing left to process
-            if (directoryContents == null || directoryContents.length == 0)
-            {
+            // Filter the files based on the username
+            File[] filteredFiles = filterFilesByUsername(directoryContents, username);
+
+            // if no files match the username, inform the user and exit
+            if (filteredFiles == null || filteredFiles.length == 0) {
                 System.out.println("No routes are available for processing!");
                 return;
             }
 
             // list all routes
-            for (int i = 0; i < directoryContents.length; i++)
-            {
-                System.out.println(i + ": " + directoryContents[i].getName());
+            for (int i = 0; i < filteredFiles.length; i++) {
+                System.out.println(i + ": " + filteredFiles[i].getName());
             }
 
-            // Prompt user to select a route or segment
+            // Prompt user to select a route
             String input = null;
             Integer choice = null;
 
-            // Acceptable input: all or "all" to send all routes/segments, or anything in the range of 0 to the total number
-            // of routes/segments to send a single route/segment.
-            while (choice == null || choice < 0 || choice >= directoryContents.length)
+            while (choice == null || choice < 0 || choice >= filteredFiles.length)
             {
                 System.out.println("\nEnter \"all\" to send all routes, or enter a file index (0-"
-                        + (directoryContents.length - 1) +") to send a single route/segment:");
+                        + (filteredFiles.length - 1) +") to send a single route/segment:");
 
                 input = scanner.nextLine();
 
                 if (input.equalsIgnoreCase("all"))
                 {
-                    sendAllRoutes(directoryContents);
+                    sendAllRoutes(filteredFiles);
                     return;
                 }
 
-                try
-                {
+                try {
                     choice = Integer.parseInt(input);
-                }
-                catch (NumberFormatException e)
-                {
-                    System.out.println("Invalid input. Please enter a valid file index or \"all\".");
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid file index.");
                     continue;
                 }
 
-                if (choice < 0 || choice >= directoryContents.length) {
-                    System.out.println("Invalid input. Please enter a valid file index or \"all\".");
+                if (choice < 0 || choice >= filteredFiles.length) {
+                    System.out.println("Invalid input. Please enter a valid file index.");
                     choice = null;
                     continue;
                 }
 
-                File file = directoryContents[choice];
+                File file = filteredFiles[choice];
 
                 // send the selected route/segment
                 Client client = new Client(file);
@@ -160,6 +162,7 @@ public class Client
             }
         }
     }
+
 
     // This method will be used to receive the statistics from the master.
     public void listenForMessages()
@@ -220,6 +223,37 @@ public class Client
             client.listenForMessages();
         }
     }
+    // The Arrays.stream() method will convert the array into a stream
+    // The filter() method will filter the stream based on the username in the creator attribute for each file in the directory
+    // This will return a stream of files that match the username
+    // The filtering will be done first and then the stream will be converted back into an array
+    private static File[] filterFilesByUsername(File[] directoryContents, String username)
+    {
+        return Arrays.stream(directoryContents)
+                .filter(file -> containsUsername(file, username))
+                .toArray(File[]::new);
+    }
+
+    // Checks if the username is in the creator attribute for the that file
+    private static boolean containsUsername(File file, String username)
+    {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+        {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("creator=\"" + username + "\""))
+                {
+                    return true;
+                }
+            }
+        } catch (IOException e)
+        {
+            System.out.println("Could not read file");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     // This method will be used to close the connection with the master and the streams
     private void shutdown()
