@@ -175,6 +175,7 @@ public class Client
         // Creating the file input stream to read the contents of the file
         try (FileInputStream fileInputStream = new FileInputStream(selectedGPX))
         {
+
             // Creating a byte buffer array with the same size as the file
             // This will be used to store the contents of the file
             byte[] buffer = new byte[(int) selectedGPX.length()];
@@ -186,6 +187,7 @@ public class Client
             out.writeObject(gpx);
             out.flush();
             System.out.println("File " + selectedGPX.getName() + " sent to master");
+
         } catch (Exception e)
         {
             System.out.println("Could not send file");
@@ -215,7 +217,7 @@ public class Client
     // The filter() method will filter the stream based on the username in the creator attribute for each file in the directory
     // This will return a stream of files that match the username
     // The filtering will be done first and then the stream will be converted back into an array
-    private static File[] filterFilesByUsername(File[] directoryContents, String username)
+    private File[] filterFilesByUsername(File[] directoryContents, String username)
     {
         return Arrays.stream(directoryContents)
                 .filter(file -> containsUsername(file, username))
@@ -223,7 +225,7 @@ public class Client
     }
 
     // Checks if the username is in the creator attribute for the that file
-    private static boolean containsUsername(File file, String username)
+    private boolean containsUsername(File file, String username)
     {
         try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
