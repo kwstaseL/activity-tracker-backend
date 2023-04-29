@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.Queue;
 
 public class GPXParser {
-    public static Route parseRoute(ByteArrayInputStream inputStream, Queue<Segment> segments) {
+    public static Route parseRoute(ByteArrayInputStream inputStream, Queue<Segment> segments)
+    {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Route route = null;
         try {
@@ -85,7 +86,8 @@ public class GPXParser {
             NodeList nodeList = doc.getElementsByTagName("wpt");
 
             // Iterate through all the <wpt> tags.
-            for (int i = 0; i < nodeList.getLength(); i++) {
+            for (int i = 0; i < nodeList.getLength(); i++)
+            {
                 // Get the <wpt> tag we are currently processing.
                 Element element = (Element) nodeList.item(i);
                 String latitude = element.getAttribute("lat");
@@ -103,7 +105,6 @@ public class GPXParser {
                 throw new RuntimeException("Could not parse the file successfully.");
             }
             segment = new Segment(waypoints);
-
         }
         catch (Exception e)
         {

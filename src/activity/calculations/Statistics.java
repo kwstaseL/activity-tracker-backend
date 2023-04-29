@@ -135,7 +135,6 @@ public class Statistics implements Serializable
 
     public void registerRoute(String user, ActivityStats activityStats)
     {
-
         // first, updating the user specific stats
         if (!userStats.containsKey(user))
         {

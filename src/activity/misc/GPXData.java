@@ -6,7 +6,6 @@ public class GPXData implements Serializable
 {
     private String fileName;
     private byte[] fileContent;
-
     public GPXData(String fileName, byte[] fileContent)
     {
         this.fileName = fileName;

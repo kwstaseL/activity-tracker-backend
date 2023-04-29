@@ -18,10 +18,8 @@ public class Master
 {
     // This is the socket that the client will connect to
     private ServerSocket clientSocket;
-
     // This is the socket that the worker will connect to
     private ServerSocket workerSocket;
-
     // Queue containing the routes that will be sent to the workers
     private Queue<Route> routes;
     // Queue containing the segments
@@ -127,6 +125,7 @@ public class Master
                     try
                     {
                         workerSocket.close();
+
                     } catch (IOException ex)
                     {
                         throw new RuntimeException(ex);

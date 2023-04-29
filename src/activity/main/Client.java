@@ -53,6 +53,7 @@ public class Client
     {
         // otherwise, initialise the Client class
         Properties config = new Properties();
+
         try
         {
             config.load(new FileInputStream("config.properties"));
@@ -73,7 +74,6 @@ public class Client
     private void startMessageLoop()
     {
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("Enter your username:");
         String username = scanner.nextLine().trim().toLowerCase();
 
@@ -101,13 +101,15 @@ public class Client
             File[] filteredFiles = filterFilesByUsername(directoryContents, username);
 
             // if no files match the username, inform the user and exit
-            if (filteredFiles == null || filteredFiles.length == 0) {
+            if (filteredFiles.length == 0)
+            {
                 System.out.println("No routes are available for processing!");
                 return;
             }
 
             // else print the files and prompt the user to select a route
-            for (int i = 0; i < filteredFiles.length; i++) {
+            for (int i = 0; i < filteredFiles.length; i++)
+            {
                 System.out.println(i + ": " + filteredFiles[i].getName());
             }
 
@@ -132,48 +134,49 @@ public class Client
                 try
                 {
                     choice = Integer.parseInt(input);
+
                 } catch (NumberFormatException e)
                 {
                     System.out.println("Invalid input. Please enter a valid file index.");
                     continue;
                 }
 
-                if (choice < 0 || choice >= filteredFiles.length) {
+                if (choice < 0 || choice >= filteredFiles.length)
+                {
                     System.out.println("Invalid input. Please enter a valid file index.");
                     choice = null;
                     continue;
                 }
 
                 File selectedGPX = filteredFiles[choice];
+                // Create a new thread that will send the file to the master and listen for the results
                 sendFile(selectedGPX);
-                listenForMessages(selectedGPX);
+                // Create a new ObjectInputStream for each iteration
+                listenForMessages();
             }
         }
     }
-    // This method will be used to receive the statistics from the master.
-    private void listenForMessages(File selectedGPX)
+    private void listenForMessages()
     {
-        try
-        {
-            System.out.println("Waiting for message from master...");
-            // routeStats: contains the statistics for the route that was sent to the master
+        try {
+
+            // Read the objects from the input stream
             Object routeStats = in.readObject();
-            System.out.println("Output for file | " + selectedGPX.getName() + " | " + routeStats + "\n");
-            // userStats: contains the overall statistics for the user that sent the route to the master
             Object userStats = in.readObject();
-            System.out.println(userStats + "\n");
-            // allUsersStats: contains the overall statistics for all users that have sent routes to the master
             Object allUsersStats = in.readObject();
+
+            // Print the received statistics
+            System.out.println("Output for file | " + routeStats + "\n");
+            System.out.println(userStats + "\n");
             System.out.println(allUsersStats + "\n");
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
-            System.out.println("Could not receive object");
+            System.out.println("Could not receive objects");
             e.printStackTrace();
             shutdown();
         }
-
     }
+
 
     // This method will be used to send the file to the master
     private void sendFile(File selectedGPX)
@@ -181,7 +184,6 @@ public class Client
         // Creating the file input stream to read the contents of the file
         try (FileInputStream fileInputStream = new FileInputStream(selectedGPX))
         {
-
             // Creating a byte buffer array with the same size as the file
             // This will be used to store the contents of the file
             byte[] buffer = new byte[(int) selectedGPX.length()];
@@ -226,8 +228,7 @@ public class Client
     private File[] filterFilesByUsername(File[] directoryContents, String username)
     {
         return Arrays.stream(directoryContents)
-                .filter(file -> containsUsername(file, username))
-                .toArray(File[]::new);
+                .filter(file -> containsUsername(file, username)).toArray(File[]::new);
     }
 
     // Checks if the username is in the creator attribute for the that file

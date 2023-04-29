@@ -230,6 +230,7 @@ public class ClientHandler implements Runnable
                 out.flush();
                 out.writeObject(statistics.getGlobalStats());
                 out.flush();
+                out.reset();
             }
         }
         catch (IOException e)
