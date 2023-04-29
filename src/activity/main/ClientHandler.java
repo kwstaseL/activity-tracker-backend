@@ -38,7 +38,7 @@ public class ClientHandler implements Runnable
     // segments: a queue containing all the segments to be checked for intersections with the routes of users.
     private Queue<Segment> segments;
     private final Object writeLock = new Object();
-    private static Statistics statistics = new Statistics();
+    private static final Statistics statistics = new Statistics();
 
     public ClientHandler(Socket clientSocket, Queue<Route> routes, Queue<Segment> segments)
     {
@@ -48,7 +48,6 @@ public class ClientHandler implements Runnable
             this.clientID = clientIDGenerator++;
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
-            this.processedDirectory = processedDirectory;
             this.routeQueue = routes;
             this.segments = segments;
         }
@@ -237,6 +236,10 @@ public class ClientHandler implements Runnable
     {
         try
         {
+            synchronized (statistics)
+            {
+                statistics.createFile();
+            }
             if (in != null)
             {
                 in.close();
