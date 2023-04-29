@@ -77,6 +77,12 @@ public class Client
         System.out.println("Enter your username:");
         String username = scanner.nextLine().trim().toLowerCase();
 
+        // TODO: Check if username already exists the isDuplicateUsername can be implemented on the server side
+        // if (isDuplicateUsername(username))
+        // {
+        //    System.out.println("Username is already connected with tha username. Please try again.");
+        // }
+
         while (true)
         {
             System.out.println("Available files:");

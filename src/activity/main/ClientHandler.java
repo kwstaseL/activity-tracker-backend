@@ -164,7 +164,6 @@ public class ClientHandler implements Runnable
                         routeHashmap.put(routeID, activityList);
                     }
                 }
-
             }
         }
     }

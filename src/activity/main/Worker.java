@@ -90,7 +90,6 @@ public class Worker
     private void handleMapping(Chunk chunk)
     {
         System.out.println("WORKER: " + "Route: " + chunk.getRoute().getRouteID() + " Received chunk " + chunk.getChunkIndex() + " of " + chunk.getTotalChunks());
-
         // intermediate_result: the mapping process returns a key-value pair,
         // where key is the client id, and the value is another pair of chunk, activityStats
         Pair<Integer, Pair<Chunk, ActivityStats>> intermediate_result = Map.map(chunk.getRoute().getClientID(), chunk);
