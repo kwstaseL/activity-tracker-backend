@@ -42,8 +42,8 @@ public class ClientHandler implements Runnable
     private final Object writeLock = new Object();
     private static Statistics statistics = new Statistics();
 
-    public ClientHandler(Socket clientSocket , Queue<Route> routes,
-                         String unprocessedDirectory, String processedDirectory,Queue<Segment> segments)
+    public ClientHandler(Socket clientSocket, Queue<Route> routes,
+                         String unprocessedDirectory, String processedDirectory, Queue<Segment> segments)
     {
         this.clientSocket = clientSocket;
         try
