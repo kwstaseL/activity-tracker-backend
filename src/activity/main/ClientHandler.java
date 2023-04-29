@@ -2,6 +2,7 @@ package activity.main;
 
 import activity.calculations.ActivityStats;
 import activity.calculations.Statistics;
+import activity.misc.GPXData;
 import activity.misc.Pair;
 import activity.mapreduce.Reduce;
 import activity.parser.Chunk;
@@ -130,6 +131,7 @@ public class ClientHandler implements Runnable
 
                             // Finds the path of the file we want to move and the path of the destination
                             // And then moves the already processed file from the unprocessed directory to the processed directory
+                            System.out.println("Moving file: " + chunk.getRoute().getFileName());
                             Path sourcePath = Paths.get(unprocessedDirectory + File.separator + chunk.getRoute().getFileName());
                             Path destPath = Paths.get(processedDirectory + File.separator + chunk.getRoute().getFileName());
                             try
@@ -180,20 +182,24 @@ public class ClientHandler implements Runnable
                 // Receive the file object from the client
                 System.out.println("ClientHandler: Waiting for file from client");
 
-                File receivedFile = (File) in.readObject();
+                Object obj = in.readObject();
 
-                // Parse the file
-                Route route = GPXParser.parseRoute(receivedFile,segments);
-                route.setClientID(clientID);
-                // Add the route to the queue
-                synchronized (routeQueue)
+                if (obj instanceof GPXData)
                 {
-                    // Dispatching the file to the workers
-                    routes.add(route);
-                    routeQueue.add(route);
-                    routeQueue.notify();
+                    GPXData gpxData = (GPXData) obj;
+                    ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
+                    // Parse the file
+                    Route route = GPXParser.parseRoute(gpxContent,segments);
+                    route.setClientID(clientID);
+                    // Add the route to the queue
+                    synchronized (routeQueue)
+                    {
+                        // Dispatching the file to the workers
+                        routes.add(route);
+                        routeQueue.add(route);
+                        routeQueue.notify();
+                    }
                 }
-
             }
 
         }

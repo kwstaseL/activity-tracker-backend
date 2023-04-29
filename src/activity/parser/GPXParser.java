@@ -1,31 +1,30 @@
 package activity.parser;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Queue;
 
-public class GPXParser
-{
-    public static Route parseRoute(File file, Queue<Segment> segments)
-    {
+public class GPXParser {
+    public static Route parseRoute(ByteArrayInputStream inputStream, Queue<Segment> segments) {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Route route = null;
-        try
-        {
+        try {
             // Parsing the GPX file
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(file);
+            Document doc = dBuilder.parse(inputStream);
 
             // Normalizing the XML structure to prevent errors
             doc.getDocumentElement().normalize();
-            System.out.println("Processing file: " + file.getName());
+            System.out.println("Processing GPX data");
 
             // This will return all the <wpt> tags
             NodeList nodeList = doc.getElementsByTagName("wpt");
@@ -33,8 +32,7 @@ public class GPXParser
             String creator = null;
 
             // Iterate through all the <wpt> tags.
-            for (int i = 0; i < nodeList.getLength(); i++)
-            {
+            for (int i = 0; i < nodeList.getLength(); i++) {
                 // Get the <wpt> tag we are currently processing.
                 Element element = (Element) nodeList.item(i);
                 creator = doc.getDocumentElement().getAttribute("creator");
@@ -48,46 +46,36 @@ public class GPXParser
                         Double.parseDouble(elevation), time));
             }
 
-            if (creator == null || waypoints.isEmpty())
-            {
-                throw new RuntimeException("Could not parse the file successfully.");
+            if (creator == null || waypoints.isEmpty()) {
+                throw new RuntimeException("Could not parse the GPX data successfully.");
             }
-            route = new Route(waypoints, creator, file.getName());
+            route = new Route(waypoints, creator, "GPX Data");
             System.out.println("Parsed: " + route);
 
-            // Check for all the segments if the route is inside of them
-            for (Segment segment : segments)
-            {
-                if (route.containsSegment(segment))
-                {
+            // Check for all the segments if the route is inside them
+            for (Segment segment : segments) {
+                if (route.containsSegment(segment)) {
                     System.out.println("Segment " + segment + " is inside route " + route);
-                }
-                else
-                {
+                } else {
                     System.out.println("Segment " + segment + " is NOT inside route " + route);
                 }
             }
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return route;
     }
 
-
-    public static Segment parseSegment(File file)
-    {
+    public static Segment parseSegment(File inputStream) {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Segment segment = null;
-        try
-        {
+        try {
             // Parsing the GPX file
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(file);
+            Document doc = dBuilder.parse(inputStream);
 
             // Normalizing the XML structure to prevent errors
             doc.getDocumentElement().normalize();
@@ -95,11 +83,8 @@ public class GPXParser
             // This will return all the <wpt> tags
             NodeList nodeList = doc.getElementsByTagName("wpt");
 
-            String creator = null;
-
             // Iterate through all the <wpt> tags.
-            for (int i = 0; i < nodeList.getLength(); i++)
-            {
+            for (int i = 0; i < nodeList.getLength(); i++) {
                 // Get the <wpt> tag we are currently processing.
                 Element element = (Element) nodeList.item(i);
                 String latitude = element.getAttribute("lat");

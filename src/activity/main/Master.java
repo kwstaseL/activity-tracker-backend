@@ -180,6 +180,7 @@ public class Master
         {
             throw new RuntimeException(e);
         }
+
         handleWorker.start();
         handleClient.start();
         dispatchWork.start();

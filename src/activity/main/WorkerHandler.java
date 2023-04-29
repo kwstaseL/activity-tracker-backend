@@ -69,11 +69,13 @@ public class WorkerHandler implements Runnable
                 appropriateHandler.addStats(stats);
             }
 
-        } catch (IOException | ClassNotFoundException e)
+        }
+        catch (IOException | ClassNotFoundException e)
         {
             System.out.println("WorkerHandler: Connection to worker lost");
             e.printStackTrace();
-        } finally
+        }
+        finally
         {
             shutdown();
         }

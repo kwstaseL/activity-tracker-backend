@@ -1,6 +1,7 @@
 package activity.main;
 
 import activity.calculations.Statistics;
+import activity.misc.GPXData;
 
 import java.io.*;
 import java.net.Socket;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 
 // Represents the client which is basically the user of the application
 // He will be able to send files to the master and receive the results of his statistics back
+// TODO: Ask the Client for his username and allow him to send only gpxs according to his username
 public class Client
 {
     // This is the socket that the client is connected to with the master
@@ -186,13 +188,21 @@ public class Client
     // This method will be used to send the file to the master
     public void sendFile()
     {
-        try
+        // Creating the file input stream to read the contents of the file
+        try (FileInputStream fileInputStream = new FileInputStream(file))
         {
-            System.out.println("Sending file " + file.getName() + " to master\n");
-            out.writeObject(file);
+            // Creating a byte buffer array with the same size as the file
+            // This will be used to store the contents of the file
+            byte[] buffer = new byte[(int) file.length()];
+            // The read() method will read the contents of the file into the buffer
+            int bytesRead = fileInputStream.read(buffer);
+            // Creating a GPXData object with the name of the file and the contents of the file
+            // and sending it to the master
+            GPXData gpx = new GPXData(file.getName(), buffer);
+            out.writeObject(gpx);
             out.flush();
-        }
-        catch (Exception e)
+            System.out.println("File " + file.getName() + " sent to master");
+        } catch (Exception e)
         {
             System.out.println("Could not send file");
             shutdown();
