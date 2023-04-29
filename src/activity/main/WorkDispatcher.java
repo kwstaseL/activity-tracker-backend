@@ -107,8 +107,6 @@ public class WorkDispatcher implements Runnable
                 }
             }
         }
-        System.err.println("Finished chunking up route: " + routeID + ". Total chunks: " + chunks);
-        System.err.println("Expected chunks were: " + expectedChunks);
     }
 
     // Creates the chunk and sends it to a worker

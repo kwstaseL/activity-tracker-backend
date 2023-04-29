@@ -108,9 +108,12 @@ public class ClientHandler implements Runnable
                         // Else, if we have accumulated all the chunks we need, we can start reducing
                         else if (activityList.size() == (chunk.getTotalChunks() - 1))
                         {
+                            // We add the last chunk to the list
                             activityList.add(stats);
+                            // We add the list to the hashmap for the specific route
                             routeHashmap.put(routeID, activityList);
-                            processChunks(stats,activityList);
+                            // and then we start the reducing phase
+                            processChunks(chunk,activityList);
                         }
                         // Else, we just add the chunk to the list
                         else
@@ -132,11 +135,9 @@ public class ClientHandler implements Runnable
         }
     }
 
-    private void processChunks(Pair<Chunk, ActivityStats> stats,ArrayList<Pair<Chunk, ActivityStats>> activityList)
+    private void processChunks(Chunk chunk,ArrayList<Pair<Chunk, ActivityStats>> activityList)
     {
-        Chunk chunk = stats.getKey();
         int routeID = chunk.getRoute().getRouteID();
-
         // fetching a list of all the stats we gathered for this specific route
         ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
         for (Pair<Chunk, ActivityStats> pair : activityList)
@@ -145,35 +146,13 @@ public class ClientHandler implements Runnable
         }
         // Creating a new thread to handle the reducing phase
         new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
-
-        // Finds the path of the file we want to move and the path of the destination
-        String fileName = chunk.getRoute().getFileName();
-        String processedFilePath = processedDirectory + File.separator + fileName;
-        try
-        {
-            // Create the processed file in the processed directory
-            File processedFile = new File(processedFilePath);
-            if (processedFile.createNewFile())
-            {
-                System.out.println("ClientHandler: File added to processed directory: " + fileName);
-            } else
-            {
-                System.out.println("ClientHandler: File already exists in processed directory: " + fileName);
-            }
-
-        } catch (IOException e)
-        {
-            throw new RuntimeException("Could not add file to processed directory: " + fileName, e);
-        }
-
+        // TODO: Create a XML file to register the processed gpx
     }
 
     // This is the method that will handle the reducing phase and send the result back to the client
     // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
     private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
     {
-        System.out.println("ClientHandler: " + "Route: " + intermediateResults.getKey() + " is about to be reduced with " + intermediateResults.getValue().size() + " chunks");
-
         // finalResults: The reduce process returns the final ActivityStats associated with a specific route.
         ActivityStats finalResults = Reduce.reduce(intermediateResults);
         try
