@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 // Represents the client which is basically the user of the application
 // He will be able to send files to the master and receive the results of his statistics back
-// TODO: Ask the Client for his username and allow him to send only gpxs according to his username
+// TODO: Cleanup the code
 public class Client
 {
     // This is the socket that the client is connected to with the master
@@ -22,10 +22,6 @@ public class Client
 
     // This is the input stream that will be used to receive objects from the master
     private ObjectInputStream in;
-
-    // This is the file that will be sent to the master
-    private File file;
-
     // initialised: represents the state of Client objects. If false, clients cannot be initialised.
     private static boolean initialised = false;
     // unprocessedDirectory: The directory with all the gpx available for processing
@@ -33,17 +29,18 @@ public class Client
     private static String masterIP;
     private static int clientPort;
 
-    public Client(File file)
+    private Object messageLock = new Object();
+
+
+    public Client()
     {
         if (!initialised)
         {
             clientInitialisation();
         }
-        this.file = file;
         // Create a socket that will connect to the master
         try
         {
-
             connection = new Socket(masterIP, clientPort);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
@@ -59,7 +56,7 @@ public class Client
     /* clientInitialisation: To be called before the first Client object is instantiated, or during the first Client instantiation.
      * Initiates all the necessary attributes a Client object should be aware of.
      */
-    public static void clientInitialisation()
+    private void clientInitialisation()
     {
         // if the Client class has already been initialised, return
         if (Client.initialised)
@@ -87,7 +84,7 @@ public class Client
 
     // This is the UI for the client
     // It will allow the user to select a route to be sent for processing and will display the results
-    private static void startMessageLoop()
+    private void startMessageLoop()
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -108,7 +105,6 @@ public class Client
                     return file.isFile();
                 }
             });
-
             // Filter the files based on the username
             File[] filteredFiles = filterFilesByUsername(directoryContents, username);
 
@@ -117,8 +113,7 @@ public class Client
                 System.out.println("No routes are available for processing!");
                 return;
             }
-
-            // list all routes
+            // else print the files and prompt the user to select a route
             for (int i = 0; i < filteredFiles.length; i++) {
                 System.out.println(i + ": " + filteredFiles[i].getName());
             }
@@ -129,20 +124,23 @@ public class Client
 
             while (choice == null || choice < 0 || choice >= filteredFiles.length)
             {
-                System.out.println("\nEnter \"all\" to send all routes, or enter a file index (0-"
+                System.out.println("\nEnter a file index (0-"
                         + (filteredFiles.length - 1) +") to send a single route/segment:");
 
                 input = scanner.nextLine();
-
+                // TODO: Implement sending all routes
+                /*
                 if (input.equalsIgnoreCase("all"))
                 {
                     sendAllRoutes(filteredFiles);
                     return;
                 }
-
-                try {
+                */
+                try
+                {
                     choice = Integer.parseInt(input);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException e)
+                {
                     System.out.println("Invalid input. Please enter a valid file index.");
                     continue;
                 }
@@ -153,25 +151,21 @@ public class Client
                     continue;
                 }
 
-                File file = filteredFiles[choice];
-
-                // send the selected route/segment
-                Client client = new Client(file);
-                client.sendFile();
-                client.listenForMessages();
+                File selectedGPX = filteredFiles[choice];
+                sendFile(selectedGPX);
+                listenForMessages(selectedGPX);
             }
         }
     }
-
-
     // This method will be used to receive the statistics from the master.
-    public void listenForMessages()
+    private void listenForMessages(File selectedGPX)
     {
         try
         {
+            System.out.println("Waiting for message from master...");
             // routeStats: contains the statistics for the route that was sent to the master
             Object routeStats = in.readObject();
-            System.out.println("Output for file | " + file.getName() + " | " + routeStats + "\n");
+            System.out.println("Output for file | " + selectedGPX.getName() + " | " + routeStats + "\n");
             // userStats: contains the overall statistics for the user that sent the route to the master
             Object userStats = in.readObject();
             System.out.println(userStats + "\n");
@@ -189,22 +183,22 @@ public class Client
     }
 
     // This method will be used to send the file to the master
-    public void sendFile()
+    private void sendFile(File selectedGPX)
     {
         // Creating the file input stream to read the contents of the file
-        try (FileInputStream fileInputStream = new FileInputStream(file))
+        try (FileInputStream fileInputStream = new FileInputStream(selectedGPX))
         {
             // Creating a byte buffer array with the same size as the file
             // This will be used to store the contents of the file
-            byte[] buffer = new byte[(int) file.length()];
+            byte[] buffer = new byte[(int) selectedGPX.length()];
             // The read() method will read the contents of the file into the buffer
             int bytesRead = fileInputStream.read(buffer);
             // Creating a GPXData object with the name of the file and the contents of the file
             // and sending it to the master
-            GPXData gpx = new GPXData(file.getName(), buffer);
+            GPXData gpx = new GPXData(selectedGPX.getName(), buffer);
             out.writeObject(gpx);
             out.flush();
-            System.out.println("File " + file.getName() + " sent to master");
+            System.out.println("File " + selectedGPX.getName() + " sent to master");
         } catch (Exception e)
         {
             System.out.println("Could not send file");
@@ -212,17 +206,23 @@ public class Client
         }
     }
 
+    /*
     // This method will be used to send all routes to the master
-    private static void sendAllRoutes(File[] directoryContents)
+    private void sendAllRoutes(File[] filteredFiles)
     {
-        for (File file : directoryContents)
+        for (File file : filteredFiles)
         {
-            Client client = new Client(file);
-            Thread clientThread = new Thread(client::sendFile);
+            Thread clientThread = new Thread(() ->
+            {
+                setFile(file);
+                sendFile();
+                listenForMessages();
+            });
             clientThread.start();
-            client.listenForMessages();
         }
     }
+    */
+
     // The Arrays.stream() method will convert the array into a stream
     // The filter() method will filter the stream based on the username in the creator attribute for each file in the directory
     // This will return a stream of files that match the username
@@ -294,11 +294,9 @@ public class Client
             }
         }
     }
-
     public static void main(String[] args)
     {
-        clientInitialisation();
-        startMessageLoop();
+        Client client = new Client();
+        client.startMessageLoop();
     }
-
 }

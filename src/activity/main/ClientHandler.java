@@ -131,6 +131,9 @@ public class ClientHandler implements Runnable
 
                             // Finds the path of the file we want to move and the path of the destination
                             // And then moves the already processed file from the unprocessed directory to the processed directory
+                            //TODO: This file should not be moved, but just added to the processed directory of the master server
+                            // Because the master, does not about the available gpx's that reside in the user's directory
+                            /*
                             System.out.println("Moving file: " + chunk.getRoute().getFileName());
                             Path sourcePath = Paths.get(unprocessedDirectory + File.separator + chunk.getRoute().getFileName());
                             Path destPath = Paths.get(processedDirectory + File.separator + chunk.getRoute().getFileName());
@@ -142,6 +145,7 @@ public class ClientHandler implements Runnable
                             {
                                 throw new RuntimeException(e);
                             }
+                            */
 
                         // Else, we just add the chunk to the list
                         }
@@ -189,12 +193,13 @@ public class ClientHandler implements Runnable
                     GPXData gpxData = (GPXData) obj;
                     ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
                     // Parse the file
+                    // Create a new thread to handle the parsing of the file
                     Route route = GPXParser.parseRoute(gpxContent,segments);
                     route.setClientID(clientID);
                     // Add the route to the queue
                     synchronized (routeQueue)
                     {
-                        // Dispatching the file to the workers
+                        // Add the route to the queue and notify the dispatcher
                         routes.add(route);
                         routeQueue.add(route);
                         routeQueue.notify();
