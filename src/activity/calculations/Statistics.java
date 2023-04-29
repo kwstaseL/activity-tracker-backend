@@ -147,8 +147,6 @@ public class Statistics implements Serializable
         totalElevation += activityStats.getElevation();
         totalActivityTime += activityStats.getTime();
         ++routesRecorded;
-
-        updateStats();
     }
 
     // registerStatistics: Called when adding a new UserStatistics instance to our database, when loading stats from the XML file.
@@ -223,19 +221,6 @@ public class Statistics implements Serializable
         {
             throw new RuntimeException("Could not transform file.");
         }
-    }
-
-    // updateStats: Updates the xml file accordingly.
-    private void updateStats()
-    {
-        // TODO: Optimise this method, to avoid creating the entire file every time
-        // TODO: Make a similar segmentstatistics.xml file and update it likewise, elements segment name, child element user with attributes activity time, speed
-        createFile();
-    }
-
-    private void updateFile()
-    {
-
     }
 
     // getUserStats: Returns the UserStatistics object associated with a specific user.
