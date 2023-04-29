@@ -22,22 +22,15 @@ public class Client
 
     // This is the input stream that will be used to receive objects from the master
     private ObjectInputStream in;
-    // initialised: represents the state of Client objects. If false, clients cannot be initialised.
-    private static boolean initialised = false;
     // unprocessedDirectory: The directory with all the gpx available for processing
     private static String directory;
     private static String masterIP;
     private static int clientPort;
-
     private Object messageLock = new Object();
-
 
     public Client()
     {
-        if (!initialised)
-        {
-            clientInitialisation();
-        }
+        clientInitialisation();
         // Create a socket that will connect to the master
         try
         {
@@ -58,12 +51,6 @@ public class Client
      */
     private void clientInitialisation()
     {
-        // if the Client class has already been initialised, return
-        if (Client.initialised)
-        {
-            return;
-        }
-
         // otherwise, initialise the Client class
         Properties config = new Properties();
         try
@@ -72,7 +59,6 @@ public class Client
             masterIP = config.getProperty("master_ip");
             clientPort = Integer.parseInt(config.getProperty("client_port"));
             directory = config.getProperty("unprocessed_directory");
-            initialised = true;
         }
         catch (Exception e)
         {
@@ -113,6 +99,7 @@ public class Client
                 System.out.println("No routes are available for processing!");
                 return;
             }
+
             // else print the files and prompt the user to select a route
             for (int i = 0; i < filteredFiles.length; i++) {
                 System.out.println(i + ": " + filteredFiles[i].getName());
@@ -206,6 +193,7 @@ public class Client
         }
     }
 
+
     /*
     // This method will be used to send all routes to the master
     private void sendAllRoutes(File[] filteredFiles)
@@ -240,8 +228,11 @@ public class Client
         try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
             String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("creator=\"" + username + "\""))
+            final String usernameTag = "creator=\"" + username + "\"";
+
+            while ((line = reader.readLine()) != null)
+            {
+                if (line.contains(usernameTag))
                 {
                     return true;
                 }
