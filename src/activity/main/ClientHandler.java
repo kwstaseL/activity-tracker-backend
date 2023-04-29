@@ -12,10 +12,6 @@ import activity.parser.Segment;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 // This class will handle the client connection
@@ -185,9 +181,8 @@ public class ClientHandler implements Runnable
 
                 Object obj = in.readObject();
 
-                if (obj instanceof GPXData)
+                if (obj instanceof GPXData gpxData)
                 {
-                    GPXData gpxData = (GPXData) obj;
                     ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
                     // Parse the file
                     // Create a new thread to handle the parsing of the file
