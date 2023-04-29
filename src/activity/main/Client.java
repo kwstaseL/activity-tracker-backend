@@ -136,14 +136,6 @@ public class Client
                         + (filteredFiles.length - 1) +") to send a single route/segment:");
 
                 String input = scanner.nextLine();
-                // TODO: Implement sending all routes
-                /*
-                if (input.equalsIgnoreCase("all"))
-                {
-                    sendAllRoutes(filteredFiles);
-                    return;
-                }
-                */
                 try
                 {
                     choice = Integer.parseInt(input);

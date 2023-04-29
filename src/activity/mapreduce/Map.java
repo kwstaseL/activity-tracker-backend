@@ -18,7 +18,7 @@ public class Map
     public synchronized static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
         Route route = chunk.getRoute();
-        ArrayList<Waypoint> waypoints = route.waypoints();
+        ArrayList<Waypoint> waypoints = route.getWaypoints();
 
         Waypoint w1 = waypoints.get(0);
         double totalDistance = 0.0;

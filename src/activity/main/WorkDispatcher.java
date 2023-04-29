@@ -48,7 +48,7 @@ public class WorkDispatcher implements Runnable
     // Takes in a route and splits it into chunks, then sends the chunks to the workers using round-robin
     private void handleRoute(Route route)
     {
-        ArrayList<Waypoint> waypoints = route.waypoints();
+        ArrayList<Waypoint> waypoints = route.getWaypoints();
         final int waypointsSize = waypoints.size();
 
         // n will represent the chunk size
