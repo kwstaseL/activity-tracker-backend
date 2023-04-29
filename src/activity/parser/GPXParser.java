@@ -25,7 +25,6 @@ public class GPXParser {
 
             // Normalizing the XML structure to prevent errors
             doc.getDocumentElement().normalize();
-            System.out.println("Processing GPX data");
 
             // This will return all the <wpt> tags
             NodeList nodeList = doc.getElementsByTagName("wpt");
@@ -54,10 +53,14 @@ public class GPXParser {
             System.out.println("Parsed: " + route);
 
             // Check for all the segments if the route is inside them
-            for (Segment segment : segments) {
-                if (route.containsSegment(segment)) {
+            for (Segment segment : segments)
+            {
+                if (route.containsSegment(segment))
+                {
                     System.out.println("Segment " + segment + " is inside route " + route);
-                } else {
+                }
+                else
+                {
                     System.out.println("Segment " + segment + " is NOT inside route " + route);
                 }
             }

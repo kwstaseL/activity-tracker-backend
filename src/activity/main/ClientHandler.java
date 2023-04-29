@@ -40,7 +40,7 @@ public class ClientHandler implements Runnable
     // segments: a queue containing all the segments to be checked for intersections with the routes of users.
     private Queue<Segment> segments;
     private final Object writeLock = new Object();
-    private static final Statistics statistics = new Statistics();
+    private static Statistics statistics = new Statistics();
 
     public ClientHandler(Socket clientSocket , Queue<Route> routes,
                          String unprocessedDirectory, String processedDirectory,Queue<Segment> segments)
