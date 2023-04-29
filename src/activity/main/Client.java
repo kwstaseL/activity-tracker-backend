@@ -63,8 +63,22 @@ public class Client<Path>
             config.load(new FileInputStream("config.properties"));
 
             unprocessedDirectory = (new File(config.getProperty("unprocessed_directory"))).getAbsolutePath();
-            // TODO: Catch the exception if the directory does not exist and create it
             completedDirectory = (new File(config.getProperty("completed_directory"))).getAbsolutePath();
+
+            try
+            {
+                File directory = new File(completedDirectory);
+                if (!directory.exists())
+                {
+                    directory.mkdirs();
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("Could not create the directory for the completed gpx.");
+                System.out.println(e.getMessage());
+                throw new RuntimeException(e);
+            }
 
             config.load(new FileInputStream("config.properties"));
             masterIP = config.getProperty("master_ip");
