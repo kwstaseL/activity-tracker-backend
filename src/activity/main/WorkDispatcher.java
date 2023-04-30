@@ -61,11 +61,6 @@ public class WorkDispatcher implements Runnable
         int chunkIndex = 0;
         int chunks = 0;
 
-        final int routeID = route.getRouteID();
-        final int clientID = route.getClientID();
-        final String user = route.getUser();
-        final String fileName = route.getFileName();
-
         for (int i = 0; i < waypoints.size(); i++)
         {
             Waypoint currentWaypoint = waypoints.get(i);
@@ -75,7 +70,7 @@ public class WorkDispatcher implements Runnable
             if (waypointChunk.size() == n && chunks == 0) {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, fileName);
+                createChunk(route, waypointChunk, expectedChunks, chunkIndex);
 
                 if (i != waypoints.size() - 1) {
                     // clear the chunk for the next set of waypoints
@@ -89,14 +84,14 @@ public class WorkDispatcher implements Runnable
             {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, fileName);
+                createChunk(route, waypointChunk, expectedChunks, chunkIndex);
 
             } // Third condition: Turns true when a chunk after the first is full. Size limit is n+1, since it needs to hold the last waypoint of the previous chunk
             else if (waypointChunk.size() == n + 1 && chunks != 0)
             {
                 chunks++;
                 chunkIndex++;
-                createChunk(waypointChunk, routeID, clientID, user, expectedChunks, chunkIndex, fileName);
+                createChunk(route, waypointChunk, expectedChunks, chunkIndex);
 
                 if (i != waypoints.size() - 1)
                 {
@@ -110,14 +105,12 @@ public class WorkDispatcher implements Runnable
     }
 
     // Creates the chunk and sends it to a worker
-    private void createChunk(ArrayList<Waypoint> chunkWaypoints, int routeID, int clientID, String user,
-                             int expectedChunks, int chunkIndex, String fileName)
+    private void createChunk(Route route, ArrayList<Waypoint> chunkWaypoints, int expectedChunks, int chunkIndex)
     {
         WorkerHandler worker = workers.poll();
         assert worker != null;
 
-        Route chunkedRoute = new Route(chunkWaypoints, routeID, clientID, user, fileName);
-        Chunk chunk = new Chunk(chunkedRoute, expectedChunks, chunkIndex);
+        Chunk chunk = new Chunk(chunkWaypoints, route, expectedChunks, chunkIndex);
 
         worker.processJob(chunk);
         // adding the worker to the end of the queue

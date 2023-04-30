@@ -17,8 +17,7 @@ public class Map
     // The activity stats are the result of the map operation for that chunk.
     public synchronized static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
-        Route route = chunk.getRoute();
-        ArrayList<Waypoint> waypoints = route.getWaypoints();
+        ArrayList<Waypoint> waypoints = chunk.getWaypoints();
 
         Waypoint w1 = waypoints.get(0);
         double totalDistance = 0.0;

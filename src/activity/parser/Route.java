@@ -1,5 +1,7 @@
 package activity.parser;
 
+import activity.misc.Pair;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,8 +12,9 @@ public class Route implements Serializable
     private final String user;
     // Route ID is the unique ID of the route
     private final int routeID;
-    // Client ID is the unique ID of the client-handler who sent the route
+
     private int clientID;
+
     // Waypoints is the ArrayList of Waypoints that the route contains
     private final ArrayList<Waypoint> waypoints;
     // segmentsContained: An arraylist, containing a pair of segments and the index of the route where the segment begins
@@ -34,31 +37,17 @@ public class Route implements Serializable
         this.segments = new ArrayList<>();
         this.segmentStartingIndices = new ArrayList<>();
     }
-    public Route(ArrayList<Waypoint> waypoints, int routeID, int clientID, String user, String fileName)
-    {
-        this.waypoints = waypoints;
-        this.routeID = routeID;
-        this.clientID = clientID;
-        this.user = user;
-        this.fileName = fileName;
-    }
-    public boolean containsSegment(Segment segment)
+
+    // checkForSegment: Checks if the segment is part of our route. if it is, adds it to the route's segment arraylist
+    public void checkForSegment(Segment segment)
     {
         int segmentIndex = Collections.indexOfSubList(waypoints, segment.getWaypoints());
 
-        if (segmentIndex == -1)
+        // if the segment is a part of our route (indicated by index != -1), add that segment to the route's segments
+        if (segmentIndex != -1)
         {
-            return false;
+            addSegment(segment, segmentIndex);
         }
-
-        addSegment(segment, segmentIndex);
-        return true;
-    }
-
-    // chunkIndex: Returns the starting index of a chunk of a route
-    public int getChunkStartingIndex(Chunk chunk)
-    {
-        return Collections.indexOfSubList(waypoints, chunk.getRoute().getWaypoints());
     }
 
     private void addSegment(Segment segment, int index)
@@ -70,6 +59,7 @@ public class Route implements Serializable
         }
     }
 
+    // getSegmentStartingIndex: If the segment is already registered in a route's segments, returns its starting value. Otherwise, returns -1.
     public int getSegmentStartingIndex(Segment segment)
     {
         if (segments.contains(segment))
@@ -80,11 +70,48 @@ public class Route implements Serializable
         return -1;
     }
 
-    public ArrayList<Waypoint> getWaypoints() {
+    // getChunkStartingIndex: Returns the starting index of a chunk of a route
+    public int getChunkStartingIndex(Chunk chunk)
+    {
+        return Collections.indexOfSubList(waypoints, chunk.getWaypoints());
+    }
+
+    // segmentsInChunk: Returns an arraylist of all the segments contained in a chunk, paired with the respective segment's beginning and ending CHUNK index.
+    public void segmentsInChunk(Chunk chunk)
+    {
+        int startingChunkIndex = getChunkStartingIndex(chunk);
+        int lastChunkIndex = startingChunkIndex + chunk.getWaypoints().size() - 1;
+
+        // precautionary check to make sure the chunk is in the route
+        if (startingChunkIndex < 0)
+        {
+            throw new RuntimeException("Found a chunk that does not belong to the route it's registered to.");
+        }
+        ArrayList<Pair<Segment, Pair<Integer, Integer>>> chunkSegments = new ArrayList<>();
+
+        for (Segment segment : segments)
+        {
+            int startingSegmentIndex = getSegmentStartingIndex(segment);
+            int lastSegmentIndex = startingSegmentIndex + segment.getWaypoints().size() - 1;
+
+            // if the segment is either before or after our chunk, continue
+            if (startingChunkIndex >= lastSegmentIndex || lastChunkIndex <= startingSegmentIndex)
+            {
+                continue;
+            }
+
+
+
+        }
+    }
+
+    public ArrayList<Waypoint> getWaypoints()
+    {
         return this.waypoints;
     }
 
-    public int getRouteID() {
+    public int getRouteID()
+    {
         return routeID;
     }
 

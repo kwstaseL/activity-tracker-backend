@@ -162,7 +162,6 @@ public class Master
             File directory = new File(segmentDirectory);
             File[] files = directory.listFiles();
 
-            // Print the name of each file in the directory.
             assert files != null;
             for (File file : files)
             {
@@ -176,7 +175,8 @@ public class Master
         {
             createSegments.join();
 
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             throw new RuntimeException(e);
         }

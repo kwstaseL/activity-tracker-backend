@@ -111,7 +111,7 @@ public class ClientHandler implements Runnable
                             // We add the list to the hashmap for the specific route
                             routeHashmap.put(routeID, activityList);
                             // and then we start the reducing phase
-                            processChunks(chunk,activityList);
+                            processChunks(chunk, activityList);
                         }
                         // Else, we just add the chunk to the list
                         else
@@ -133,7 +133,7 @@ public class ClientHandler implements Runnable
         }
     }
 
-    private void processChunks(Chunk chunk,ArrayList<Pair<Chunk, ActivityStats>> activityList)
+    private void processChunks(Chunk chunk, ArrayList<Pair<Chunk, ActivityStats>> activityList)
     {
         int routeID = chunk.getRoute().getRouteID();
         // fetching a list of all the stats we gathered for this specific route

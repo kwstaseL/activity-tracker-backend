@@ -49,22 +49,17 @@ public class GPXParser {
             if (creator == null || waypoints.isEmpty()) {
                 throw new RuntimeException("Could not parse the GPX data successfully.");
             }
+
             route = new Route(waypoints, creator, "GPX Data");
 
             // Check for all the segments if the route is inside them
             for (Segment segment : segments)
             {
-                if (route.containsSegment(segment))
-                {
-                    //System.out.println("Segment " + segment + " is inside route " + route);
-                }
-                else
-                {
-                    //System.out.println("Segment " + segment + " is NOT inside route " + route);
-                }
+                route.checkForSegment(segment);
             }
-
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
 
