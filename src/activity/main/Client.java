@@ -195,7 +195,6 @@ public class Client
         }
     }
 
-
     // This method will be used to send the file to the master
     private void sendFile(File selectedGPX)
     {

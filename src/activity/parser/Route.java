@@ -71,6 +71,7 @@ public class Route implements Serializable
     }
 
     // getChunkStartingIndex: Returns the starting index of a chunk of a route
+    // returns the starting index of the sublist within the route's waypoints that the chunk starts at
     public int getChunkStartingIndex(Chunk chunk)
     {
         return Collections.indexOfSubList(waypoints, chunk.getWaypoints());
@@ -99,11 +100,12 @@ public class Route implements Serializable
             {
                 continue;
             }
-
-
-
+            int chunkSegmentStartingIndex = Math.max(startingChunkIndex, startingSegmentIndex) - startingChunkIndex;
+            int chunkSegmentLastIndex = Math.min(lastChunkIndex, lastSegmentIndex) - startingChunkIndex;
+            chunkSegments.add(new Pair<>(segment, new Pair<>(chunkSegmentStartingIndex, chunkSegmentLastIndex)));
         }
     }
+
 
     public ArrayList<Waypoint> getWaypoints()
     {
@@ -132,6 +134,11 @@ public class Route implements Serializable
 
     public String getUser() {
         return user;
+    }
+
+    public ArrayList<Segment> getSegments()
+    {
+        return segments;
     }
 
     public String toString()
