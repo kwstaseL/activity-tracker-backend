@@ -36,6 +36,7 @@ public class Chunk implements Serializable {
         this.segments = new ArrayList<>();
         this.segmentStartingIndices = new ArrayList<>();
         this.segmentEndingIndices = new ArrayList<>();
+        registerSegments();
     }
 
     public ArrayList<Waypoint> getWaypoints()
@@ -58,14 +59,21 @@ public class Chunk implements Serializable {
         return chunkIndex;
     }
 
-    public void registerSegments()
+    /* registerSegments: Called on the route this chunk belongs to. The route calls
+     * addSegment for all the segments that are contained in this chunk. */
+    private void registerSegments()
     {
         route.segmentsInChunk(this);
     }
 
-    public void addSegment(Segment segment, int startingIndex, int endingIndex)
+    /* addSegment: Called by this chunk's route class, adds all the segments
+     * and their respective starting/ending indices to the chunk    */
+    protected void addSegment(Segment segment, int startingIndex, int endingIndex)
     {
-
+        segments.add(segment);
+        segmentStartingIndices.add(startingIndex);
+        segmentEndingIndices.add(endingIndex);
     }
 
 }
+
