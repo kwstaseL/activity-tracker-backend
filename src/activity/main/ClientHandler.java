@@ -26,8 +26,7 @@ public class ClientHandler implements Runnable
     // Used to generate the clientID
     private static int clientIDGenerator = 0;
 
-    // This is the queue that the routes will be added to and
-    // the worker dispatcher will take from
+    // This is the queue that the routes will be added to and the worker dispatcher will take from
     private Queue<Route> routeQueue;
     // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
     private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
