@@ -80,27 +80,35 @@ public class Route implements Serializable
     // segmentsInChunk: Returns an arraylist of all the segments contained in a chunk, paired with the respective segment's beginning and ending CHUNK index.
     public void segmentsInChunk(Chunk chunk)
     {
+        // StartingChunkIndex: The index of the route where the chunk starts
         int startingChunkIndex = getChunkStartingIndex(chunk);
+        // LastChunkIndex: The index of the route where the chunk ends
         int lastChunkIndex = startingChunkIndex + chunk.getWaypoints().size() - 1;
 
-        // precautionary check to make sure the chunk is in the route
+        // precautionary check to make sure the chunk is in the route (indexOfSubList returns -1 if the chunk is not in the route)
         if (startingChunkIndex < 0)
         {
             throw new RuntimeException("Found a chunk that does not belong to the route it's registered to.");
         }
         ArrayList<Pair<Segment, Pair<Integer, Integer>>> chunkSegments = new ArrayList<>();
 
+        // If the chunk is in the route, check if any of the route's segments are in the chunk
         for (Segment segment : segments)
         {
+            // StartingSegmentIndex: The index of the route where the segment starts
             int startingSegmentIndex = getSegmentStartingIndex(segment);
+            // LastSegmentIndex: The index of the route where the segment ends
             int lastSegmentIndex = startingSegmentIndex + segment.getWaypoints().size() - 1;
 
-            // if the segment is either before or after our chunk, continue
+            // we say that the chunk and the segment do not overlap as we only have 1 segment waypoint in the chunk,
+            // which will be calculated by the next (or previous) chunk
             if (startingChunkIndex >= lastSegmentIndex || lastChunkIndex <= startingSegmentIndex)
             {
                 continue;
             }
+            // chunkSegmentStartingIndex: The index of the chunk where the segment starts
             int chunkSegmentStartingIndex = Math.max(startingChunkIndex, startingSegmentIndex) - startingChunkIndex;
+            // chunkSegmentLastIndex: The index of the chunk where the segment ends
             int chunkSegmentLastIndex = Math.min(lastChunkIndex, lastSegmentIndex) - startingChunkIndex;
             chunkSegments.add(new Pair<>(segment, new Pair<>(chunkSegmentStartingIndex, chunkSegmentLastIndex)));
         }
