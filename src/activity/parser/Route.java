@@ -1,7 +1,5 @@
 package activity.parser;
 
-import activity.misc.Pair;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,9 +16,9 @@ public class Route implements Serializable
     // Waypoints is the ArrayList of Waypoints that the route contains
     private final ArrayList<Waypoint> waypoints;
     // segmentsContained: An arraylist, containing a pair of segments and the index of the route where the segment begins
-    private ArrayList<Segment> segments;
+    private final ArrayList<Segment> segments;
     // segmentStartingIndices: An arraylist, containing the index of the route where the segment begins
-    private ArrayList<Integer> segmentStartingIndices;
+    private final ArrayList<Integer> segmentStartingIndices;
 
     // Route file name: The name of the file. Used to move to "processed_gpx" as soon as the Reduce phase is done.
     private final String fileName;
@@ -60,7 +58,7 @@ public class Route implements Serializable
     }
 
     // getSegmentStartingIndex: If the segment is already registered in a route's segments, returns its starting value. Otherwise, returns -1.
-    public int getSegmentStartingIndex(Segment segment)
+    private int getSegmentStartingIndex(Segment segment)
     {
         if (segments.contains(segment))
         {
@@ -71,41 +69,41 @@ public class Route implements Serializable
     }
 
     // getChunkStartingIndex: Returns the starting index of a chunk of a route
-    // returns the starting index of the sublist within the route's waypoints that the chunk starts at
-    public int getChunkStartingIndex(Chunk chunk)
+    private int getChunkStartingIndex(Chunk chunk)
     {
         return Collections.indexOfSubList(waypoints, chunk.getWaypoints());
     }
 
-    // segmentsInChunk: Returns an arraylist of all the segments contained in a chunk, paired with the respective segment's beginning and ending CHUNK index.
-    public void segmentsInChunk(Chunk chunk)
+    // segmentsInChunk: Registers all the segments contained in a chunk of this route.
+    protected void segmentsInChunk(Chunk chunk)
     {
-        int startingChunkIndex = getChunkStartingIndex(chunk);
-        int lastChunkIndex = startingChunkIndex + chunk.getWaypoints().size() - 1;
+        // first, fetch the first and last index of the segment in the route
+        int firstChunkIndex = getChunkStartingIndex(chunk);
+        int lastChunkIndex = firstChunkIndex + chunk.getWaypoints().size() - 1;
 
         // precautionary check to make sure the chunk is in the route
-        if (startingChunkIndex < 0)
+        if (firstChunkIndex < 0)
         {
             throw new RuntimeException("Found a chunk that does not belong to the route it's registered to.");
         }
-        ArrayList<Pair<Segment, Pair<Integer, Integer>>> chunkSegments = new ArrayList<>();
 
         for (Segment segment : segments)
         {
-            int startingSegmentIndex = getSegmentStartingIndex(segment);
-            int lastSegmentIndex = startingSegmentIndex + segment.getWaypoints().size() - 1;
+            int firstSegmentIndex = getSegmentStartingIndex(segment);
+            int lastSegmentIndex = firstSegmentIndex + segment.getWaypoints().size() - 1;
 
             // if the segment is either before or after our chunk, continue
-            if (startingChunkIndex >= lastSegmentIndex || lastChunkIndex <= startingSegmentIndex)
+            if (firstChunkIndex >= lastSegmentIndex || lastChunkIndex <= firstSegmentIndex)
             {
                 continue;
             }
-            int chunkSegmentStartingIndex = Math.max(startingChunkIndex, startingSegmentIndex) - startingChunkIndex;
-            int chunkSegmentLastIndex = Math.min(lastChunkIndex, lastSegmentIndex) - startingChunkIndex;
-            chunkSegments.add(new Pair<>(segment, new Pair<>(chunkSegmentStartingIndex, chunkSegmentLastIndex)));
+
+            // otherwise, calculate the first and last index within the chunk for the segment accordingly
+            int chunkSegmentStartingIndex = Math.max(firstChunkIndex, firstSegmentIndex) - firstChunkIndex;
+            int chunkSegmentEndingIndex = Math.min(lastChunkIndex, lastSegmentIndex) - firstChunkIndex;
+            chunk.addSegment(segment, chunkSegmentStartingIndex, chunkSegmentEndingIndex);
         }
     }
-
 
     public ArrayList<Waypoint> getWaypoints()
     {
@@ -134,11 +132,6 @@ public class Route implements Serializable
 
     public String getUser() {
         return user;
-    }
-
-    public ArrayList<Segment> getSegments()
-    {
-        return segments;
     }
 
     public String toString()
