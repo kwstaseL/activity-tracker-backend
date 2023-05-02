@@ -26,6 +26,8 @@ public class ClientHandler implements Runnable
     // Used to generate the clientID
     private static int clientIDGenerator = 0;
 
+    private String clientUsername;
+
     // This is the queue that the routes will be added to and the worker dispatcher will take from
     private Queue<Route> routeQueue;
     // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
@@ -198,6 +200,7 @@ public class ClientHandler implements Runnable
                 System.out.println("ClientHandler: User " + username + " connected!");
                 out.writeObject("OK");
                 connectedClients.add(username);
+                clientUsername = username;
             }
             // Receive the file object from the client
 
@@ -271,6 +274,11 @@ public class ClientHandler implements Runnable
                 clientSocket.close();
             }
             System.out.println("ClientHandler: Client disconnected");
+            // Remove the client from the list of connected clients
+            if (clientUsername != null && connectedClients.contains(clientUsername))
+            {
+                connectedClients.remove(clientUsername);
+            }
         }
         catch (IOException e)
         {
