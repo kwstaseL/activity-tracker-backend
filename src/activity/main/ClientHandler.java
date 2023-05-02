@@ -33,6 +33,7 @@ public class ClientHandler implements Runnable
     private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
+    private static final ArrayList<String> connectedClients = new ArrayList<>();
     // routes: Represents all routes received
     private static final ArrayList<Route> routes = new ArrayList<>();
     // segments: a queue containing all the segments to be checked for intersections with the routes of users.
@@ -182,9 +183,27 @@ public class ClientHandler implements Runnable
     {
         try
         {
+            // Get the clients username
+            String username = (String) in.readObject();
+            // Check if the user is already connected
+            if (connectedClients.contains(username))
+            {
+                // If the user is already connected, we send a message to the client and close the connection
+                System.out.println("ClientHandler: User already connected!");
+                out.writeObject("User already connected!");
+                out.flush();
+                shutdown();
+            }
+            else
+            {
+                System.out.println("ClientHandler: User " + username + " connected!");
+                out.writeObject("OK");
+                connectedClients.add(username);
+            }
+            // Receive the file object from the client
+
             while (!clientSocket.isClosed())
             {
-                // Receive the file object from the client
                 System.out.println("ClientHandler: Waiting for file from client");
 
                 Object obj = in.readObject();
@@ -252,11 +271,12 @@ public class ClientHandler implements Runnable
             {
                 clientSocket.close();
             }
-            System.out.println("Client disconnected");
+            System.out.println("ClientHandler: Client disconnected");
         }
         catch (IOException e)
         {
-            System.out.println("Client disconnected");
+            System.out.println("Could not close connection to client");
+            e.printStackTrace();
         }
     }
 

@@ -98,11 +98,28 @@ public class Client
         System.out.println("Enter your username:");
         String username = scanner.nextLine().trim().toLowerCase();
 
-        // TODO: Check if username already exists the isDuplicateUsername can be implemented on the server side
-        // if (isDuplicateUsername(username))
-        // {
-        //    System.out.println("Username is already connected with tha username. Please try again.");
-        // }
+        // send the username to the master to check if it is already connected
+        try
+        {
+            out.writeObject(username);
+            // Read the response from the master
+            String response = (String) in.readObject();
+            // If the response is not "OK", then the username is already connected
+            if (!response.equals("OK"))
+            {
+                System.out.println("This user is already connected.");
+                shutdown();
+                return;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("Could not send the username to the master.");
+            shutdown();
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Welcome " + username + "!");
 
         while (true)
         {
