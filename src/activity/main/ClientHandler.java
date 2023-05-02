@@ -25,20 +25,16 @@ public class ClientHandler implements Runnable
     private int clientID;
     // Used to generate the clientID
     private static int clientIDGenerator = 0;
-
     private String clientUsername;
-
     // This is the queue that the routes will be added to and the worker dispatcher will take from
     private Queue<Route> routeQueue;
+    // segments: a queue containing all the segments to be checked for intersections with the routes of users.
+    private Queue<Segment> segments;
     // statsQueue: the queue that will contain all the activity stats calculated from each chunk respectively
     private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     private static final ArrayList<String> connectedClients = new ArrayList<>();
-    // routes: Represents all routes received
-    private static final ArrayList<Route> routes = new ArrayList<>();
-    // segments: a queue containing all the segments to be checked for intersections with the routes of users.
-    private Queue<Segment> segments;
     private final Object writeLock = new Object();
     private static final Statistics statistics = new Statistics();
 
@@ -221,7 +217,6 @@ public class ClientHandler implements Runnable
                     synchronized (routeQueue)
                     {
                         // Add the route to the queue and notify the dispatcher
-                        routes.add(route);
                         routeQueue.add(route);
                         routeQueue.notify();
                     }
@@ -275,7 +270,7 @@ public class ClientHandler implements Runnable
             }
             System.out.println("ClientHandler: Client disconnected");
             // Remove the client from the list of connected clients
-            if (clientUsername != null && connectedClients.contains(clientUsername))
+            if (clientUsername != null)
             {
                 connectedClients.remove(clientUsername);
             }
