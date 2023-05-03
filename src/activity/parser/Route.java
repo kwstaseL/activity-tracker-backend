@@ -76,6 +76,7 @@ public class Route implements Serializable
     // segmentsInChunk: Registers all the segments contained in a chunk of this route.
     protected void segmentsInChunk(Chunk chunk)
     {
+        assert chunk != null;
         // firstChunkIndex: The index of the route where the chunk starts
         int firstChunkIndex = getChunkStartingIndex(chunk);
 
@@ -88,6 +89,10 @@ public class Route implements Serializable
             throw new RuntimeException("Found a chunk that does not belong to the route it's registered to.");
         }
 
+        if (segments.size() == 0)
+        {
+            return;
+        }
 
         for (Segment segment : segments)
         {
@@ -134,11 +139,6 @@ public class Route implements Serializable
     public void setClientID(int clientID)
     {
         this.clientID = clientID;
-    }
-
-    public String getFileName()
-    {
-        return fileName;
     }
 
     public String getUser()

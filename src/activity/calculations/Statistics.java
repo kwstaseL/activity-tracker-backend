@@ -21,6 +21,8 @@ import java.util.Properties;
  */
 public class Statistics implements Serializable
 {
+    // The total number of routes recorded,
+    // as well as the total distance, elevation and activity time across all users.
     private int routesRecorded;
     private double totalDistance;
     private double totalElevation;
@@ -42,6 +44,33 @@ public class Statistics implements Serializable
         {
             loadStats();
         }
+    }
+
+    // registerRoute: Called when adding a new route to our database,
+    // updates the statistics for the user and the total stats for all users.
+    public void registerRoute(String user, ActivityStats activityStats)
+    {
+        // first, updating the user specific stats
+        if (!userStats.containsKey(user))
+        {
+            userStats.put(user, new UserStatistics(user));
+        }
+        userStats.get(user).registerRoute(activityStats);
+
+        // then, updating the total stats
+        totalDistance += activityStats.getDistance();
+        totalElevation += activityStats.getElevation();
+        totalActivityTime += activityStats.getTime();
+        ++routesRecorded;
+    }
+
+    // registerStatistics: Called when adding a new UserStatistics instance to our database, when loading stats from the XML file.
+    public void registerStatistics(UserStatistics userStatistics)
+    {
+        this.routesRecorded += userStatistics.getRoutesRecorded();
+        this.totalDistance += userStatistics.getTotalDistance();
+        this.totalElevation += userStatistics.getTotalElevation();
+        this.totalActivityTime += userStatistics.getTotalActivityTime();
     }
 
     // fileExists: Returns true if the statistics file already exists, false otherwise.
@@ -76,6 +105,7 @@ public class Statistics implements Serializable
         }
         catch (IOException e)
         {
+            System.out.println("Could not load config.");
             throw new RuntimeException(e);
         }
     }
@@ -131,31 +161,6 @@ public class Statistics implements Serializable
         {
             throw new RuntimeException(e);
         }
-    }
-
-    public void registerRoute(String user, ActivityStats activityStats)
-    {
-        // first, updating the user specific stats
-        if (!userStats.containsKey(user))
-        {
-            userStats.put(user, new UserStatistics(user));
-        }
-        userStats.get(user).registerRoute(activityStats);
-
-        // then, updating the total stats
-        totalDistance += activityStats.getDistance();
-        totalElevation += activityStats.getElevation();
-        totalActivityTime += activityStats.getTime();
-        ++routesRecorded;
-    }
-
-    // registerStatistics: Called when adding a new UserStatistics instance to our database, when loading stats from the XML file.
-    public void registerStatistics(UserStatistics userStatistics)
-    {
-        this.routesRecorded += userStatistics.getRoutesRecorded();
-        this.totalDistance += userStatistics.getTotalDistance();
-        this.totalElevation += userStatistics.getTotalElevation();
-        this.totalActivityTime += userStatistics.getTotalActivityTime();
     }
 
     // createFile: Called when first creating the file. Writes down the statistics for all users currently registered
@@ -223,10 +228,12 @@ public class Statistics implements Serializable
         }
     }
 
+
     // getUserStats: Returns the UserStatistics object associated with a specific user.
     public UserStatistics getUserStats(String user)
     {
-        if (!userStats.containsKey(user)) {
+        if (!userStats.containsKey(user))
+        {
             throw new RuntimeException("User has not been registered.");
         }
         return userStats.get(user);

@@ -135,49 +135,6 @@ public class ClientHandler implements Runnable
         }
     }
 
-    private void processChunks(Chunk chunk, ArrayList<Pair<Chunk, ActivityStats>> activityList)
-    {
-        int routeID = chunk.getRoute().getRouteID();
-        // fetching a list of all the stats we gathered for this specific route
-        ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
-        for (Pair<Chunk, ActivityStats> pair : activityList)
-        {
-            statsArrayList.add(pair.getValue());
-        }
-        // Creating a new thread to handle the reducing phase
-        new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
-        // TODO: Create a XML file to register the processed gpx
-    }
-
-    // This is the method that will handle the reducing phase and send the result back to the client
-    // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
-    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
-    {
-        // finalResults: The reduce process returns the final ActivityStats associated with a specific route.
-        ActivityStats finalResults = Reduce.reduce(intermediateResults);
-        try
-        {
-            // Send the result back to the client
-            synchronized (writeLock)
-            {
-                statistics.registerRoute(user, finalResults);
-                out.writeObject(finalResults);
-                out.flush();
-                out.writeObject(statistics.getUserStats(user));
-                out.flush();
-                out.writeObject(statistics.getGlobalStats());
-                out.flush();
-                // Here we reset the output stream to make sure
-                // that the object is sent with all the changes we made
-                out.reset();
-            }
-        }
-        catch (IOException e)
-        {
-            System.out.println("Could not send object to the client");
-        }
-    }
-
     // This method is used to get the file from the client
     // And to send it to the work-dispatcher that will dispatch it to the workers.
     private void readFromClient()
@@ -238,7 +195,48 @@ public class ClientHandler implements Runnable
         }
     }
 
+    private void processChunks(Chunk chunk, ArrayList<Pair<Chunk, ActivityStats>> activityList)
+    {
+        int routeID = chunk.getRoute().getRouteID();
+        // fetching a list of all the stats we gathered for this specific route
+        ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
+        for (Pair<Chunk, ActivityStats> pair : activityList)
+        {
+            statsArrayList.add(pair.getValue());
+        }
+        // Creating a new thread to handle the reducing phase
+        new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
+        // TODO: Create a XML file to register the processed gpx
+    }
 
+    // This is the method that will handle the reducing phase and send the result back to the client
+    // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
+    private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
+    {
+        // finalResults: The reduce process returns the final ActivityStats associated with a specific route.
+        ActivityStats finalResults = Reduce.reduce(intermediateResults);
+        try
+        {
+            // Send the result back to the client
+            synchronized (writeLock)
+            {
+                statistics.registerRoute(user, finalResults);
+                out.writeObject(finalResults);
+                out.flush();
+                out.writeObject(statistics.getUserStats(user));
+                out.flush();
+                out.writeObject(statistics.getGlobalStats());
+                out.flush();
+                // Here we reset the output stream to make sure
+                // that the object is sent with all the changes we made
+                out.reset();
+            }
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not send object to the client");
+        }
+    }
 
     // addStats: Adds the stats to the queue to be processed by the readFromWorkerHandler method
     public void addStats(Pair<Chunk, ActivityStats> stats)

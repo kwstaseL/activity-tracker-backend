@@ -19,7 +19,8 @@ public class Chunk implements Serializable {
     private final ArrayList<Waypoint> waypoints;
 
     /* segments, segmentStartingIndices, segmentEndingIndices:
-     * Three symmetrical arraylists, the index of a starting/ending segment index corresponds to the segment in the according segments index
+     * Three symmetrical arraylists, the index of a starting/ending segment index corresponds
+     * to the segment in the according segments index
      */
     private final ArrayList<Segment> segments;
 

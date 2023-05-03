@@ -83,6 +83,7 @@ public class WorkerHandler implements Runnable
     // This method will send a chunk to the worker to be mapped
     public void processJob(Chunk chunk)
     {
+        assert chunk != null;
         try
         {
             // Send the chunk to the worker to be mapped

@@ -117,7 +117,6 @@ public class WorkDispatcher implements Runnable
     {
         WorkerHandler worker = workers.poll();
         assert worker != null;
-
         Chunk chunk = new Chunk(chunkWaypoints, route, expectedChunks, chunkIndex);
 
         synchronized (writeLock)

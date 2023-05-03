@@ -28,6 +28,16 @@ public class ActivityCalculator
         return stats;
     }
 
+    // Calculating the time between two waypoints
+    private static double calculateTime(Waypoint w1, Waypoint w2)
+    {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        LocalDateTime t1 = LocalDateTime.parse(w1.getTimestamp(), formatter);
+        LocalDateTime t2 = LocalDateTime.parse(w2.getTimestamp(), formatter);
+        Duration duration = Duration.between(t1, t2);
+        double timeInSeconds = duration.getSeconds();
+        return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
+    }
     // Calculating the distance between two waypoints
     public static double calculateDistance(Waypoint w1, Waypoint w2)
     {
@@ -60,18 +70,6 @@ public class ActivityCalculator
         double d_meters = r * theta;
         // Converting to Kilometers
         return d_meters/1000;
-    }
-
-
-    // Calculating the time between two waypoints
-    private static double calculateTime(Waypoint w1, Waypoint w2)
-    {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        LocalDateTime t1 = LocalDateTime.parse(w1.getTimestamp(), formatter);
-        LocalDateTime t2 = LocalDateTime.parse(w2.getTimestamp(), formatter);
-        Duration duration = Duration.between(t1, t2);
-        double timeInSeconds = duration.getSeconds();
-        return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
     }
 
     // Calculating the speed between two waypoints

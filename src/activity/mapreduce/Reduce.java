@@ -9,7 +9,8 @@ public class Reduce
 {
     // This is the method that will reduce all the intermediate results received from the workers
     // into a single result that will be sent to the client
-    public synchronized static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediateResults)
+    // TODO: This method does not need to be synchronized? its not accessing any shared resources
+    public static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediateResults)
     {
         assert intermediateResults.getValue() != null && intermediateResults.getValue().size()>0;
         ArrayList<ActivityStats> activityStats = intermediateResults.getValue();

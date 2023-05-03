@@ -188,15 +188,14 @@ public class Client
             Object allUsersStats = in.readObject();
 
             // Print the received statistics
-            System.out.println("Output for file | " + selectedGPX.getName() + " | " + routeStats + "\n");
+            System.out.println("Statistics for your route: | " + routeStats + " |" + "\n");
             System.out.println(userStats + "\n");
             System.out.println(allUsersStats + "\n");
 
         }
         catch (Exception e)
         {
-            System.out.println("Could not receive objects");
-            e.printStackTrace();
+            System.out.println("Could not read the statistics.");
             shutdown();
         }
 
@@ -208,7 +207,8 @@ public class Client
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("Could not move the file to the completed directory.");
+            shutdown();
         }
     }
 
@@ -230,8 +230,6 @@ public class Client
             GPXData gpx = new GPXData(selectedGPX.getName(), buffer);
             out.writeObject(gpx);
             out.flush();
-            System.out.println("File " + selectedGPX.getName() + " sent to master");
-
         } catch (Exception e)
         {
             System.out.println("Could not send file");
@@ -269,7 +267,7 @@ public class Client
         catch (IOException e)
         {
             System.out.println("Could not read file");
-            e.printStackTrace();
+            shutdown();
         }
         return false;
     }
@@ -296,7 +294,6 @@ public class Client
         catch (IOException e)
         {
             System.out.println("Could not close connection");
-            e.printStackTrace();
         }
     }
     public static void main(String[] args)

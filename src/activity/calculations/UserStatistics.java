@@ -10,7 +10,8 @@ public class UserStatistics implements Serializable
     private double totalElevation;
     private double totalActivityTime;
 
-    // routesRecorded: A counter for the amount of routes a user has registered. Eager approach to avoid repetitive activityArchive.length calls
+    // routesRecorded: A counter for the amount of routes a user has registered.
+    // Eager approach to avoid repetitive activityArchive.length calls
     private int routesRecorded;
 
     // user: Represents the username as entered on the original gpx file

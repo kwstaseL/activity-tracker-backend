@@ -15,7 +15,8 @@ public class Map
     // This is the method that will get called by the worker to map a chunk to a pair of clientID and activity stats
     // The clientID is used to identify the client that requested the activity stats
     // The activity stats are the result of the map operation for that chunk.
-    public synchronized static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
+    // TODO: This method does not need to be synchronized? because its not accessing any shared data
+    public static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
         ArrayList<Waypoint> waypoints = chunk.getWaypoints();
 

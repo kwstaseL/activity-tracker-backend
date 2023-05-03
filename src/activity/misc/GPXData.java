@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class GPXData implements Serializable
 {
-    private String fileName;
-    private byte[] fileContent;
+    private final String fileName;
+    private final byte[] fileContent;
     public GPXData(String fileName, byte[] fileContent)
     {
         this.fileName = fileName;

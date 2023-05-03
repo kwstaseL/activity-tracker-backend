@@ -47,8 +47,9 @@ public class Worker
         }
 
     }
+
     // This method will start the worker and start listening for jobs from the master
-    public void start()
+    private void start()
     {
         Thread readData = new Thread(this::readForData);
         readData.start();
@@ -90,6 +91,7 @@ public class Worker
     // It will call the map method from the Map class and send the result back to the master
     private void handleMapping(Chunk chunk)
     {
+        assert chunk != null;
         // intermediate_result: the mapping process returns a key-value pair,
         // where key is the client id, and the value is another pair of chunk, activityStats
         Pair<Integer, Pair<Chunk, ActivityStats>> intermediate_result = Map.map(chunk.getRoute().getClientID(), chunk);
