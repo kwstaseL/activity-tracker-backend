@@ -9,8 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
 
 // This class will handle the worker connection
 public class WorkerHandler implements Runnable
@@ -57,18 +55,21 @@ public class WorkerHandler implements Runnable
         {
             while (!workerSocket.isClosed())
             {
-                // Receive message from worker
+                // Receive the results from the worker
                 Object receivedObject = in.readObject();
-                Pair<Integer, Pair<Chunk, ActivityStats>> activityStatsPair = (Pair<Integer, Pair<Chunk, ActivityStats>>) receivedObject;
 
-                // extracting the pair associated with the client
-                Pair<Chunk, ActivityStats> stats = activityStatsPair.getValue();
+                if (receivedObject instanceof Pair<?,?>)
+                {
+                    Pair<Integer, Pair<Chunk, ActivityStats>> activityStatsPair = (Pair<Integer, Pair<Chunk, ActivityStats>>) receivedObject;
 
-                ClientHandler appropriateHandler = clients.get(activityStatsPair.getKey());
-                // sending the results to the appropriate client by writing them to shared memory
-                appropriateHandler.addStats(stats);
+                    // extracting the pair associated with the client
+                    Pair<Chunk, ActivityStats> stats = activityStatsPair.getValue();
+
+                    ClientHandler appropriateHandler = clients.get(activityStatsPair.getKey());
+                    // sending the results to the appropriate client by writing them to shared memory
+                    appropriateHandler.addStats(stats);
+                }
             }
-
         }
         catch (IOException | ClassNotFoundException e)
         {
