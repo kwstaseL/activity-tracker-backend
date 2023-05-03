@@ -9,10 +9,12 @@ import java.util.ArrayList;
 
 public class Chunk implements Serializable {
 
-    // Route contains the ArrayList of Waypoints, the route id, client id, and the username of the user who recorded the route
+    // route represents the original route this chunk is a part of
     private final Route route;
+
     // Total chunks is the total number of chunks the route was split into
     private final int totalChunks;
+
     // Chunk index is the index of the chunk being currently processed amongst the total chunks
     private final int chunkIndex;
 
