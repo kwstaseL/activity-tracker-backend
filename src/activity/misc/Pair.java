@@ -30,6 +30,8 @@ public class Pair<K, V> implements Serializable
     {
         if (this == o) return true;
         if (!(o instanceof Pair<?, ?> pair)) return false;
-        return Objects.equals(key, pair.key) && Objects.equals(value, pair.value);
+
+        // making the assumption that 2 pairs will be the same if their keys are the same (used for .contains methods)
+        return Objects.equals(key, pair.key);
     }
 }
