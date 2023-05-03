@@ -69,6 +69,35 @@ public class Chunk implements Serializable {
         route.segmentsInChunk(this);
     }
 
+    // isFirstIndex: Returns true if the waypoint parameter is the first index of a chunk of a segment this chunk contains
+    public boolean isFirstIndex(Waypoint waypoint)
+    {
+        int indexInChunk = waypoints.indexOf(waypoint);
+        return segmentStartingIndices.contains(indexInChunk);
+    }
+
+    // isLastIndex: Returns true if the waypoint parameter is the last index of a chunk of a segment this chunk contains
+    public boolean isLastIndex(Waypoint waypoint)
+    {
+        int indexInChunk = waypoints.indexOf(waypoint);
+        return segmentStartingIndices.contains(indexInChunk);
+    }
+
+    // isContainedInSegment: Returns true if the waypoint parameter is contained in a segment this chunk holds.
+    public boolean isContainedInSegment(Waypoint waypoint)
+    {
+        int indexInChunk = waypoints.indexOf(waypoint);
+        for (int i = 0; i < segmentStartingIndices.size(); i++)
+        {
+            if (segmentStartingIndices.get(i) < indexInChunk && indexInChunk < segmentEndingIndices.get(i))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     /* addSegment: Called by this chunk's route class, adds all the segments
      * and their respective starting/ending indices to the chunk    */
     protected void addSegment(Segment segment, int startingIndex, int endingIndex)
