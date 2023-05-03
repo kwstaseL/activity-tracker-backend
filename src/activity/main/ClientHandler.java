@@ -19,12 +19,15 @@ public class ClientHandler implements Runnable
 {
     // This is the socket that the client is connected to
     private final Socket clientSocket;
+    // This is the input which will be used to receive objects from the client
     private ObjectInputStream in;
+    // This is the output which will be used to send objects to the client
     private ObjectOutputStream out;
     // The unique id of the client, generated through a static id generator
     private int clientID;
-    // Used to generate the clientID
+    // Used to generate the clientIDs
     private static int clientIDGenerator = 0;
+    // The username of the client that is connected
     private String clientUsername;
     // This is the queue that the routes will be added to and the worker dispatcher will take from
     private Queue<Route> routeQueue;
@@ -34,6 +37,7 @@ public class ClientHandler implements Runnable
     private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
+    // connectedClients: A list of all the connected clients
     private static final ArrayList<String> connectedClients = new ArrayList<>();
     private final Object writeLock = new Object();
     private static final Statistics statistics = new Statistics();
@@ -189,7 +193,7 @@ public class ClientHandler implements Runnable
                 System.out.println("ClientHandler: User already connected!");
                 out.writeObject("User already connected!");
                 out.flush();
-                shutdown();
+                throw new RuntimeException("User already connected!");
             }
             else
             {
@@ -252,9 +256,15 @@ public class ClientHandler implements Runnable
     {
         try
         {
-            synchronized (statistics)
+            if (clientUsername != null)
             {
-                statistics.createFile();
+                System.out.println("ClientHandler: Saving statistics for user " + clientUsername);
+                synchronized (statistics)
+                {
+                    statistics.createFile();
+                }
+                // Remove the client from the list of connected clients
+                connectedClients.remove(clientUsername);
             }
             if (in != null)
             {
@@ -269,11 +279,6 @@ public class ClientHandler implements Runnable
                 clientSocket.close();
             }
             System.out.println("ClientHandler: Client disconnected");
-            // Remove the client from the list of connected clients
-            if (clientUsername != null)
-            {
-                connectedClients.remove(clientUsername);
-            }
         }
         catch (IOException e)
         {
