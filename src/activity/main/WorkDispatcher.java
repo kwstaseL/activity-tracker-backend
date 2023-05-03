@@ -16,6 +16,9 @@ public class WorkDispatcher implements Runnable
     // This is the queue that contains all the routes that need to be handled
     private final Queue<Route> filesToWorker;
 
+    private final Object writeLock = new Object();
+    private final Object readLock = new Object();
+
     public WorkDispatcher(Queue<WorkerHandler> workers, Queue<Route> filesToWorker)
     {
         this.workers = workers;
@@ -40,7 +43,12 @@ public class WorkDispatcher implements Runnable
                     }
                 }
                 Route route = filesToWorker.poll();
-                handleRoute(route);
+                // Create a new thread to handle the route
+                // We create a new thread for each route, so that we can handle multiple routes at the same time
+                // and because if one route takes a long time to process, we can still process other routes
+                // But also to ensure that if one process fails, it does not affect the other processes
+                Thread handleRoute = new Thread(() -> handleRoute(route));
+                handleRoute.start();
             }
         }
     }
@@ -112,9 +120,12 @@ public class WorkDispatcher implements Runnable
 
         Chunk chunk = new Chunk(chunkWaypoints, route, expectedChunks, chunkIndex);
 
-        worker.processJob(chunk);
-        // adding the worker to the end of the queue
-        workers.add(worker);
+        synchronized (writeLock)
+        {
+            worker.processJob(chunk);
+            // adding the worker to the end of the queue
+            workers.add(worker);
+        }
     }
 
     private int calculateExpectedChunks(int waypointsSize,int n)
@@ -125,15 +136,18 @@ public class WorkDispatcher implements Runnable
     private int calculateChunkSize(int numWaypoints)
     {
         // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2
-        if (numWaypoints >= workers.size())
+        synchronized (readLock)
         {
-            return (int) Math.ceil(numWaypoints / (workers.size() * 2.0));
-        }
-        else
-        {
-            // making the assumption that if workers are more than the waypoints provided, n will be
-            // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
-            return 1;
+            if (numWaypoints >= workers.size())
+            {
+                return (int) Math.ceil(numWaypoints / (workers.size() * 2.0));
+            }
+            else
+            {
+                // making the assumption that if workers are more than the waypoints provided, n will be
+                // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
+                return 1;
+            }
         }
     }
 
