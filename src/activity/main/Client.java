@@ -150,7 +150,7 @@ public class Client
             while (choice == null || choice < 0 || choice >= filteredFiles.length)
             {
                 System.out.println("\nEnter a file index (0-"
-                        + (filteredFiles.length - 1) +") to send a single route/segment:");
+                        + (filteredFiles.length - 1) +") to send a single route:");
 
                 String input = scanner.nextLine();
                 try
