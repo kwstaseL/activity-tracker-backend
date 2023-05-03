@@ -20,7 +20,8 @@ public class Reduce
         double distance = 0;
         double totalSpeed = 0;
 
-        for (ActivityStats stats : activityStats) {
+        for (ActivityStats stats : activityStats)
+        {
             elevation += stats.getElevation();
             time += stats.getTime();
             distance += stats.getDistance();

@@ -7,7 +7,6 @@ import activity.calculations.ActivityStats;
 
 import activity.misc.Pair;
 import activity.parser.Waypoint;
-import activity.parser.Route;
 import activity.parser.Chunk;
 
 public class Map
