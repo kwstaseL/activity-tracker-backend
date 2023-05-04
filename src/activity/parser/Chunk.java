@@ -80,7 +80,7 @@ public class Chunk implements Serializable {
     public boolean isLastIndex(Waypoint waypoint)
     {
         int indexInChunk = waypoints.indexOf(waypoint);
-        return segmentStartingIndices.contains(indexInChunk);
+        return segmentEndingIndices.contains(indexInChunk);
     }
 
     // isContainedInSegment: Returns true if the waypoint parameter is contained in a segment this chunk holds.
