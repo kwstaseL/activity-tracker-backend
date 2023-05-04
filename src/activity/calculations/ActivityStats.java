@@ -45,14 +45,13 @@ public class ActivityStats implements Serializable
 
     public void update(Waypoint w1, Waypoint w2)
     {
-        this.distance += ActivityCalculator.calculateDistance(w1, w2);
+        this.distance += ActivityCalculator.calculateDistanceInKilometers(w1, w2);
         this.time += ActivityCalculator.calculateTime(w1, w2);
         this.elevation += ActivityCalculator.calculateElevation(w1, w2);
     }
 
     public void segmentUpdate(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
     {
-        System.out.println("Entered segment update.");
         for (Segment segment : segments)
         {
             int segmentID = segment.getSegmentID();
@@ -63,8 +62,6 @@ public class ActivityStats implements Serializable
             {
                 continue;
             }
-
-            System.out.println("Entered");
 
             SegmentStats segmentStats = segmentStatsList.get(segmentStatsIndex);
             segmentStats.timeUpdate(ActivityCalculator.calculateTime(w1, w2));

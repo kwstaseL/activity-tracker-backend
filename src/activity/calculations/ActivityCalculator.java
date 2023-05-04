@@ -21,8 +21,9 @@ public class ActivityCalculator
         double timeInSeconds = duration.getSeconds();
         return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
     }
-    // Calculating the distance between two waypoints
-    public static double calculateDistance(Waypoint w1, Waypoint w2)
+
+    // Calculates the distance in kilometers between two waypoints
+    public static double calculateDistanceInKilometers(Waypoint w1, Waypoint w2)
     {
         // Convert degrees to radians
         double lat1 = w1.getLatitude();
@@ -55,8 +56,8 @@ public class ActivityCalculator
         return d_meters/1000;
     }
 
-    // Calculating the distance between two waypoints
-    public static double calculateDistanceInMetres(Waypoint w1, Waypoint w2)
+    // Calculates the distance between two waypoints in meters
+    public static double calculateDistanceInMeters(Waypoint w1, Waypoint w2)
     {
         // Convert degrees to radians
         double lat1 = w1.getLatitude();
