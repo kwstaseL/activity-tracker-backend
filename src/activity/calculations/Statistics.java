@@ -15,7 +15,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.TreeSet;
 
 /* Statistics: The class that will be in charge of handling all the related statistics.
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded,
@@ -34,6 +33,7 @@ public class Statistics implements Serializable
     private final HashMap<String, UserStatistics> userStats;
 
     // segmentStatistics: Matches a segmentID (integer) to a list of user stats for that segment
+    // TODO: Introduce reading/writing to a file for segmentStatistics
     private final HashMap<Integer, SegmentLeaderboard> segmentStatistics = new HashMap<>();
 
     public Statistics()
