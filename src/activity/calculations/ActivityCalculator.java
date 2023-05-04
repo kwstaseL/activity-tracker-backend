@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 // Class used for the mapping phase
-// It will calculate for a chunk of data the distance,time ,speed and elevation
+// It will calculate the distance, time and elevation differences between two waypoints.
 public class ActivityCalculator
 {
 
@@ -22,41 +22,8 @@ public class ActivityCalculator
         return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
     }
 
-    // Calculates the distance in kilometers between two waypoints
-    public static double calculateDistanceInKilometers(Waypoint w1, Waypoint w2)
-    {
-        // Convert degrees to radians
-        double lat1 = w1.getLatitude();
-        double lon1 = w1.getLongitude();
-        double lat2 = w2.getLatitude();
-        double lon2 = w2.getLongitude();
-        lat1 = lat1 * Math.PI / 180.0;
-        lon1 = lon1 * Math.PI / 180.0;
-        lat2 = lat2 * Math.PI / 180.0;
-        lon2 = lon2 * Math.PI / 180.0;
-        // radius of earth in metres
-        final double r = 6378100;
-        // P
-        double rho1 = r * Math.cos(lat1);
-        double z1 = r * Math.sin(lat1);
-        double x1 = rho1 * Math.cos(lon1);
-        double y1 = rho1 * Math.sin(lon1);
-        // Q
-        double rho2 = r * Math.cos(lat2);
-        double z2 = r * Math.sin(lat2);
-        double x2 = rho2 * Math.cos(lon2);
-        double y2 = rho2 * Math.sin(lon2);
-        // Dot product
-        double dot = (x1 * x2 + y1 * y2 + z1 * z2);
-        double cos_theta = dot / (r * r);
-        final double theta = Math.acos(cos_theta);
-        // Distance in Metres
-        double d_meters = r * theta;
-        // Converting to Kilometers
-        return d_meters/1000;
-    }
 
-    // Calculates the distance between two waypoints in meters
+    // Calculating the distance between two waypoints in meters
     public static double calculateDistanceInMeters(Waypoint w1, Waypoint w2)
     {
         // Convert degrees to radians
@@ -88,6 +55,12 @@ public class ActivityCalculator
         return r * theta;
     }
 
+    // Calculating the distance in kilometers between two waypoints
+    public static double calculateDistanceInKilometers(Waypoint w1, Waypoint w2)
+    {
+        // Converting to Kilometers
+        return calculateDistanceInMeters(w1, w2)/1000;
+    }
 
     // Calculating the elevation between two waypoints
     protected static double calculateElevation(Waypoint w1, Waypoint w2)
