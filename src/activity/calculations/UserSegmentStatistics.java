@@ -22,10 +22,18 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>,
     {
         double comparisonResult = this.time - o.time;
 
-        if (comparisonResult > -1 && comparisonResult < 0) {
-            return -1;
+        if (comparisonResult < 0)
+        {
+            return (int) Math.floor(comparisonResult);
         }
-        return (int) Math.ceil(comparisonResult);
+        else if (comparisonResult > 0)
+        {
+            return (int) Math.ceil(comparisonResult);
+        }
+        else
+        {
+            return this.username.compareTo(o.username);
+        }
     }
 
     @Override
