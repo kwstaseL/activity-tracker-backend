@@ -34,7 +34,7 @@ public class Statistics implements Serializable
     private final HashMap<String, UserStatistics> userStats;
 
     // segmentStatistics: Matches a segmentID (integer) to a list of user stats for that segment
-    private final HashMap<Integer, TreeSet<UserSegmentStatistics>> segmentStatistics = new HashMap<>();
+    private final HashMap<Integer, SegmentLeaderboard> segmentStatistics = new HashMap<>();
 
     public Statistics()
     {
@@ -74,10 +74,10 @@ public class Statistics implements Serializable
             int segmentID = segment.getSegmentID();
             if (!this.segmentStatistics.containsKey(segmentID))
             {
-                segmentStatistics.put(segmentID, new TreeSet<>());
+                segmentStatistics.put(segmentID, new SegmentLeaderboard(segmentID));
             }
-            TreeSet<UserSegmentStatistics> treeSet = segmentStatistics.get(segmentID);
-            treeSet.add(new UserSegmentStatistics(segmentID, user, segment.getTime()));
+            SegmentLeaderboard leaderboard = segmentStatistics.get(segmentID);
+            leaderboard.registerSegmentStatistics(new UserSegmentStatistics(segmentID, user, segment.getTime()));
         }
     }
 
@@ -88,6 +88,15 @@ public class Statistics implements Serializable
         this.totalDistance += userStatistics.getTotalDistance();
         this.totalElevation += userStatistics.getTotalElevation();
         this.totalActivityTime += userStatistics.getTotalActivityTime();
+    }
+
+    public SegmentLeaderboard getLeaderboard(int segmentID)
+    {
+        if (!segmentStatistics.containsKey(segmentID))
+        {
+            throw new RuntimeException("Could not find the segment.");
+        }
+        return segmentStatistics.get(segmentID);
     }
 
     // fileExists: Returns true if the statistics file already exists, false otherwise.

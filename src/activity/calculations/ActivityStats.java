@@ -16,10 +16,12 @@ public class ActivityStats implements Serializable
     private double elevation;
     private double time;
     private final ArrayList<SegmentStats> segmentStatsList;
+    private final int routeID;
 
     // Constructor used for the map/reduce phase for the final results
-    public ActivityStats(double distance, double speed, double elevation, double time, ArrayList<SegmentStats> segmentStatsList)
+    public ActivityStats(int routeID, double distance, double speed, double elevation, double time, ArrayList<SegmentStats> segmentStatsList)
     {
+        this.routeID = routeID;
         this.distance = distance;
         this.speed = speed;
         this.elevation = elevation;
@@ -28,9 +30,9 @@ public class ActivityStats implements Serializable
     }
 
     // This constructor is used for calculating and saving the results of the calculations
-    public ActivityStats()
+    public ActivityStats(int routeID)
     {
-        this(0, 0, 0, 0, new ArrayList<>());
+        this(routeID, 0, 0, 0, 0, new ArrayList<>());
     }
 
     public void registerSegments(ArrayList<Segment> segments)
@@ -90,9 +92,24 @@ public class ActivityStats implements Serializable
         return time;
     }
 
+    public int getRouteID()
+    {
+        return routeID;
+    }
+
     public ArrayList<SegmentStats> getSegmentStatsList()
     {
         return this.segmentStatsList;
+    }
+
+    public ArrayList<Integer> getSegmentIDs()
+    {
+        ArrayList<Integer> segmentIDs = new ArrayList<>();
+        for (SegmentStats segmentStats : segmentStatsList)
+        {
+            segmentIDs.add(segmentStats.getSegmentID());
+        }
+        return segmentIDs;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package activity.calculations;
 
-public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>
+import java.io.Serializable;
+
+public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>, Serializable
 {
     private int segmentID;
     private String username;
@@ -23,5 +25,11 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>
             return -1;
         }
         return (int) Math.ceil(comparisonResult);
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s: %.2f min", username, time);
     }
 }

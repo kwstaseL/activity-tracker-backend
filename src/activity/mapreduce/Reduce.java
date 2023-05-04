@@ -12,6 +12,7 @@ public class Reduce
     // into a single result that will be sent to the client
     public static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediateResults)
     {
+        // ensuring the arraylist is not null, and contains at least 1 element
         assert intermediateResults.getValue() != null && intermediateResults.getValue().size()>0;
         ArrayList<ActivityStats> activityStatsList = intermediateResults.getValue();
 
@@ -19,6 +20,7 @@ public class Reduce
         double time = 0;
         double distance = 0;
         double totalSpeed = 0;
+        int routeID = activityStatsList.get(0).getRouteID();
         ArrayList<SegmentStats> finalSegmentStats = new ArrayList<>();
 
         // iterating over the stats returned by each chunk of our route
@@ -50,6 +52,6 @@ public class Reduce
             }
         }
 
-        return new ActivityStats(distance, totalSpeed / activityStatsList.size(), elevation, time, finalSegmentStats);
+        return new ActivityStats(routeID, distance, totalSpeed / activityStatsList.size(), elevation, time, finalSegmentStats);
     }
 }

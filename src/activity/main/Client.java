@@ -1,5 +1,6 @@
 package activity.main;
 
+import activity.calculations.SegmentLeaderboard;
 import activity.misc.GPXData;
 
 import java.io.*;
@@ -8,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Scanner;
@@ -179,6 +181,8 @@ public class Client
             }
         }
     }
+
+    @SuppressWarnings("unchecked")
     private void listenForMessages(File selectedGPX)
     {
         try {
@@ -187,16 +191,22 @@ public class Client
             Object routeStats = in.readObject();
             Object userStats = in.readObject();
             Object allUsersStats = in.readObject();
+            Object leaderboardObject = in.readObject();
 
             // Print the received statistics
             System.out.println("Statistics for your route: | " + routeStats + " |" + "\n");
             System.out.println(userStats + "\n");
             System.out.println(allUsersStats + "\n");
-
+            ArrayList<SegmentLeaderboard> leaderboards = (ArrayList<SegmentLeaderboard>) leaderboardObject;
+            for (SegmentLeaderboard leaderboard : leaderboards)
+            {
+                System.out.println(leaderboard + "\n");
+            }
         }
         catch (Exception e)
         {
             System.out.println("Could not read the statistics.");
+            System.out.println(e.getMessage());
             shutdown();
         }
 

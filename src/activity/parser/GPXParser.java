@@ -46,7 +46,8 @@ public class GPXParser {
                         Double.parseDouble(elevation), time));
             }
 
-            if (creator == null || waypoints.isEmpty()) {
+            if (creator == null || waypoints.isEmpty())
+            {
                 throw new RuntimeException("Could not parse the GPX data successfully.");
             }
 

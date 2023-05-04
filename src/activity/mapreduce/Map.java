@@ -17,7 +17,7 @@ public class Map
     public static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
         ArrayList<Waypoint> waypoints = chunk.getWaypoints();
-        ActivityStats stats = new ActivityStats();
+        ActivityStats stats = new ActivityStats(chunk.getRoute().getRouteID());
 
         Waypoint w1 = waypoints.get(0);
 

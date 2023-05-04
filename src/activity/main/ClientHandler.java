@@ -1,6 +1,7 @@
 package activity.main;
 
 import activity.calculations.ActivityStats;
+import activity.calculations.SegmentLeaderboard;
 import activity.calculations.Statistics;
 import activity.misc.GPXData;
 import activity.misc.Pair;
@@ -42,7 +43,7 @@ public class ClientHandler implements Runnable
     private final Object writeLock = new Object();
     private static final Statistics statistics = new Statistics();
 
-    public ClientHandler(Socket clientSocket, Queue<Route> routes, Queue<Segment> segments)
+    public ClientHandler(Socket clientSocket, Queue<Route> routeQueue, Queue<Segment> segments)
     {
         this.clientSocket = clientSocket;
         try
@@ -50,7 +51,7 @@ public class ClientHandler implements Runnable
             this.clientID = clientIDGenerator++;
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
-            this.routeQueue = routes;
+            this.routeQueue = routeQueue;
             this.segments = segments;
         }
         catch (IOException e)
@@ -227,6 +228,18 @@ public class ClientHandler implements Runnable
                 out.flush();
                 out.writeObject(statistics.getGlobalStats());
                 out.flush();
+
+                ArrayList<Integer> segmentsInRoute = finalResults.getSegmentIDs();
+                ArrayList<SegmentLeaderboard> segmentLeaderboards = new ArrayList<>();
+
+                for (int segmentID : segmentsInRoute)
+                {
+                    segmentLeaderboards.add(statistics.getLeaderboard(segmentID));
+                }
+
+                out.writeObject(segmentLeaderboards);
+                out.flush();
+
                 // Here we reset the output stream to make sure
                 // that the object is sent with all the changes we made
                 out.reset();
@@ -235,6 +248,7 @@ public class ClientHandler implements Runnable
         catch (IOException e)
         {
             System.out.println("Could not send object to the client");
+            System.out.println(e.getMessage());
         }
     }
 
