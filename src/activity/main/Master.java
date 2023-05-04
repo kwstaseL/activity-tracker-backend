@@ -174,7 +174,6 @@ public class Master
         try
         {
             createSegments.join();
-
         }
         catch (InterruptedException e)
         {

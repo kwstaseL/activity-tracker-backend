@@ -2,5 +2,9 @@
 <User_Statistics>
     <User Routes_Recorded="3" Total_Activity_Time="55.883333333333326" Total_Distance="13.11758774126834" Total_Elevation="119.84000000000003" Username="user1"/>
     <User Routes_Recorded="2" Total_Activity_Time="23.46666666666667" Total_Distance="3.9205955452348626" Total_Elevation="38.22" Username="user2"/>
+    <User Routes_Recorded="1" Total_Activity_Time="30.366666666666667" Total_Distance="12.249878213155949" Total_Elevation="3.57" Username="user7"/>
+    <User Routes_Recorded="1" Total_Activity_Time="104.21666666666667" Total_Distance="42.01428430568501" Total_Elevation="46.69" Username="user5"/>
+    <User Routes_Recorded="1" Total_Activity_Time="61.516666666666666" Total_Distance="24.79807537750504" Total_Elevation="8.09" Username="user6"/>
     <User Routes_Recorded="1" Total_Activity_Time="20.93333333333333" Total_Distance="5.168312859067851" Total_Elevation="56.03000000000003" Username="user3"/>
+    <User Routes_Recorded="1" Total_Activity_Time="25.316666666666666" Total_Distance="10.20248982729987" Total_Elevation="0.0" Username="user4"/>
 </User_Statistics>

@@ -101,25 +101,28 @@ public class WorkerHandler implements Runnable
     {
         try
         {
-            if (in != null)
-            {
-                in.close();
-            }
-            if (out != null)
-            {
-                out.close();
-            }
-            if (workerSocket != null)
-            {
-                workerSocket.close();
-            }
-            System.out.println("Worker disconnected");
+            in.close();
         }
         catch (IOException e)
         {
-            System.out.println("Could not close connection to worker");
-            throw new RuntimeException(e);
+            System.out.println("WorkerHandler: Could not close input stream");
         }
-
+        try
+        {
+            out.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("WorkerHandler: Could not close output stream");
+        }
+        try
+        {
+            workerSocket.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("WorkerHandler: Could not close socket");
+        }
+        System.out.println("WorkerHandler: Worker disconnected.");
     }
 }

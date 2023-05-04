@@ -67,7 +67,8 @@ public class Client
                 File directory = new File(completedDirectory);
                 if (!directory.exists())
                 {
-                    if (!directory.mkdirs()) {
+                    if (!directory.mkdirs())
+                    {
                         throw new RuntimeException("Could not create the directory for the completed gpx.");
                     }
                 }

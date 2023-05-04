@@ -116,22 +116,29 @@ public class Worker
     {
         try
         {
-            if (in != null)
-            {
-                in.close();
-            }
-            if (out != null)
-            {
-                out.close();
-            }
-            if (connection != null)
-            {
-                connection.close();
-            }
+            in.close();
         }
         catch (IOException e)
         {
-            System.out.println("Worker: Could not close connection to master");
+            System.out.println("Could not close input stream");
+            System.out.println("Error: " + e.getMessage());
+        }
+        try
+        {
+            out.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not close output stream");
+            System.out.println("Error: " + e.getMessage());
+        }
+        try
+        {
+            connection.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not close connection");
             System.out.println("Error: " + e.getMessage());
         }
     }

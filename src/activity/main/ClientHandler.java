@@ -252,37 +252,41 @@ public class ClientHandler implements Runnable
     // and clean up the resources
     private void shutdown()
     {
+        if (clientUsername != null)
+        {
+            System.out.println("ClientHandler: Saving statistics for user " + clientUsername);
+            synchronized (statistics)
+            {
+                statistics.createFile();
+            }
+            // Remove the client from the list of connected clients
+            connectedClients.remove(clientUsername);
+        }
         try
         {
-            if (clientUsername != null)
-            {
-                System.out.println("ClientHandler: Saving statistics for user " + clientUsername);
-                synchronized (statistics)
-                {
-                    statistics.createFile();
-                }
-                // Remove the client from the list of connected clients
-                connectedClients.remove(clientUsername);
-            }
-            if (in != null)
-            {
-                in.close();
-            }
-            if (out != null)
-            {
-                out.close();
-            }
-            if (clientSocket != null)
-            {
-                clientSocket.close();
-            }
-            System.out.println("ClientHandler: Client disconnected");
+            in.close();
         }
         catch (IOException e)
         {
-            System.out.println("Could not close connection to client");
-            e.printStackTrace();
+            System.out.println("ClientHandler: Could not close input stream");
         }
+        try
+        {
+            out.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("ClientHandler: Could not close output stream");
+        }
+        try
+        {
+            clientSocket.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("ClientHandler: Could not close client socket");
+        }
+        System.out.println("ClientHandler: Client disconnected");
     }
 
     public int getClientID()
