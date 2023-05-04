@@ -66,7 +66,6 @@ public class WorkDispatcher implements Runnable
         final int expectedChunks = calculateExpectedChunks(waypointsSize, n);
 
         ArrayList<Waypoint> waypointChunk = new ArrayList<>();
-        int chunkIndex = 0;
         int chunks = 0;
 
         for (int i = 0; i < waypoints.size(); i++)
@@ -77,8 +76,7 @@ public class WorkDispatcher implements Runnable
             // First condition: Turns true when the first chunk is full.
             if (waypointChunk.size() == n && chunks == 0) {
                 chunks++;
-                chunkIndex++;
-                createChunk(route, waypointChunk, expectedChunks, chunkIndex);
+                createChunk(route, waypointChunk, expectedChunks);
 
                 if (i != waypoints.size() - 1) {
                     // clear the chunk for the next set of waypoints
@@ -91,15 +89,13 @@ public class WorkDispatcher implements Runnable
             else if (i == waypoints.size() - 1)
             {
                 chunks++;
-                chunkIndex++;
-                createChunk(route, waypointChunk, expectedChunks, chunkIndex);
+                createChunk(route, waypointChunk, expectedChunks);
 
             } // Third condition: Turns true when a chunk after the first is full. Size limit is n+1, since it needs to hold the last waypoint of the previous chunk
             else if (waypointChunk.size() == n + 1 && chunks != 0)
             {
                 chunks++;
-                chunkIndex++;
-                createChunk(route, waypointChunk, expectedChunks, chunkIndex);
+                createChunk(route, waypointChunk, expectedChunks);
 
                 if (i != waypoints.size() - 1)
                 {
@@ -113,11 +109,11 @@ public class WorkDispatcher implements Runnable
     }
 
     // Creates the chunk and sends it to a worker
-    private void createChunk(Route route, ArrayList<Waypoint> chunkWaypoints, int expectedChunks, int chunkIndex)
+    private void createChunk(Route route, ArrayList<Waypoint> chunkWaypoints, int expectedChunks)
     {
         WorkerHandler worker = workers.poll();
         assert worker != null;
-        Chunk chunk = new Chunk(chunkWaypoints, route, expectedChunks, chunkIndex);
+        Chunk chunk = new Chunk(chunkWaypoints, route, expectedChunks);
 
         synchronized (writeLock)
         {

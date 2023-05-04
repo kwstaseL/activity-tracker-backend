@@ -15,9 +15,6 @@ public class Chunk implements Serializable {
     // Total chunks is the total number of chunks the route was split into
     private final int totalChunks;
 
-    // Chunk index is the index of the chunk being currently processed amongst the total chunks
-    private final int chunkIndex;
-
     private final ArrayList<Waypoint> waypoints;
 
     /* segments, segmentStartingIndices, segmentEndingIndices:
@@ -30,12 +27,11 @@ public class Chunk implements Serializable {
 
     private final ArrayList<Integer> segmentEndingIndices;
 
-    public Chunk(ArrayList<Waypoint> waypoints, Route route, int totalChunks, int chunkIndex)
+    public Chunk(ArrayList<Waypoint> waypoints, Route route, int totalChunks)
     {
         this.route = route;
         this.waypoints = new ArrayList<>(waypoints);
         this.totalChunks = totalChunks;
-        this.chunkIndex = chunkIndex;
         this.segments = new ArrayList<>();
         this.segmentStartingIndices = new ArrayList<>();
         this.segmentEndingIndices = new ArrayList<>();
@@ -57,10 +53,6 @@ public class Chunk implements Serializable {
         return totalChunks;
     }
 
-    public int getChunkIndex()
-    {
-        return chunkIndex;
-    }
 
     /* registerSegments: Called on the route this chunk belongs to. The route calls
      * addSegment for all the segments that are contained in this chunk. */
@@ -69,18 +61,11 @@ public class Chunk implements Serializable {
         route.segmentsInChunk(this);
     }
 
-    // isFirstIndex: Returns true if the waypoint parameter is the first index of a chunk of a segment this chunk contains
-    public boolean isFirstIndex(Waypoint waypoint)
+    // isFirstSegmentIndex: Returns true if the waypoint parameter is the first index of the part of a segment that this chunk contains
+    public boolean isFirstSegmentIndex(Waypoint waypoint)
     {
         int indexInChunk = waypoints.indexOf(waypoint);
         return segmentStartingIndices.contains(indexInChunk);
-    }
-
-    // isLastIndex: Returns true if the waypoint parameter is the last index of a chunk of a segment this chunk contains
-    public boolean isLastIndex(Waypoint waypoint)
-    {
-        int indexInChunk = waypoints.indexOf(waypoint);
-        return segmentEndingIndices.contains(indexInChunk);
     }
 
     // isContainedInSegment: Returns true if the waypoint parameter is contained in a segment this chunk holds.
@@ -89,12 +74,32 @@ public class Chunk implements Serializable {
         int indexInChunk = waypoints.indexOf(waypoint);
         for (int i = 0; i < segmentStartingIndices.size(); i++)
         {
-            if (segmentStartingIndices.get(i) < indexInChunk && indexInChunk < segmentEndingIndices.get(i))
+            if (indexInChunk >= segmentStartingIndices.get(i) && indexInChunk <= segmentEndingIndices.get(i))
             {
                 return true;
             }
         }
         return false;
+    }
+
+    // waypointSegments: Returns the segments this waypoint is contained in
+    public ArrayList<Segment> waypointSegments(Waypoint waypoint)
+    {
+        ArrayList<Segment> waypointSegments = new ArrayList<>();
+        if (!isContainedInSegment(waypoint))
+        {
+            return waypointSegments;
+        }
+
+        int indexInChunk = waypoints.indexOf(waypoint);
+        for (int i = 0; i < segments.size(); i++)
+        {
+            if (indexInChunk >= segmentStartingIndices.get(i) && indexInChunk <= segmentEndingIndices.get(i))
+            {
+                waypointSegments.add(segments.get(i));
+            }
+        }
+        return waypointSegments;
     }
 
 

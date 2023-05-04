@@ -1,6 +1,10 @@
 package activity.calculations;
 
+import activity.parser.Segment;
+import activity.parser.Waypoint;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 // Contains the results of the calculations for the activities
 // during the map/reduce phase
@@ -11,40 +15,59 @@ public class ActivityStats implements Serializable
     private double speed;
     private double elevation;
     private double time;
+    private final ArrayList<SegmentStats> segmentStatsList;
 
     // Constructor used for the map/reduce phase for the final results
-    public ActivityStats(double distance, double speed, double elevation, double time)
+    public ActivityStats(double distance, double speed, double elevation, double time, ArrayList<SegmentStats> segmentStatsList)
     {
         this.distance = distance;
         this.speed = speed;
         this.elevation = elevation;
         this.time = time;
+        this.segmentStatsList = new ArrayList<>(segmentStatsList);
     }
 
     // This constructor is used for calculating and saving the results of the calculations
     public ActivityStats()
     {
-        this(0, 0, 0, 0);
+        this(0, 0, 0, 0, new ArrayList<>());
     }
 
-    public void setDistance(double distance)
+    public void registerSegments(ArrayList<Segment> segments)
     {
-        this.distance = distance;
+        for (Segment segment : segments)
+        {
+            this.segmentStatsList.add(new SegmentStats(segment.getSegmentID()));
+        }
     }
 
-    public void setSpeed(double speed)
+    public void update(Waypoint w1, Waypoint w2)
     {
-        this.speed = speed;
+        this.distance += ActivityCalculator.calculateDistance(w1, w2);
+        this.time += ActivityCalculator.calculateTime(w1, w2);
+        this.elevation += ActivityCalculator.calculateElevation(w1, w2);
     }
 
-    public void setElevation(double elevation)
+    public void segmentUpdate(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
     {
-        this.elevation = elevation;
+        for (Segment segment : segments)
+        {
+            int segmentID = segment.getSegmentID();
+            int segmentStatsIndex = segmentStatsList.indexOf(new SegmentStats(segmentID));
+
+            if (segmentStatsIndex == -1)
+            {
+                continue;
+            }
+
+            SegmentStats segmentStats = segmentStatsList.get(segmentStatsIndex);
+            segmentStats.timeUpdate(ActivityCalculator.calculateTime(w1, w2));
+        }
     }
 
-    public void setTime(double time)
+    public void finalise()
     {
-        this.time = time;
+        this.speed = (time > 0) ? distance / (time / 60.0) : 0.0;
     }
 
     public double getDistance()
@@ -65,6 +88,11 @@ public class ActivityStats implements Serializable
     public double getTime()
     {
         return time;
+    }
+
+    public ArrayList<SegmentStats> getSegmentStatsList()
+    {
+        return this.segmentStatsList;
     }
 
     @Override

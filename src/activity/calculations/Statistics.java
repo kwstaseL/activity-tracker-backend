@@ -12,8 +12,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.TreeSet;
 
 /* Statistics: The class that will be in charge of handling all the related statistics.
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded,
@@ -30,6 +32,9 @@ public class Statistics implements Serializable
 
     // userStats: A hashmap matching each user to their respective statistics.
     private final HashMap<String, UserStatistics> userStats;
+
+    // segmentStatistics: Matches a segmentID (integer) to a list of user stats for that segment
+    private final HashMap<Integer, TreeSet<UserSegmentStatistics>> segmentStatistics = new HashMap<>();
 
     public Statistics()
     {
@@ -62,6 +67,18 @@ public class Statistics implements Serializable
         totalElevation += activityStats.getElevation();
         totalActivityTime += activityStats.getTime();
         ++routesRecorded;
+
+        ArrayList<SegmentStats> segmentStatsList = activityStats.getSegmentStatsList();
+        for (SegmentStats segment : segmentStatsList)
+        {
+            int segmentID = segment.getSegmentID();
+            if (!this.segmentStatistics.containsKey(segmentID))
+            {
+                segmentStatistics.put(segmentID, new TreeSet<>());
+            }
+            TreeSet<UserSegmentStatistics> treeSet = segmentStatistics.get(segmentID);
+            treeSet.add(new UserSegmentStatistics(segmentID, user, segment.getTime()));
+        }
     }
 
     // registerStatistics: Called when adding a new UserStatistics instance to our database, when loading stats from the XML file.
