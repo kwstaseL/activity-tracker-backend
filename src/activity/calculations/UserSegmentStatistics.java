@@ -1,6 +1,7 @@
 package activity.calculations;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>, Serializable
 {
@@ -25,6 +26,14 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>,
             return -1;
         }
         return (int) Math.ceil(comparisonResult);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof UserSegmentStatistics that)) return false;
+        return segmentID == that.segmentID && Double.compare(that.time, time) == 0 && Objects.equals(username, that.username);
     }
 
     @Override

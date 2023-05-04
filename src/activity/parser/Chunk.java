@@ -76,9 +76,11 @@ public class Chunk implements Serializable {
         {
             if (indexInChunk >= segmentStartingIndices.get(i) && indexInChunk <= segmentEndingIndices.get(i))
             {
+                System.err.println("Entered");
                 return true;
             }
         }
+        System.out.println("Found nothing");
         return false;
     }
 

@@ -52,15 +52,19 @@ public class ActivityStats implements Serializable
 
     public void segmentUpdate(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
     {
+        System.out.println("Entered segment update.");
         for (Segment segment : segments)
         {
             int segmentID = segment.getSegmentID();
+
             int segmentStatsIndex = segmentStatsList.indexOf(new SegmentStats(segmentID));
 
             if (segmentStatsIndex == -1)
             {
                 continue;
             }
+
+            System.out.println("Entered");
 
             SegmentStats segmentStats = segmentStatsList.get(segmentStatsIndex);
             segmentStats.timeUpdate(ActivityCalculator.calculateTime(w1, w2));

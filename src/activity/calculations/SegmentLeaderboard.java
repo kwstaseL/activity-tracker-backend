@@ -21,10 +21,10 @@ public class SegmentLeaderboard implements Serializable
 
     @Override
     public String toString() {
-        StringBuilder toReturn = new StringBuilder(String.format("Found a segment!%n Leaderboard:%n"));
+        StringBuilder toReturn = new StringBuilder(String.format("Found a segment!%nLeaderboard:%n"));
         for (UserSegmentStatistics userSegmentStatistics : statistics)
         {
-            toReturn.append(userSegmentStatistics);
+            toReturn.append(userSegmentStatistics).append("\n");
         }
         return toReturn.toString();
     }
