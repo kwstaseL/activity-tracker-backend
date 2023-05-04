@@ -48,8 +48,7 @@ public class Waypoint implements Serializable
     }
 
     /* equals: Used when calculating segments, and is used to work around a possible GPS drift between two waypoints
-     * Making the assumption that two waypoints will be equal if they are at most 5 metres apart.
-     */
+     * Making the assumption that two waypoints will be equal if they are at most 10 metres apart.           */
     @Override
     public boolean equals(Object o)
     {
