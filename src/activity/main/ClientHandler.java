@@ -206,7 +206,7 @@ public class ClientHandler implements Runnable
         }
         // Creating a new thread to handle the reducing phase
         new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
-        // TODO: Create a XML file to register the processed gpx
+        // TODO: Create an XML file to register the processed gpx
     }
 
     // This is the method that will handle the reducing phase and send the result back to the client
