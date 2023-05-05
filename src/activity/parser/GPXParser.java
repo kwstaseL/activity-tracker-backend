@@ -32,7 +32,8 @@ public class GPXParser {
             String creator = null;
 
             // Iterate through all the <wpt> tags.
-            for (int i = 0; i < nodeList.getLength(); i++) {
+            for (int i = 0; i < nodeList.getLength(); i++)
+            {
                 // Get the <wpt> tag we are currently processing.
                 Element element = (Element) nodeList.item(i);
                 creator = doc.getDocumentElement().getAttribute("creator");
@@ -67,7 +68,7 @@ public class GPXParser {
         return route;
     }
 
-    public static Segment parseSegment(File inputStream)
+    public static Segment parseSegment(File segmentFile)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Segment segment = null;
@@ -75,7 +76,8 @@ public class GPXParser {
             // Parsing the GPX file
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(inputStream);
+            Document doc = dBuilder.parse(segmentFile);
+            String fileName = segmentFile.getName();
 
             // Normalizing the XML structure to prevent errors
             doc.getDocumentElement().normalize();
@@ -102,7 +104,7 @@ public class GPXParser {
             {
                 throw new RuntimeException("Could not parse the file successfully.");
             }
-            segment = new Segment(waypoints);
+            segment = new Segment(waypoints, fileName);
         }
         catch (Exception e)
         {

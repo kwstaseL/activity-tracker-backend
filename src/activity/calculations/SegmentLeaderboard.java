@@ -6,12 +6,15 @@ import java.util.TreeSet;
 public class SegmentLeaderboard implements Serializable
 {
     private final TreeSet<UserSegmentStatistics> statistics;
+    private final String fileName;
     private final int segmentID;
 
-    public SegmentLeaderboard(int segmentID)
+    public SegmentLeaderboard(int segmentID, String fileName)
     {
         this.statistics = new TreeSet<>();
         this.segmentID = segmentID;
+        this.fileName = fileName;
+        System.out.println(getTrimmedFileName());
     }
 
     public void registerSegmentStatistics(UserSegmentStatistics userSegmentStatistics)
@@ -19,8 +22,20 @@ public class SegmentLeaderboard implements Serializable
         this.statistics.add(userSegmentStatistics);
     }
 
+    public TreeSet<UserSegmentStatistics> getLeaderboard()
+    {
+        return this.statistics;
+    }
+
+    public String getTrimmedFileName()
+    {
+        int fileTypeIndex = fileName.indexOf(".gpx");
+        return fileName.substring(0, fileTypeIndex);
+    }
+
     @Override
-    public String toString() {
+    public String toString()
+    {
         StringBuilder toReturn = new StringBuilder(String.format("Found a segment!%nLeaderboard:%n"));
         for (UserSegmentStatistics userSegmentStatistics : statistics)
         {

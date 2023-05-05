@@ -39,7 +39,7 @@ public class ActivityStats implements Serializable
     {
         for (Segment segment : segments)
         {
-            this.segmentStatsList.add(new SegmentStats(segment.getSegmentID()));
+            this.segmentStatsList.add(new SegmentStats(segment.getSegmentID(), segment.getFileName()));
         }
     }
 
@@ -56,7 +56,7 @@ public class ActivityStats implements Serializable
         {
             int segmentID = segment.getSegmentID();
 
-            int segmentStatsIndex = segmentStatsList.indexOf(new SegmentStats(segmentID));
+            int segmentStatsIndex = segmentStatsList.indexOf(new SegmentStats(segmentID, segment.getFileName()));
 
             if (segmentStatsIndex == -1)
             {

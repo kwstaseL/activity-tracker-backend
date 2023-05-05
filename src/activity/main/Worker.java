@@ -77,13 +77,13 @@ public class Worker
                     throw new RuntimeException("Received unknown object.");
                 }
 
-            } catch (IOException | ClassNotFoundException e)
+            }
+            catch (IOException | ClassNotFoundException e)
             {
                 System.out.println("Could not receive object");
                 shutdown();
                 System.out.println("Error: " + e.getMessage());
             }
-
         }
     }
 

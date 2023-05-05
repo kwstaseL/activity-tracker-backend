@@ -56,7 +56,7 @@ public class Waypoint implements Serializable
         if (this == o) return true;
         if (!(o instanceof Waypoint)) return false;
 
-        // Calculates the distance between two waypoints. If the distance is less than 5 metres, the 2 waypoints are considered equal.
+        // Calculates the distance between two waypoints. If the distance is less than 10 metres, the 2 waypoints are considered equal.
         return ActivityCalculator.calculateDistanceInMeters(this,(Waypoint) o) <= gpsError;
     }
 }

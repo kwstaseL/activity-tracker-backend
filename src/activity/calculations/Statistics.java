@@ -74,7 +74,7 @@ public class Statistics implements Serializable
             int segmentID = segment.getSegmentID();
             if (!this.segmentStatistics.containsKey(segmentID))
             {
-                segmentStatistics.put(segmentID, new SegmentLeaderboard(segmentID));
+                segmentStatistics.put(segmentID, new SegmentLeaderboard(segmentID, segment.getFileName()));
             }
             SegmentLeaderboard leaderboard = segmentStatistics.get(segmentID);
             leaderboard.registerSegmentStatistics(new UserSegmentStatistics(segmentID, user, segment.getTime()));

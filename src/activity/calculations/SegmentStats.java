@@ -4,12 +4,14 @@ import java.io.Serializable;
 
 public class SegmentStats implements Serializable
 {
-    private final int segmentID;
+    private final int segmentID;    // represents the id of the segment this SegmentStats instance represents
+    private final String fileName;  // represents the name of the segment file
     private double time;
 
-    SegmentStats(int segmentID)
+    SegmentStats(int segmentID, String fileName)
     {
         this.segmentID = segmentID;
+        this.fileName = fileName;
         this.time = 0;
     }
 
@@ -26,6 +28,11 @@ public class SegmentStats implements Serializable
     public int getSegmentID()
     {
         return this.segmentID;
+    }
+
+    public String getFileName()
+    {
+        return fileName;
     }
 
     @Override

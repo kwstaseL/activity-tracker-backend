@@ -130,7 +130,7 @@ public class WorkDispatcher implements Runnable
 
     private int calculateChunkSize(int numWaypoints)
     {
-        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2
+        // if there's more waypoints than workers provided, make n equal to waypoints.size / TODO: change? workers.size * 2
         synchronized (readLock)
         {
             if (numWaypoints >= workers.size())

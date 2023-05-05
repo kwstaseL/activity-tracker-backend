@@ -7,13 +7,15 @@ import java.util.Objects;
 public class Segment implements Serializable
 {
     private final ArrayList<Waypoint> waypoints;
+    private final String fileName;
     private final int segmentID;
     private static int segmentIDGenerator = 0;
 
-    public Segment(ArrayList<Waypoint> waypoints)
+    public Segment(ArrayList<Waypoint> waypoints, String fileName)
     {
         this.waypoints = waypoints;
         segmentID = segmentIDGenerator++;
+        this.fileName = fileName;
     }
 
     public ArrayList<Waypoint> getWaypoints()
@@ -24,6 +26,11 @@ public class Segment implements Serializable
     public int getSegmentID()
     {
         return segmentID;
+    }
+
+    public String getFileName()
+    {
+        return fileName;
     }
 
     @Override
