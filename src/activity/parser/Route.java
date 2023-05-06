@@ -56,7 +56,8 @@ public class Route implements Serializable
         }
     }
 
-    // getSegmentStartingIndex: If the segment is already registered in a route's segments, returns its starting value. Otherwise, returns -1.
+    // getSegmentStartingIndex: If the segment is already registered in a route's segments, returns its starting value.
+    // Otherwise, returns -1.
     private int getSegmentStartingIndex(Segment segment)
     {
         if (segments.contains(segment))

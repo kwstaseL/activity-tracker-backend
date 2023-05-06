@@ -3,10 +3,14 @@ package activity.calculations;
 import java.io.Serializable;
 import java.util.Objects;
 
+// UserSegmentStatistics: A class that represents the statistics for a specific segment for a specific user
 public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>, Serializable
 {
+    // segmentID: The ID of the segment this UserSegmentStatistics is for
     private int segmentID;
+    // username: The username of the user this UserSegmentStatistics is for
     private String username;
+    // time: The time it took for the user to complete the segment
     private final double time;
 
     public UserSegmentStatistics(int segmentID, String username, double time)
@@ -16,6 +20,7 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>,
         this.time = time;
     }
 
+    // compareTo: Used to compare two UserSegmentStatistics when inserting them into a TreeSet for the leaderboard
     @Override
     public int compareTo(UserSegmentStatistics o)
     {
@@ -35,6 +40,8 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>,
         }
     }
 
+    // Equals function that only compares the segmentID, username and time between two UserSegmentStatistics
+    // Used for the TreeSet, to handle the case where two users have the same time for a segment
     @Override
     public boolean equals(Object o)
     {

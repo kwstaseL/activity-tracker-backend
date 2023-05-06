@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <User_Statistics>
+    <User Routes_Recorded="3" Total_Activity_Time="55.88333333333333" Total_Distance="13.11758774126834" Total_Elevation="119.84000000000003" Username="user1"/>
+    <User Routes_Recorded="1" Total_Activity_Time="104.21666666666667" Total_Distance="42.014284305685" Total_Elevation="46.690000000000005" Username="user5"/>
     <User Routes_Recorded="1" Total_Activity_Time="25.316666666666666" Total_Distance="10.20248982729987" Total_Elevation="0.0" Username="user4"/>
 </User_Statistics>

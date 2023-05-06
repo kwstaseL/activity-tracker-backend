@@ -64,6 +64,7 @@ public class ActivityCalculator
     // Calculating the elevation between two waypoints
     protected static double calculateElevation(Waypoint w1, Waypoint w2)
     {
+        // if the elevation of w2 is greater than w1, return the difference between the two elevations
         if (w2.getElevation() > w1.getElevation())
         {
             return w2.getElevation() - w1.getElevation();

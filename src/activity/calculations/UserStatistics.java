@@ -1,9 +1,8 @@
 package activity.calculations;
 
-// UserStatistics: Contains the total distance, elevation and activity time recorded for a specific user. Also keeps track of how many routesRecorded they have registered.
-
 import java.io.Serializable;
 
+// UserStatistics: A class that represents the statistics for a specific user
 public class UserStatistics implements Serializable
 {
     private double totalDistance;

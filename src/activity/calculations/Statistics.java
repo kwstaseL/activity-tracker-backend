@@ -33,7 +33,7 @@ public class Statistics implements Serializable
     // userStats: A hashmap matching each user to their respective statistics.
     private final HashMap<String, UserStatistics> userStats;
 
-    // segmentStatistics: Matches a segmentID (integer) to a list of user stats for that segment
+    // segmentStatistics: Matches a segmentID to a list of user stats for that segment
     private final HashMap<Integer, SegmentLeaderboard> segmentStatistics = new HashMap<>();
 
     public Statistics()
@@ -68,20 +68,24 @@ public class Statistics implements Serializable
         totalActivityTime += activityStats.getTime();
         ++routesRecorded;
 
+        // Extracting all the segment stats this user has done, and updating the segment statistics
         ArrayList<SegmentStats> segmentStatsList = activityStats.getSegmentStatsList();
         for (SegmentStats segment : segmentStatsList)
         {
             int segmentID = segment.getSegmentID();
             if (!this.segmentStatistics.containsKey(segmentID))
             {
+                // Creating a new SegmentLeaderBoard for that specific segment if it does not exist
                 segmentStatistics.put(segmentID, new SegmentLeaderboard(segmentID, segment.getFileName()));
             }
+            // If the leaderboard for that segment already exists, we register the segment statistics for that user
             SegmentLeaderboard leaderboard = segmentStatistics.get(segmentID);
             leaderboard.registerSegmentStatistics(new UserSegmentStatistics(segmentID, user, segment.getTime()));
         }
     }
 
-    // registerStatistics: Called when adding a new UserStatistics instance to our database, when loading stats from the XML file.
+    // registerStatistics: Called when adding a new UserStatistics instance to our database,
+    // when loading stats from the XML file.
     public void registerStatistics(UserStatistics userStatistics)
     {
         this.routesRecorded += userStatistics.getRoutesRecorded();
@@ -90,6 +94,7 @@ public class Statistics implements Serializable
         this.totalActivityTime += userStatistics.getTotalActivityTime();
     }
 
+    // Returns the leaderboard for a specific segment
     public SegmentLeaderboard getLeaderboard(int segmentID)
     {
         if (!segmentStatistics.containsKey(segmentID))
@@ -136,7 +141,8 @@ public class Statistics implements Serializable
         }
     }
 
-    // initialise: Called upon Statistics initialisation, loads data from our "statistics.xml" file
+    // initialise: Called upon Statistics initialisation, loads data into both the userStats hashmap and the segmentStatistics hashmap
+    // for the statistics xml file and for each segment xml file for all users.
     public void loadStats()
     {
         try
@@ -149,6 +155,7 @@ public class Statistics implements Serializable
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            // Finding the statistics file and parsing it
             Document doc = dBuilder.parse(new File(statisticsPath + File.separator + statisticsFilename));
 
             // Normalizing the XML structure to prevent errors
@@ -166,24 +173,22 @@ public class Statistics implements Serializable
                 double totalElevation = Double.parseDouble(currentElement.getAttribute("Total_Elevation"));
                 double totalActivityTime = Double.parseDouble(currentElement.getAttribute("Total_Activity_Time"));
 
+                // Creating a new UserStatistics instance for that user and registering it in the userStats hashmap, also registering the stats
                 UserStatistics userStatistics = new UserStatistics(user, routesForUser, totalDistance, totalElevation, totalActivityTime);
                 userStats.put(user, userStatistics);
                 registerStatistics(userStatistics);
             }
 
-
+            // Finding all the segment files and parsing them
             File statsDir = new File(statisticsPath);
-
-            File[] statsFiles = statsDir.listFiles(new FilenameFilter()
-            {
-                public boolean accept(File dir, String name) {
-                    return name.startsWith("segment") && name.endsWith(".xml");
-                }
-            });
+            // Filtering the files to only get the segment files
+            File[] statsFiles = statsDir.listFiles((dir, name) -> name.startsWith("segment") && name.endsWith(".xml"));
 
             DocumentBuilderFactory dbFactor = DocumentBuilderFactory.newInstance();
             DocumentBuilder dbBuilder = dbFactor.newDocumentBuilder();
 
+            // for all the segment files, we parse them and load the stats into the segmentStatistics hashmap
+            assert statsFiles != null;
             for (File statsFile : statsFiles)
             {
                 Document document = dbBuilder.parse(statsFile);
@@ -198,6 +203,7 @@ public class Statistics implements Serializable
                     String fileName = currentElement.getAttribute("File_Name");
                     NodeList userNodeListForSegment = currentElement.getElementsByTagName("User");
 
+                    // Creating a new SegmentLeaderboard instance for that segment and registering it in the segmentStatistics hashmap
                     SegmentLeaderboard segmentLeaderboard = new SegmentLeaderboard(segmentID, fileName);
 
                     for (int j = 0; j < userNodeListForSegment.getLength(); j++)
@@ -206,14 +212,13 @@ public class Statistics implements Serializable
                         String user = currentUserElement.getAttribute("Username");
                         double time = Double.parseDouble(currentUserElement.getAttribute("Time"));
 
+                        // Creating a new UserSegmentStatistics instance for that user and registering it in the segmentLeaderboard
                         UserSegmentStatistics segmentUserStatistics = new UserSegmentStatistics(segmentID, user, time);
                         segmentLeaderboard.registerSegmentStatistics(segmentUserStatistics);
                     }
                     segmentStatistics.put(segmentID, segmentLeaderboard);
                 }
             }
-
-
 
         }
         catch (ParserConfigurationException e)
@@ -234,10 +239,13 @@ public class Statistics implements Serializable
         }
     }
 
+    // createFile: Called when closing the connection with the user, creates the statistics file and writes the statistics for all users to it.
+    // also for each segment, creates a new xml file and writes the statistics for that segment to it of the users who have completed it.
     public void createFile()
     {
         try
         {
+            // Create the statistics.xml file and write the statistics for all users to it
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.newDocument();
@@ -261,7 +269,7 @@ public class Statistics implements Serializable
                 root.appendChild(userElement);
             }
 
-            // write user statistics to separate files for each segment
+            // write user statistics to separate files for each segment, same as above
             for (Integer segmentID : segmentStatistics.keySet())
             {
                 SegmentLeaderboard statisticsForSegment = segmentStatistics.get(segmentID);
