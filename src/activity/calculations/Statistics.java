@@ -273,7 +273,7 @@ public class Statistics implements Serializable
                 Document segmentDoc = builder.newDocument();
                 Element segmentRoot = segmentDoc.createElement("Segment_Statistics");
                 segmentRoot.setAttribute("segmentID",segID);
-                segmentRoot.setAttribute("File_Name", segmentName + ".xml");
+                segmentRoot.setAttribute("File_Name", segmentName + ".gpx");
                 segmentDoc.appendChild(segmentRoot);
 
                 // loop through the TreeSet and add each user to the XML file

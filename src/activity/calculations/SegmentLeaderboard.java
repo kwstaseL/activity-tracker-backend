@@ -29,7 +29,7 @@ public class SegmentLeaderboard implements Serializable
     public String getTrimmedFileName()
     {
         System.out.println("The file : " + fileName);
-        int fileTypeIndex = fileName.indexOf(".gpx");
+        int fileTypeIndex = fileName.trim().indexOf(".gpx");
         return fileName.substring(0, fileTypeIndex);
     }
 
