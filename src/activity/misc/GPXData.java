@@ -12,11 +12,6 @@ public class GPXData implements Serializable
         this.fileContent = fileContent;
     }
 
-    public String getFileName()
-    {
-        return fileName;
-    }
-
     public byte[] getFileContent()
     {
         return fileContent;
