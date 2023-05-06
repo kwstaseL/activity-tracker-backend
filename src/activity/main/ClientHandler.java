@@ -106,7 +106,7 @@ public class ClientHandler implements Runnable
                         {
                             throw new RuntimeException("Found more chunks than expected!");
                         }
-                        // Else, if we have accumulated all the chunks we need, we can start reducing
+                        // Else, if we have accumulated all the chunks we need, we can start reducing.
                         else if (activityList.size() == (chunk.getTotalChunks() - 1))
                         {
                             // We add the last chunk to the list
