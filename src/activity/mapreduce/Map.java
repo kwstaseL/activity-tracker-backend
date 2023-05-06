@@ -24,7 +24,7 @@ public class Map
         // checking if the first chunk waypoint is also the first waypoint of a part of a segment this chunk contains
         if (chunk.isFirstSegmentIndex(w1))
         {
-            ArrayList<Segment> segments = chunk.waypointSegments(w1);
+            ArrayList<Segment> segments = chunk.getSegmentsStartingFrom(w1);
             stats.registerSegments(segments);
         }
         
@@ -32,14 +32,17 @@ public class Map
         {
             Waypoint w2 = waypoints.get(i);
 
+            // first, get the segments starting from this waypoint, and register them to the ActivityStats instance
             if (chunk.isFirstSegmentIndex(w2))
             {
-                ArrayList<Segment> segments = chunk.waypointSegments(w2);
+                ArrayList<Segment> segments = chunk.getSegmentsStartingFrom(w2);
                 stats.registerSegments(segments);
             }
-            else if (chunk.isContainedInSegment(w2))
+
+            // then, if this waypoint is inside any of the chunk segments, calculate accordingly
+            if (chunk.isInsideSegment(w2))
             {
-                ArrayList<Segment> segments = chunk.waypointSegments(w2);
+                ArrayList<Segment> segments = chunk.getSegmentsContainingWaypoint(w2);
                 stats.updateSegmentStats(w1, w2, segments);
             }
 

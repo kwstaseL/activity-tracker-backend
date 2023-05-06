@@ -67,13 +67,13 @@ public class Chunk implements Serializable {
         return segmentStartingIndices.contains(indexInChunk);
     }
 
-    // isContainedInSegment: Returns true if the waypoint parameter is contained in a segment this chunk holds.
-    public boolean isContainedInSegment(Waypoint waypoint)
+    // isInsideSegment: Returns true if the waypoint parameter is contained in a segment this chunk holds.
+    public boolean isInsideSegment(Waypoint waypoint)
     {
         int indexInChunk = waypoints.indexOf(waypoint);
         for (int i = 0; i < segmentStartingIndices.size(); i++)
         {
-            if (indexInChunk >= segmentStartingIndices.get(i) && indexInChunk <= segmentEndingIndices.get(i))
+            if (indexInChunk > segmentStartingIndices.get(i) && indexInChunk <= segmentEndingIndices.get(i))
             {
                 return true;
             }
@@ -81,19 +81,31 @@ public class Chunk implements Serializable {
         return false;
     }
 
-    // waypointSegments: Returns the segments this waypoint is contained in
-    public ArrayList<Segment> waypointSegments(Waypoint waypoint)
+    // getSegmentsStartingFrom: Returns all the segments starting from the parameter waypoint
+    public ArrayList<Segment> getSegmentsStartingFrom(Waypoint waypoint)
     {
         ArrayList<Segment> waypointSegments = new ArrayList<>();
-        if (!isContainedInSegment(waypoint))
-        {
-            return waypointSegments;
-        }
 
         int indexInChunk = waypoints.indexOf(waypoint);
         for (int i = 0; i < segments.size(); i++)
         {
-            if (indexInChunk >= segmentStartingIndices.get(i) && indexInChunk <= segmentEndingIndices.get(i))
+            if (indexInChunk == segmentStartingIndices.get(i))
+            {
+                waypointSegments.add(segments.get(i));
+            }
+        }
+        return waypointSegments;
+    }
+
+    // getSegmentsContainingWaypoint: Returns the segments this waypoint is contained in
+    public ArrayList<Segment> getSegmentsContainingWaypoint(Waypoint waypoint)
+    {
+        ArrayList<Segment> waypointSegments = new ArrayList<>();
+
+        int indexInChunk = waypoints.indexOf(waypoint);
+        for (int i = 0; i < segments.size(); i++)
+        {
+            if (indexInChunk > segmentStartingIndices.get(i) && indexInChunk <= segmentEndingIndices.get(i))
             {
                 waypointSegments.add(segments.get(i));
             }
