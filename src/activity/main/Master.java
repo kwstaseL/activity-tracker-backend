@@ -159,6 +159,7 @@ public class Master
             }
             String segmentDirectory = config.getProperty("segment_directory");
 
+            // Create the segments
             File directory = new File(segmentDirectory);
             File[] files = directory.listFiles();
 
