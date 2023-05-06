@@ -222,12 +222,12 @@ public class ClientHandler implements Runnable
                 out.writeObject(statistics.getGlobalStats());
                 out.flush();
 
-                ArrayList<Integer> segmentsInRoute = finalResults.getSegmentIDs();
+                ArrayList<Integer> segmentsInRoute = finalResults.getSegmentHashes();
                 ArrayList<SegmentLeaderboard> segmentLeaderboards = new ArrayList<>();
 
-                for (int segmentID : segmentsInRoute)
+                for (int segmentHash : segmentsInRoute)
                 {
-                    segmentLeaderboards.add(statistics.getLeaderboard(segmentID));
+                    segmentLeaderboards.add(statistics.getLeaderboard(segmentHash));
                 }
 
                 out.writeObject(segmentLeaderboards);

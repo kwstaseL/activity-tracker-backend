@@ -33,7 +33,7 @@ public class Statistics implements Serializable
     // userStats: A hashmap matching each user to their respective statistics.
     private final HashMap<String, UserStatistics> userStats;
 
-    // segmentStatistics: Matches a segmentID to a list of user stats for that segment
+    // segmentStatistics: Matches the hashcode (integer) of a segment name, to a leaderboard of user stats for that segment
     private final HashMap<Integer, SegmentLeaderboard> segmentStatistics = new HashMap<>();
 
     public Statistics()
@@ -72,15 +72,15 @@ public class Statistics implements Serializable
         ArrayList<SegmentStats> segmentStatsList = activityStats.getSegmentStatsList();
         for (SegmentStats segment : segmentStatsList)
         {
-            int segmentID = segment.getSegmentID();
-            if (!this.segmentStatistics.containsKey(segmentID))
+            int segmentHash = segment.getFileName().hashCode();
+            if (!this.segmentStatistics.containsKey(segmentHash))
             {
                 // Creating a new SegmentLeaderBoard for that specific segment if it does not exist
-                segmentStatistics.put(segmentID, new SegmentLeaderboard(segmentID, segment.getFileName()));
+                segmentStatistics.put(segmentHash, new SegmentLeaderboard(segmentHash, segment.getFileName()));
             }
             // If the leaderboard for that segment already exists, we register the segment statistics for that user
-            SegmentLeaderboard leaderboard = segmentStatistics.get(segmentID);
-            leaderboard.registerSegmentStatistics(new UserSegmentStatistics(segmentID, user, segment.getTime()));
+            SegmentLeaderboard leaderboard = segmentStatistics.get(segmentHash);
+            leaderboard.registerSegmentStatistics(new UserSegmentStatistics(segmentHash, user, segment.getTime()));
         }
     }
 
@@ -95,13 +95,13 @@ public class Statistics implements Serializable
     }
 
     // Returns the leaderboard for a specific segment
-    public SegmentLeaderboard getLeaderboard(int segmentID)
+    public SegmentLeaderboard getLeaderboard(int segmentHash)
     {
-        if (!segmentStatistics.containsKey(segmentID))
+        if (!segmentStatistics.containsKey(segmentHash))
         {
             throw new RuntimeException("Could not find the segment.");
         }
-        return segmentStatistics.get(segmentID);
+        return segmentStatistics.get(segmentHash);
     }
 
     // fileExists: Returns true if the statistics file already exists, false otherwise.
@@ -182,14 +182,14 @@ public class Statistics implements Serializable
             // Finding all the segment files and parsing them
             File statsDir = new File(statisticsPath);
             // Filtering the files to only get the segment files
-            File[] statsFiles = statsDir.listFiles((dir, name) -> name.startsWith("segment") && name.endsWith(".xml"));
+            File[] segmentStatsFiles = statsDir.listFiles((dir, name) -> name.startsWith("segment") && name.endsWith(".xml"));
 
             DocumentBuilderFactory dbFactor = DocumentBuilderFactory.newInstance();
             DocumentBuilder dbBuilder = dbFactor.newDocumentBuilder();
 
             // for all the segment files, we parse them and load the stats into the segmentStatistics hashmap
-            assert statsFiles != null;
-            for (File statsFile : statsFiles)
+            assert segmentStatsFiles != null;
+            for (File statsFile : segmentStatsFiles)
             {
                 Document document = dbBuilder.parse(statsFile);
                 document.getDocumentElement().normalize();
@@ -199,12 +199,13 @@ public class Statistics implements Serializable
                 for (int i = 0; i < segmentNodeList.getLength(); i++)
                 {
                     Element currentElement = (Element) segmentNodeList.item(i);
-                    int segmentID = Integer.parseInt(currentElement.getAttribute("segmentID"));
+
                     String fileName = currentElement.getAttribute("File_Name");
+                    int segmentHash = fileName.hashCode();
                     NodeList userNodeListForSegment = currentElement.getElementsByTagName("User");
 
                     // Creating a new SegmentLeaderboard instance for that segment and registering it in the segmentStatistics hashmap
-                    SegmentLeaderboard segmentLeaderboard = new SegmentLeaderboard(segmentID, fileName);
+                    SegmentLeaderboard segmentLeaderboard = new SegmentLeaderboard(segmentHash, fileName);
 
                     for (int j = 0; j < userNodeListForSegment.getLength(); j++)
                     {
@@ -213,10 +214,10 @@ public class Statistics implements Serializable
                         double time = Double.parseDouble(currentUserElement.getAttribute("Time"));
 
                         // Creating a new UserSegmentStatistics instance for that user and registering it in the segmentLeaderboard
-                        UserSegmentStatistics segmentUserStatistics = new UserSegmentStatistics(segmentID, user, time);
+                        UserSegmentStatistics segmentUserStatistics = new UserSegmentStatistics(segmentHash, user, time);
                         segmentLeaderboard.registerSegmentStatistics(segmentUserStatistics);
                     }
-                    segmentStatistics.put(segmentID, segmentLeaderboard);
+                    segmentStatistics.put(segmentHash, segmentLeaderboard);
                 }
             }
 
@@ -270,17 +271,16 @@ public class Statistics implements Serializable
             }
 
             // write user statistics to separate files for each segment, same as above
-            for (Integer segmentID : segmentStatistics.keySet())
+            for (Integer segmentHash : segmentStatistics.keySet())
             {
-                SegmentLeaderboard statisticsForSegment = segmentStatistics.get(segmentID);
+                SegmentLeaderboard statisticsForSegment = segmentStatistics.get(segmentHash);
                 TreeSet<UserSegmentStatistics> userStatistics = statisticsForSegment.getLeaderboard();
-                String segID = String.valueOf(segmentID);
                 String segmentName = statisticsForSegment.getTrimmedFileName();
 
                 // create a new document for this segment
                 Document segmentDoc = builder.newDocument();
                 Element segmentRoot = segmentDoc.createElement("Segment_Statistics");
-                segmentRoot.setAttribute("segmentID",segID);
+
                 segmentRoot.setAttribute("File_Name", segmentName + ".gpx");
                 segmentDoc.appendChild(segmentRoot);
 

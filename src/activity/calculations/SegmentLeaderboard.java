@@ -12,12 +12,12 @@ public class SegmentLeaderboard implements Serializable
     // fileName: The name of the file this segment was extracted from
     private final String fileName;
     // segmentID: The ID of this segment the leaderboard is for
-    private final int segmentID;
+    private final int segmentHash;
 
-    public SegmentLeaderboard(int segmentID, String fileName)
+    public SegmentLeaderboard(int segmentHash, String fileName)
     {
         this.statistics = new TreeSet<>();
-        this.segmentID = segmentID;
+        this.segmentHash = segmentHash;
         this.fileName = fileName;
     }
     // Used in the Statistics class to add a UserSegmentStatistics to the leaderboard
@@ -30,6 +30,7 @@ public class SegmentLeaderboard implements Serializable
     {
         return this.statistics;
     }
+
     public String getTrimmedFileName()
     {
         int fileTypeIndex = fileName.trim().indexOf(".gpx");

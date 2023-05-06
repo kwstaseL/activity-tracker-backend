@@ -110,13 +110,13 @@ public class ActivityStats implements Serializable
         return this.segmentStatsList;
     }
 
-    // Returns an arraylist of all the segmentIDs we have calculated the stats for
-    public ArrayList<Integer> getSegmentIDs()
+    // Returns an arraylist of all the hash codes of the file names of the segments we have calculated the stats for
+    public ArrayList<Integer> getSegmentHashes()
     {
         ArrayList<Integer> segmentIDs = new ArrayList<>();
         for (SegmentStats segmentStats : segmentStatsList)
         {
-            segmentIDs.add(segmentStats.getSegmentID());
+            segmentIDs.add(segmentStats.getFileName().hashCode());
         }
         return segmentIDs;
     }
