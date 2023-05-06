@@ -19,7 +19,8 @@ public class ActivityStats implements Serializable
     private final int routeID;
 
     // Constructor used for the map/reduce phase for the final results
-    public ActivityStats(int routeID, double distance, double speed, double elevation, double time, ArrayList<SegmentStats> segmentStatsList)
+    public ActivityStats(int routeID, double distance, double speed, double elevation,
+                         double time, ArrayList<SegmentStats> segmentStatsList)
     {
         this.routeID = routeID;
         this.distance = distance;
@@ -43,14 +44,14 @@ public class ActivityStats implements Serializable
         }
     }
 
-    public void update(Waypoint w1, Waypoint w2)
+    public void updateStats(Waypoint w1, Waypoint w2)
     {
         this.distance += ActivityCalculator.calculateDistanceInKilometers(w1, w2);
         this.time += ActivityCalculator.calculateTime(w1, w2);
         this.elevation += ActivityCalculator.calculateElevation(w1, w2);
     }
 
-    public void segmentUpdate(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
+    public void updateSegmentStats(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
     {
         for (Segment segment : segments)
         {
@@ -68,7 +69,7 @@ public class ActivityStats implements Serializable
         }
     }
 
-    public void finalise()
+    public void finaliseStats()
     {
         this.speed = (time > 0) ? distance / (time / 60.0) : 0.0;
     }

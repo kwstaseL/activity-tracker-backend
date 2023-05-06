@@ -7,7 +7,6 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>,
 {
     private int segmentID;
     private String username;
-
     private final double time;
 
     public UserSegmentStatistics(int segmentID, String username, double time)
@@ -42,6 +41,16 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>,
         if (this == o) return true;
         if (!(o instanceof UserSegmentStatistics that)) return false;
         return segmentID == that.segmentID && Double.compare(that.time, time) == 0 && Objects.equals(username, that.username);
+    }
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public double getTime()
+    {
+        return time;
     }
 
     @Override

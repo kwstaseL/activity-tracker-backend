@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.TreeSet;
 
 /* Statistics: The class that will be in charge of handling all the related statistics.
  * Will maintain a hashmap of users-UserStatistics, a counter of the routes recorded,
@@ -33,7 +34,6 @@ public class Statistics implements Serializable
     private final HashMap<String, UserStatistics> userStats;
 
     // segmentStatistics: Matches a segmentID (integer) to a list of user stats for that segment
-    // TODO: Introduce reading/writing to a file for segmentStatistics
     private final HashMap<Integer, SegmentLeaderboard> segmentStatistics = new HashMap<>();
 
     public Statistics()
@@ -170,6 +170,51 @@ public class Statistics implements Serializable
                 userStats.put(user, userStatistics);
                 registerStatistics(userStatistics);
             }
+
+
+            File statsDir = new File(statisticsPath);
+
+            File[] statsFiles = statsDir.listFiles(new FilenameFilter()
+            {
+                public boolean accept(File dir, String name) {
+                    return name.startsWith("segment") && name.endsWith(".xml");
+                }
+            });
+
+            DocumentBuilderFactory dbFactor = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dbBuilder = dbFactor.newDocumentBuilder();
+
+            for (File statsFile : statsFiles)
+            {
+                Document document = dbBuilder.parse(statsFile);
+                document.getDocumentElement().normalize();
+
+                // Load stats for segments
+                NodeList segmentNodeList = document.getElementsByTagName("Segment_Statistics");
+                for (int i = 0; i < segmentNodeList.getLength(); i++)
+                {
+                    Element currentElement = (Element) segmentNodeList.item(i);
+                    int segmentID = Integer.parseInt(currentElement.getAttribute("segmentID"));
+                    String fileName = currentElement.getAttribute("File_Name");
+                    NodeList userNodeListForSegment = currentElement.getElementsByTagName("User");
+
+                    SegmentLeaderboard segmentLeaderboard = new SegmentLeaderboard(segmentID, fileName);
+
+                    for (int j = 0; j < userNodeListForSegment.getLength(); j++)
+                    {
+                        Element currentUserElement = (Element) userNodeListForSegment.item(j);
+                        String user = currentUserElement.getAttribute("Username");
+                        double time = Double.parseDouble(currentUserElement.getAttribute("Time"));
+
+                        UserSegmentStatistics segmentUserStatistics = new UserSegmentStatistics(segmentID, user, time);
+                        segmentLeaderboard.registerSegmentStatistics(segmentUserStatistics);
+                    }
+                    segmentStatistics.put(segmentID, segmentLeaderboard);
+                }
+            }
+
+
+
         }
         catch (ParserConfigurationException e)
         {
@@ -189,7 +234,6 @@ public class Statistics implements Serializable
         }
     }
 
-    // createFile: Called when first creating the file. Writes down the statistics for all users currently registered
     public void createFile()
     {
         try
@@ -203,8 +247,7 @@ public class Statistics implements Serializable
             doc.appendChild(root);
 
             // for all the users currently registered, write their statistics to the xml file
-            for (String user : userStats.keySet())
-            {
+            for (String user : userStats.keySet()) {
                 UserStatistics statisticsForUser = userStats.get(user);
 
                 Element userElement = doc.createElement("User");
@@ -218,6 +261,47 @@ public class Statistics implements Serializable
                 root.appendChild(userElement);
             }
 
+            // write user statistics to separate files for each segment
+            for (Integer segmentID : segmentStatistics.keySet())
+            {
+                SegmentLeaderboard statisticsForSegment = segmentStatistics.get(segmentID);
+                TreeSet<UserSegmentStatistics> userStatistics = statisticsForSegment.getLeaderboard();
+                String segID = String.valueOf(segmentID);
+                String segmentName = statisticsForSegment.getTrimmedFileName();
+
+                // create a new document for this segment
+                Document segmentDoc = builder.newDocument();
+                Element segmentRoot = segmentDoc.createElement("Segment_Statistics");
+                segmentRoot.setAttribute("segmentID",segID);
+                segmentRoot.setAttribute("File_Name", segmentName + ".xml");
+                segmentDoc.appendChild(segmentRoot);
+
+                // loop through the TreeSet and add each user to the XML file
+                for (UserSegmentStatistics userStat : userStatistics)
+                {
+                    Element userElement = segmentDoc.createElement("User");
+                    userElement.setAttribute("Username", userStat.getUsername());
+                    userElement.setIdAttribute("Username", true);
+                    userElement.setAttribute("Time", String.valueOf(userStat.getTime()));
+                    segmentRoot.appendChild(userElement);
+                }
+
+                // write the segment document to a separate file
+                DOMSource segmentSource = new DOMSource(segmentDoc);
+                Properties config = new Properties();
+                config.load(new FileInputStream("config.properties"));
+                String path = Paths.get(config.getProperty("statistics_directory"),  segmentName + "_results.xml").toString();
+
+                File file = new File(path);
+                Result result = new StreamResult(file);
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.transform(segmentSource, result);
+            }
+
+            // write user statistics to a single file
             DOMSource source = new DOMSource(doc);
             Properties config = new Properties();
             config.load(new FileInputStream("config.properties"));
@@ -253,7 +337,6 @@ public class Statistics implements Serializable
             throw new RuntimeException("Could not transform file.");
         }
     }
-
 
     // getUserStats: Returns the UserStatistics object associated with a specific user.
     public UserStatistics getUserStats(String user)

@@ -37,15 +37,14 @@ public class Reduce
             // for each segment stats in the list above:
             for (SegmentStats segmentStats : chunkSegmentStats)
             {
+                // check if these segment stats are already included in our final stats (by comparing their segmentID)
                 int segmentStatsIndex = finalSegmentStats.indexOf(segmentStats);
-
-                // if these segment stats are not included in our final stats
+                // if these segment stats are not included in our final stats yet, add them
                 if (segmentStatsIndex == -1)
                 {
                     finalSegmentStats.add(segmentStats);
                     continue;
                 }
-
                 // else (meaning we have already found other stats about this segment), update the total time
                 SegmentStats currentSegmentStats = finalSegmentStats.get(segmentStatsIndex);
                 currentSegmentStats.timeUpdate(segmentStats.getTime());

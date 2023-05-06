@@ -10,18 +10,17 @@ import java.time.format.DateTimeFormatter;
 // It will calculate the distance, time and elevation differences between two waypoints.
 public class ActivityCalculator
 {
-
     // Calculating the time between two waypoints
     protected static double calculateTime(Waypoint w1, Waypoint w2)
     {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         LocalDateTime t1 = LocalDateTime.parse(w1.getTimestamp(), formatter);
         LocalDateTime t2 = LocalDateTime.parse(w2.getTimestamp(), formatter);
         Duration duration = Duration.between(t1, t2);
         double timeInSeconds = duration.getSeconds();
         return timeInSeconds / 60.0f;   // /60.0f to get the current time in hours
     }
-
 
     // Calculating the distance between two waypoints in meters
     public static double calculateDistanceInMeters(Waypoint w1, Waypoint w2)
@@ -59,7 +58,7 @@ public class ActivityCalculator
     public static double calculateDistanceInKilometers(Waypoint w1, Waypoint w2)
     {
         // Converting to Kilometers
-        return calculateDistanceInMeters(w1, w2)/1000;
+        return calculateDistanceInMeters(w1, w2)/ 1000;
     }
 
     // Calculating the elevation between two waypoints

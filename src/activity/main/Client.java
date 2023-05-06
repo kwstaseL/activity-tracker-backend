@@ -146,7 +146,6 @@ public class Client
             {
                 System.out.println(i + ": " + filteredFiles[i].getName());
             }
-
             // Prompt user to select a route
             Integer choice = null;
 

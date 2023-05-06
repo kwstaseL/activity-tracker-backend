@@ -27,7 +27,7 @@ public class Map
             ArrayList<Segment> segments = chunk.waypointSegments(w1);
             stats.registerSegments(segments);
         }
-
+        
         for (int i = 1; i < waypoints.size(); ++i)
         {
             Waypoint w2 = waypoints.get(i);
@@ -40,13 +40,13 @@ public class Map
             else if (chunk.isContainedInSegment(w2))
             {
                 ArrayList<Segment> segments = chunk.waypointSegments(w2);
-                stats.segmentUpdate(w1, w2, segments);
+                stats.updateSegmentStats(w1, w2, segments);
             }
 
-            stats.update(w1, w2);
+            stats.updateStats(w1, w2);
             w1 = waypoints.get(i);
         }
-        stats.finalise();
+        stats.finaliseStats();
 
         // statsPair: Represents a pair of chunk and the activity stats calculated for it
         Pair<Chunk, ActivityStats> statsPair = new Pair<>(chunk, stats);

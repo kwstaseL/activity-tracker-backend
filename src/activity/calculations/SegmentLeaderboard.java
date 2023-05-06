@@ -14,7 +14,6 @@ public class SegmentLeaderboard implements Serializable
         this.statistics = new TreeSet<>();
         this.segmentID = segmentID;
         this.fileName = fileName;
-        System.out.println(getTrimmedFileName());
     }
 
     public void registerSegmentStatistics(UserSegmentStatistics userSegmentStatistics)
@@ -29,6 +28,7 @@ public class SegmentLeaderboard implements Serializable
 
     public String getTrimmedFileName()
     {
+        System.out.println("The file : " + fileName);
         int fileTypeIndex = fileName.indexOf(".gpx");
         return fileName.substring(0, fileTypeIndex);
     }

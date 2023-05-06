@@ -7,8 +7,6 @@ import java.util.ArrayList;
  * a variable indicating how many chunks in total the route was split into, and a variable indicating
  * the index of the chunk being currently processed amongst the total chunks                        */
 
-// TODO: Write the 2 extra methods to account for segment overlapping
-
 public class Chunk implements Serializable {
 
     // route represents the original route this chunk is a part of
@@ -16,6 +14,7 @@ public class Chunk implements Serializable {
 
     // Total chunks is the total number of chunks the route was split into
     private final int totalChunks;
+
     private final ArrayList<Waypoint> waypoints;
 
     /* segments, segmentStartingIndices, segmentEndingIndices:
@@ -53,7 +52,6 @@ public class Chunk implements Serializable {
     {
         return totalChunks;
     }
-
 
     /* registerSegments: Called on the route this chunk belongs to. The route calls
      * addSegment for all the segments that are contained in this chunk. */
