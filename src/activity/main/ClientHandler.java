@@ -95,41 +95,34 @@ public class ClientHandler implements Runnable
                 Chunk chunk = stats.getKey();
                 int routeID = chunk.getRoute().getRouteID();
 
+                System.out.println();
+
                 synchronized (routeHashmap)
                 {
-                    // If the route already exists in the hashmap, we add the chunk to the list of chunks
+                    ArrayList<Pair<Chunk, ActivityStats>> activityList;
+
+                    /* if the route already exists in the hashmap, fetch the list of the results for the chunks this
+                     * route contains. Else, create a new list for this route's chunks                         */
                     if (routeHashmap.containsKey(routeID))
                     {
-                        ArrayList<Pair<Chunk, ActivityStats>> activityList = routeHashmap.get(routeID);
-                        // If the chunks we received are more than what we expected, we throw an exception
+                        activityList = routeHashmap.get(routeID);
+                        // If the chunks received are more than expected, throw an exception
                         if (activityList.size() >= chunk.getTotalChunks())
                         {
                             throw new RuntimeException("Found more chunks than expected!");
                         }
-                        // Else, if we have accumulated all the chunks we need, we can start reducing.
-                        else if (activityList.size() == (chunk.getTotalChunks() - 1))
-                        {
-                            // We add the last chunk to the list
-                            activityList.add(stats);
-                            // We add the list to the hashmap for the specific route
-                            routeHashmap.put(routeID, activityList);
-                            // and then we start the reducing phase
-                            processChunks(chunk, activityList);
-                        }
-                        // Else, we just add the chunk to the list
-                        else
-                        {
-                            activityList.add(stats);
-                            routeHashmap.put(routeID, activityList);
-                        }
-
-                    // Else if the route does not exist in the hashmap, we create a new list and add the chunk to it
                     }
                     else
                     {
-                        ArrayList<Pair<Chunk, ActivityStats>> activityList = new ArrayList<>();
-                        activityList.add(stats);
-                        routeHashmap.put(routeID, activityList);
+                        activityList = new ArrayList<>();
+                    }
+                    activityList.add(stats);
+                    routeHashmap.put(routeID, activityList);
+
+                    if (activityList.size() == (chunk.getTotalChunks() - 1) || (activityList.size() == 1 && chunk.getTotalChunks() == 1))
+                    {
+                        // and then we start the reducing phase
+                        processChunks(chunk, activityList);
                     }
                 }
             }
@@ -168,8 +161,9 @@ public class ClientHandler implements Runnable
 
                 Object obj = in.readObject();
 
-                if (obj instanceof GPXData gpxData)
+                if (obj instanceof GPXData)
                 {
+                    GPXData gpxData = (GPXData) obj;
                     ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
                     // Parse the file
                     // Create a new thread to handle the parsing of the file

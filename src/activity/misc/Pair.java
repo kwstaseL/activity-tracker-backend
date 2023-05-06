@@ -29,8 +29,9 @@ public class Pair<K, V> implements Serializable
     public boolean equals(Object o)
     {
         if (this == o) return true;
-        if (!(o instanceof Pair<?, ?> pair)) return false;
+        if (!(o instanceof Pair<?, ?>)) return false;
 
+        Pair<?, ?> pair = (Pair<?, ?>) o;
         // making the assumption that 2 pairs will be the same if their keys are the same (used for .contains methods)
         return Objects.equals(key, pair.key);
     }

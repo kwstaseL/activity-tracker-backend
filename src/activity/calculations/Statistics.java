@@ -290,7 +290,7 @@ public class Statistics implements Serializable
                 DOMSource segmentSource = new DOMSource(segmentDoc);
                 Properties config = new Properties();
                 config.load(new FileInputStream("config.properties"));
-                String path = Paths.get(config.getProperty("statistics_directory"),  segmentName + "_results.xml").toString();
+                String path = Paths.get(config.getProperty("statistics_directory"),segmentName + "_statistics.xml").toString();
 
                 File file = new File(path);
                 Result result = new StreamResult(file);

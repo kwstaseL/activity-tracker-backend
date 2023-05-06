@@ -39,7 +39,9 @@ public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>,
     public boolean equals(Object o)
     {
         if (this == o) return true;
-        if (!(o instanceof UserSegmentStatistics that)) return false;
+        if (!(o instanceof UserSegmentStatistics)) return false;
+
+        UserSegmentStatistics that = (UserSegmentStatistics) o;
         return segmentID == that.segmentID && Double.compare(that.time, time) == 0 && Objects.equals(username, that.username);
     }
 

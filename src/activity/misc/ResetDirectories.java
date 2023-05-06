@@ -66,18 +66,12 @@ public class ResetDirectories
 
             for (File file : directoryContents)
             {
-                // add to check if the file starts with "statistics" and ends with ".xml"
-                if (file.getName().endsWith("xml"))
+                // delete all the xml that are related to statistics
+                if (file.getName().endsWith("xml") && file.getName().contains("statistic"))
                 {
-                    boolean deleted = file.delete();
-
-                    if (!deleted)
+                    if (!file.delete())
                     {
                         throw new RuntimeException("Could not delete file.");
-                    }
-                    else
-                    {
-                        System.out.println("Deleted stats file.");
                     }
                 }
             }
