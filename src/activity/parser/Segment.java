@@ -37,7 +37,9 @@ public class Segment implements Serializable
     public boolean equals(Object o)
     {
         if (this == o) return true;
-        if (!(o instanceof Segment segment)) return false;
+        if (!(o instanceof Segment)) return false;
+
+        Segment segment = (Segment) o;
         return segmentID == segment.segmentID && Objects.equals(waypoints, segment.waypoints);
     }
 }

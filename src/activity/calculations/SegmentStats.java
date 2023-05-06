@@ -39,7 +39,8 @@ public class SegmentStats implements Serializable
     public boolean equals(Object o)
     {
         if (this == o) return true;
-        if (!(o instanceof SegmentStats that)) return false;
+        if (!(o instanceof SegmentStats)) return false;
+        SegmentStats that = (SegmentStats) o;
         return segmentID == that.segmentID;
     }
 }

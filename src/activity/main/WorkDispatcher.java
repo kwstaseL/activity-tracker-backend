@@ -108,6 +108,29 @@ public class WorkDispatcher implements Runnable
         }
     }
 
+    private int calculateChunkSize(int waypointsSize)
+    {
+        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2.0
+        synchronized (readLock)
+        {
+            if (waypointsSize >= workers.size())
+            {
+                return (int) Math.ceil(waypointsSize / (double) workers.size());
+            }
+            else
+            {
+                // making the assumption that if workers are more than the waypoints provided, n will be
+                // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
+                return 1;
+            }
+        }
+    }
+
+    private int calculateExpectedChunks(int waypointsSize, int n)
+    {
+        return (int) Math.ceil(waypointsSize / (double) n);
+    }
+
     // Creates the chunk and sends it to a worker
     private void createChunk(Route route, ArrayList<Waypoint> chunkWaypoints, int expectedChunks)
     {
@@ -122,29 +145,5 @@ public class WorkDispatcher implements Runnable
             workers.add(worker);
         }
     }
-
-    private int calculateExpectedChunks(int waypointsSize,int n)
-    {
-        return (int) Math.ceil(waypointsSize / (double) n);
-    }
-
-    private int calculateChunkSize(int numWaypoints)
-    {
-        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2.0
-        synchronized (readLock)
-        {
-            if (numWaypoints >= workers.size())
-            {
-                return (int) Math.ceil(numWaypoints / (workers.size() * 2.0));
-            }
-            else
-            {
-                // making the assumption that if workers are more than the waypoints provided, n will be
-                // equal to 1, to achieve equal load balance between the first (waypoints.size()) workers
-                return 1;
-            }
-        }
-    }
-
 
 }
