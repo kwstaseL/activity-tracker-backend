@@ -144,7 +144,7 @@ public class Master
             Thread workDispatcherThread = new Thread(workDispatcher);
             workDispatcherThread.start();
         });
-
+        // Thread that will create the segments
         Thread createSegments = new Thread(() ->
         {
             // Get the segment files from the directory.
