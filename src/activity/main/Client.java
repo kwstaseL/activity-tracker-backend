@@ -159,7 +159,8 @@ public class Client
                 {
                     choice = Integer.parseInt(input);
 
-                } catch (NumberFormatException e)
+                }
+                catch (NumberFormatException e)
                 {
                     System.out.println("Invalid input. Please enter a valid file index.");
                     continue;
@@ -237,7 +238,7 @@ public class Client
 
             // Creating a GPXData object with the name of the file and the contents of the file
             // and sending it to the master
-            GPXData gpx = new GPXData(selectedGPX.getName(), buffer);
+            GPXData gpx = new GPXData(buffer);
             out.writeObject(gpx);
             out.flush();
         } catch (Exception e)

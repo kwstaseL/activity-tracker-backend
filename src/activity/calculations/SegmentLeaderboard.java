@@ -11,13 +11,10 @@ public class SegmentLeaderboard implements Serializable
     private final TreeSet<UserSegmentStatistics> statistics;
     // fileName: The name of the file this segment was extracted from
     private final String fileName;
-    // segmentID: The ID of this segment the leaderboard is for
-    private final int segmentHash;
 
-    public SegmentLeaderboard(int segmentHash, String fileName)
+    public SegmentLeaderboard(String fileName)
     {
         this.statistics = new TreeSet<>();
-        this.segmentHash = segmentHash;
         this.fileName = fileName;
     }
     // Used in the Statistics class to add a UserSegmentStatistics to the leaderboard

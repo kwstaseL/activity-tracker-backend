@@ -76,7 +76,7 @@ public class Statistics implements Serializable
             if (!this.segmentStatistics.containsKey(segmentHash))
             {
                 // Creating a new SegmentLeaderBoard for that specific segment if it does not exist
-                segmentStatistics.put(segmentHash, new SegmentLeaderboard(segmentHash, segment.getFileName()));
+                segmentStatistics.put(segmentHash, new SegmentLeaderboard(segment.getFileName()));
             }
             // If the leaderboard for that segment already exists, we register the segment statistics for that user
             SegmentLeaderboard leaderboard = segmentStatistics.get(segmentHash);
@@ -205,7 +205,7 @@ public class Statistics implements Serializable
                     NodeList userNodeListForSegment = currentElement.getElementsByTagName("User");
 
                     // Creating a new SegmentLeaderboard instance for that segment and registering it in the segmentStatistics hashmap
-                    SegmentLeaderboard segmentLeaderboard = new SegmentLeaderboard(segmentHash, fileName);
+                    SegmentLeaderboard segmentLeaderboard = new SegmentLeaderboard(fileName);
 
                     for (int j = 0; j < userNodeListForSegment.getLength(); j++)
                     {
