@@ -123,16 +123,19 @@ public class UserStatistics implements Serializable
     @Override
     public String toString()
     {
-        return "+--------------------------------------+\n" +
-                String.format("| General Statistics for: %-13s|\n", user) +
-                "+------------------+--------+----------+\n" +
-                "| Metric           | Total  | Average  |\n" +
-                "+------------------+--------+----------+\n" +
-                String.format("| Distance (km)    | %5.2f  | %6.2f   |\n", totalDistance, getAverageDistance()) +
-                String.format("| Elevation (m)    | %5.2f  | %6.2f   |\n", totalElevation, getAverageElevation()) +
-                String.format("| Workout Time (min)| %5.2f | %6.2f   |\n", totalActivityTime, getAverageActivityTime()) +
-                String.format("| Routes Recorded  | %5d  |     -    |\n", routesRecorded) +
-                "+------------------+--------+----------+\n";
+        return "+--------------------------------------------+\n" +
+                String.format("| General Statistics for: %-19s|\n", user) +
+                String.format("| Routes Recorded: %-21d     |\n",routesRecorded) +
+                "+---------------------+----------+-----------+\n" +
+                "| Metric              | Total    | Average   |\n" +
+                "+---------------------+----------+-----------+\n" +
+                String.format("| Distance (km)       | %8.2f | %8.2f  |\n", totalDistance, getAverageDistance()) +
+                String.format("| Elevation (m)       | %8.2f | %8.2f  |\n", totalElevation, getAverageElevation()) +
+                String.format("| Workout Time (min)  | %8.2f | %8.2f  |\n", totalActivityTime, getAverageActivityTime()) +
+                "+---------------------+----------+-----------+\n";
     }
+
+
+
 
 }
