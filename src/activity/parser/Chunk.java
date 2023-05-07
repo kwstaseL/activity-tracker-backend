@@ -3,9 +3,12 @@ package activity.parser;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-/* Chunk: Wrapper class, which contains the ArrayList of Waypoints the chunk is supposed to contain,
+/**
+ *  Chunk: Wrapper class, which contains the ArrayList of Waypoints the chunk is supposed to contain,
  * a variable indicating how many chunks in total the route was split into, and a variable indicating
- * the index of the chunk being currently processed amongst the total chunks                        */
+ * the index of the chunk being currently processed amongst the total chunks
+ *
+ * */
 
 public class Chunk implements Serializable {
 
@@ -53,23 +56,49 @@ public class Chunk implements Serializable {
         return totalChunks;
     }
 
-    /* registerSegments: Called on the route this chunk belongs to. The route calls
-     * addSegment for all the segments that are contained in this chunk. */
+    /**
+     *  Called on the route this chunk belongs to. The route calls
+     * addSegment for all the segments that are contained in this chunk.
+     * @throws IllegalArgumentException if the method on the route class fails to register the segments,
+     * */
     private void registerSegments()
     {
-        route.segmentsInChunk(this);
+        try
+        {
+            route.segmentsInChunk(this);
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException("Error while registering segments");
+        }
     }
 
-    // isFirstSegmentIndex: Returns true if the waypoint parameter is the first index of the part of a segment that this chunk contains
+    /**
+     * @param waypoint the waypoint to check
+     * @return Returns true if the waypoint parameter is the first index of the part of a segment that this chunk contains
+     * @throws IllegalArgumentException if the waypoint parameter is null
+     */
     public boolean isFirstSegmentIndex(Waypoint waypoint)
     {
-        int indexInChunk = waypoints.indexOf(waypoint);
-        return segmentStartingIndices.contains(indexInChunk);
+        if (waypoint == null)
+        {
+            throw new IllegalArgumentException("Waypoint cannot be null");
+        }
+        return segmentStartingIndices.contains(waypoints.indexOf(waypoint));
     }
 
-    // isInsideSegment: Returns true if the waypoint parameter is contained in a segment this chunk holds.
+    /**
+     * @param waypoint the waypoint to check
+     * @return Returns true if the given waypoint is contained in a segment in this chunk
+     * @throws IllegalArgumentException if the waypoint parameter is null or not contained in this chunk
+     */
     public boolean isInsideSegment(Waypoint waypoint)
     {
+        if (!waypoints.contains(waypoint) || waypoint == null)
+        {
+            throw new IllegalArgumentException("Waypoint is not contained in this chunk");
+        }
+
         int indexInChunk = waypoints.indexOf(waypoint);
         for (int i = 0; i < segmentStartingIndices.size(); i++)
         {
@@ -81,9 +110,18 @@ public class Chunk implements Serializable {
         return false;
     }
 
-    // getSegmentsStartingFrom: Returns all the segments starting from the parameter waypoint
+    /**
+     * Returns the segments starting from the given waypoint.
+     * @param waypoint the waypoint to check
+     * @return Returns an arraylist of segments starting from the given waypoint
+     * @throws IllegalArgumentException if the waypoint parameter is null or not contained in this chunk
+     */
     public ArrayList<Segment> getSegmentsStartingFrom(Waypoint waypoint)
     {
+        if (!waypoints.contains(waypoint) || waypoint == null)
+        {
+            throw new IllegalArgumentException("Waypoint is not contained in this chunk");
+        }
         ArrayList<Segment> waypointSegments = new ArrayList<>();
 
         int indexInChunk = waypoints.indexOf(waypoint);
@@ -97,9 +135,17 @@ public class Chunk implements Serializable {
         return waypointSegments;
     }
 
-    // getSegmentsContainingWaypoint: Returns the segments this waypoint is contained in
+    /**
+     * @param waypoint the waypoint to check
+     * @return Returns the segments containing the given waypoint.
+     * @throws IllegalArgumentException if the waypoint parameter is null or not contained in this chunk
+     */
     public ArrayList<Segment> getSegmentsContainingWaypoint(Waypoint waypoint)
     {
+        if (!waypoints.contains(waypoint) || waypoint == null)
+        {
+            throw new IllegalArgumentException("Waypoint is not contained in this chunk");
+        }
         ArrayList<Segment> waypointSegments = new ArrayList<>();
 
         int indexInChunk = waypoints.indexOf(waypoint);
@@ -114,8 +160,13 @@ public class Chunk implements Serializable {
     }
 
 
-    /* addSegment: Called by this chunk's route class, adds all the segments
-     * and their respective starting/ending indices to the chunk    */
+    /**
+     * Called by this chunk's route class, adds all the segments
+     * and their respective starting/ending indices to the chunk
+     * @param segment the segment to add
+     * @param startingIndex the starting index of the segment in the route
+     * @param endingIndex the ending index of the segment in the route
+     */
     protected void addSegment(Segment segment, int startingIndex, int endingIndex)
     {
         segments.add(segment);
