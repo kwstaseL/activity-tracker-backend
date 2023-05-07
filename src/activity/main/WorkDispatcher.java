@@ -67,7 +67,7 @@ public class WorkDispatcher implements Runnable
     /**
      * Splits a route into chunks of waypoints and sends each chunk to a worker.
      *
-     * @param route the route to be split into chunks
+     * @param route the route to be split into chunks.
      */
     private void handleRoute(Route route)
     {
