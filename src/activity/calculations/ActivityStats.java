@@ -20,8 +20,6 @@ public class ActivityStats implements Serializable
     private final ArrayList<SegmentStats> segmentStatsList;
     // uniqueID: represents the unique ID of the route
     private final int routeID;
-
-
     /**
      * Constructor used for the map/reduce phase for the final results.
      *

@@ -12,22 +12,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Queue;
 
-public class GPXParser
-{
-    /**
-     * Parses a GPX file from an input stream and returns a Route object.
-     *
-     * @param inputStream the input stream containing the GPX data
-     * @param segments a queue of Segment objects to check the route against
-     * @return a Route object representing the parsed GPX data
-     * @throws RuntimeException if the GPX data cannot be parsed successfully
-     */
+public class GPXParser {
     public static Route parseRoute(ByteArrayInputStream inputStream, Queue<Segment> segments)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
         Route route = null;
-        try
-        {
+        try {
             // Parsing the GPX file
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -78,13 +68,6 @@ public class GPXParser
         return route;
     }
 
-    /**
-     * Parses a GPX file from a file object and returns a Segment object.
-     *
-     * @param segmentFile the GPX file to parse
-     * @return a Segment object representing the parsed GPX data
-     * @throws RuntimeException if the file cannot be parsed successfully
-     */
     public static Segment parseSegment(File segmentFile)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<>();

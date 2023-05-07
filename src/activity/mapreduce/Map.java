@@ -11,53 +11,50 @@ import activity.parser.Chunk;
 
 public class Map
 {
-
-    /**
-     * Maps a chunk to a pair of client ID and activity stats.
-     *
-     * @param clientID the ID of the client that requested the activity stats.
-     * @param chunk the chunk to be mapped.
-     * @return a pair of client ID and the chunk's activity stats.
-     */
+    // This is the method that will get called by the worker to map a chunk to a pair of clientID and activity stats
+    // The clientID is used to identify the client that requested the activity stats
+    // The activity stats are the result of the map operation for that chunk.
     public static Pair<Integer, Pair<Chunk, ActivityStats>> map(int clientID, Chunk chunk)
     {
-        // Get the waypoints from the chunk
         ArrayList<Waypoint> waypoints = chunk.getWaypoints();
-
-        // create a new ActivityStats instance with the route ID of the chunk
         ActivityStats stats = new ActivityStats(chunk.getRoute().getRouteID());
 
-        // register the segments starting from the first waypoint of the chunk, if it is also the first waypoint of a segment
-        Waypoint previousWaypoint = waypoints.get(0);
-        if (chunk.isFirstSegmentIndex(previousWaypoint))
-        {
-            stats.registerSegments(chunk.getSegmentsStartingFrom(previousWaypoint));
-        }
+        Waypoint w1 = waypoints.get(0);
 
-        // iterate over the waypoints and update the activity stats accordingly
-        for (Waypoint currentWaypoint : waypoints.subList(1, waypoints.size()))
+        // checking if the first chunk waypoint is also the first waypoint of a part of a segment this chunk contains
+        if (chunk.isFirstSegmentIndex(w1))
         {
-            // Register the segments starting from the current waypoint, if it is also the first waypoint of a segment
-            if (chunk.isFirstSegmentIndex(currentWaypoint))
+            ArrayList<Segment> segments = chunk.getSegmentsStartingFrom(w1);
+            stats.registerSegments(segments);
+        }
+        
+        for (int i = 1; i < waypoints.size(); ++i)
+        {
+            Waypoint w2 = waypoints.get(i);
+
+            // first, get the segments starting from this waypoint, and register them to the ActivityStats instance
+            if (chunk.isFirstSegmentIndex(w2))
             {
-                stats.registerSegments(chunk.getSegmentsStartingFrom(currentWaypoint));
+                ArrayList<Segment> segments = chunk.getSegmentsStartingFrom(w2);
+                stats.registerSegments(segments);
             }
 
-            // If the current waypoint is inside any of the chunk segments, update the segment stats
-            if (chunk.isInsideSegment(currentWaypoint))
+            // then, if this waypoint is inside any of the chunk segments, calculate accordingly
+            if (chunk.isInsideSegment(w2))
             {
-                stats.updateSegmentStats(previousWaypoint, currentWaypoint, chunk.getSegmentsContainingWaypoint(currentWaypoint));
+                ArrayList<Segment> segments = chunk.getSegmentsContainingWaypoint(w2);
+                stats.updateSegmentStats(w1, w2, segments);
             }
 
-            // Update the activity stats
-            stats.updateStats(previousWaypoint, currentWaypoint);
-            previousWaypoint = currentWaypoint;
+            stats.updateStats(w1, w2);
+            w1 = waypoints.get(i);
         }
-
-        // Finalize the activity stats
         stats.finaliseStats();
 
-        // Return a pair of client ID and the chunk's activity stats
-        return new Pair<>(clientID, new Pair<>(chunk, stats));
+        // statsPair: Represents a pair of chunk and the activity stats calculated for it
+        Pair<Chunk, ActivityStats> statsPair = new Pair<>(chunk, stats);
+
+        return new Pair<>(clientID, statsPair);
     }
+
 }

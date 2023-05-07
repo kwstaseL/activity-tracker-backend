@@ -56,19 +56,10 @@ public class Master
         }
     }
 
-    /**
-     *  This method will start the master server and will create two threads:
-     *  1. Thread that will accept client connections and create a new thread to handle the client
-     *  2. Thread that will accept worker connections and create a new thread to handle the worker
-     * and some additional "helper" threads.
-     */
+    // This method will start the master and all the threads
     private void start()
     {
-        /**
-         * Thread that will accept client connections and create a new thread to handle the client
-         * by creating a new ClientHandler object.
-         * We also pass shared resources to the ClientHandler for processing reasons.
-         */
+        // Thread that will handle the clients
         Thread handleClient = new Thread(() ->
         {
             while (!clientSocket.isClosed())
@@ -105,12 +96,7 @@ public class Master
             }
         });
 
-        /**
-         *  Thread that will accept worker connections and create a new thread to handle the worker
-         *  by creating a new WorkerHandler object.
-         *  We also pass the clientMap to the WorkerHandler so that the worker can send the results back to the corresponding
-         *  component that handles the client.
-         */
+        // Thread that will handle the workers
         Thread handleWorker = new Thread(() ->
         {
             while (workerHandlers.size() != maxWorkers)
@@ -148,22 +134,17 @@ public class Master
             }
         });
 
-        /**
-         * Thread that will start dispatching work to the workers.
-         * We are passing the worker handler so that the work dispatcher can send work to the workers.
-         * We are also passing the routes, which is a shared memory between the client handler and the work dispatcher.
-         * The client-handler will upload the routes to the work dispatcher and the work dispatcher will send the routes to the workers.
-         */
+        // Thread that will start dispatching work to the workers
+        // We are passing the worker handler so that the work dispatcher can send work to the workers
+        // We are also passing the routes, which is a shared memory between the client handler and the work dispatcher
+        // The client-handler will upload the routes to the work dispatcher and the work dispatcher will send the routes to the workers
         Thread dispatchWork = new Thread(() ->
         {
             WorkDispatcher workDispatcher = new WorkDispatcher(workerHandlers, routes);
             Thread workDispatcherThread = new Thread(workDispatcher);
             workDispatcherThread.start();
         });
-
-        /**
-         * Thread that will create the segments from the files in the directory of the master.
-         */
+        // Thread that will create the segments
         Thread createSegments = new Thread(() ->
         {
             // Get the segment files from the directory.
@@ -199,6 +180,7 @@ public class Master
         {
             throw new RuntimeException(e);
         }
+
         handleWorker.start();
         handleClient.start();
         dispatchWork.start();

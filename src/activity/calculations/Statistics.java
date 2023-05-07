@@ -36,9 +36,6 @@ public class Statistics implements Serializable
     // segmentStatistics: Matches the hashcode (integer) of a segment name, to a leaderboard of user stats for that segment
     private final HashMap<Integer, SegmentLeaderboard> segmentStatistics = new HashMap<>();
 
-    /**
-     * Initializes a new instance of the Statistics class.
-     */
     public Statistics()
     {
         this.userStats = new HashMap<>();
@@ -54,13 +51,8 @@ public class Statistics implements Serializable
         }
     }
 
-    /**
-     * Registers a new route for a user, updating their statistics and the total statistics for all users.
-     * Also updates the segment statistics for the user.
-     *
-     * @param user The user who recorded the new route.
-     * @param activityStats The statistics for the new route.
-     */
+    // registerRoute: Called when adding a new route to our database,
+    // updates the statistics for the user and the total stats for all users.
     public void registerRoute(String user, ActivityStats activityStats)
     {
         // first, updating the user specific stats
@@ -92,11 +84,8 @@ public class Statistics implements Serializable
         }
     }
 
-    /**
-     * Registers existing statistics for a user, updating the total statistics for all users.
-     *
-     * @param userStatistics The user statistics to register.
-     */
+    // registerStatistics: Called when adding a new UserStatistics instance to our database,
+    // when loading stats from the XML file.
     public void registerStatistics(UserStatistics userStatistics)
     {
         this.routesRecorded += userStatistics.getRoutesRecorded();
@@ -105,26 +94,17 @@ public class Statistics implements Serializable
         this.totalActivityTime += userStatistics.getTotalActivityTime();
     }
 
-    /**
-     * Retrieves the leaderboard for a specific segment.
-     *
-     * @param segmentHashID The hash of the segment.
-     * @return The leaderboard for the segment.
-     */
-    public SegmentLeaderboard getLeaderboard(int segmentHashID)
+    // Returns the leaderboard for a specific segment
+    public SegmentLeaderboard getLeaderboard(int segmentHash)
     {
-        if (!segmentStatistics.containsKey(segmentHashID))
+        if (!segmentStatistics.containsKey(segmentHash))
         {
             throw new RuntimeException("Could not find the segment.");
         }
-        return segmentStatistics.get(segmentHashID);
+        return segmentStatistics.get(segmentHash);
     }
 
-    /**
-     * Checks if the statistics file exists.
-     *
-     * @return Returns true if the statistics file exists, false otherwise.
-     */
+    // fileExists: Returns true if the statistics file already exists, false otherwise.
     private boolean fileExists()
     {
         try
@@ -161,10 +141,8 @@ public class Statistics implements Serializable
         }
     }
 
-    /**
-     *  Called upon Statistics initialisation, loads data into both the userStats hashmap and the segmentStatistics hashmap
-     *  for the statistics xml file and for each segment xml file for all users.
-     */
+    // initialise: Called upon Statistics initialisation, loads data into both the userStats hashmap and the segmentStatistics hashmap
+    // for the statistics xml file and for each segment xml file for all users.
     public void loadStats()
     {
         try
@@ -223,12 +201,10 @@ public class Statistics implements Serializable
                     Element currentElement = (Element) segmentNodeList.item(i);
 
                     String fileName = currentElement.getAttribute("File_Name");
-                    // Hashing the file name to get a unique ID for the segment
-                    int segmentHashID = fileName.hashCode();
+                    int segmentHash = fileName.hashCode();
                     NodeList userNodeListForSegment = currentElement.getElementsByTagName("User");
 
-                    // Creating a new SegmentLeaderboard instance for that segment and registering it in
-                    // the segmentStatistics hashmap
+                    // Creating a new SegmentLeaderboard instance for that segment and registering it in the segmentStatistics hashmap
                     SegmentLeaderboard segmentLeaderboard = new SegmentLeaderboard(fileName);
 
                     for (int j = 0; j < userNodeListForSegment.getLength(); j++)
@@ -238,40 +214,34 @@ public class Statistics implements Serializable
                         double time = Double.parseDouble(currentUserElement.getAttribute("Time"));
 
                         // Creating a new UserSegmentStatistics instance for that user and registering it in the segmentLeaderboard
-                        UserSegmentStatistics segmentUserStatistics = new UserSegmentStatistics(segmentHashID, user, time);
+                        UserSegmentStatistics segmentUserStatistics = new UserSegmentStatistics(segmentHash, user, time);
                         segmentLeaderboard.registerSegmentStatistics(segmentUserStatistics);
                     }
-                    segmentStatistics.put(segmentHashID, segmentLeaderboard);
+                    segmentStatistics.put(segmentHash, segmentLeaderboard);
                 }
             }
 
         }
         catch (ParserConfigurationException e)
         {
-            System.out.println("Could not configure parser.");
             throw new RuntimeException("Could not configure parser.");
         }
         catch (FileNotFoundException e)
         {
-            System.out.println("Could not find the file.");
             throw new RuntimeException("Could not find the file");
         }
         catch (IOException e)
         {
-            System.out.println("An error occurred during the I/O process while initialising Statistics.");
             throw new RuntimeException("An error occurred during the I/O process while initialising Statistics.");
         }
         catch (SAXException e)
         {
-            System.out.println("An error occurred during the parsing process while initialising Statistics.");
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Called when closing the connection with the user, creates the statistics file and writes the statistics for all users to it.
-     * also for each segment, creates a new xml file and writes the statistics for that segment to it of the users who have completed it.
-     */
+    // createFile: Called when closing the connection with the user, creates the statistics file and writes the statistics for all users to it.
+    // also for each segment, creates a new xml file and writes the statistics for that segment to it of the users who have completed it.
     public void createFile()
     {
         try
@@ -286,8 +256,7 @@ public class Statistics implements Serializable
             doc.appendChild(root);
 
             // for all the users currently registered, write their statistics to the xml file
-            for (String user : userStats.keySet())
-            {
+            for (String user : userStats.keySet()) {
                 UserStatistics statisticsForUser = userStats.get(user);
 
                 Element userElement = doc.createElement("User");
@@ -377,18 +346,14 @@ public class Statistics implements Serializable
         }
     }
 
-    /**
-     * @param username The username of the user
-     * @return Returns the UserStatistics object for the given user.
-     * @throws RuntimeException If the user has not been registered.
-     */
-    public UserStatistics getUserStats(String username)
+    // getUserStats: Returns the UserStatistics object associated with a specific user.
+    public UserStatistics getUserStats(String user)
     {
-        if (!userStats.containsKey(username))
+        if (!userStats.containsKey(user))
         {
             throw new RuntimeException("User has not been registered.");
         }
-        return userStats.get(username);
+        return userStats.get(user);
     }
 
     public Statistics getGlobalStats()
@@ -396,10 +361,7 @@ public class Statistics implements Serializable
         return this;
     }
 
-    /**
-     * Calculates and returns the average distance recorded across all users.
-     * @throws RuntimeException If no routes have been recorded yet.
-     */
+    // getAverageDistance: Calculates the average distance recorded across all routes.
     public double getAverageDistance()
     {
         if (routesRecorded == 0)
@@ -409,10 +371,7 @@ public class Statistics implements Serializable
         return totalDistance / routesRecorded;
     }
 
-    /**
-     * Calculates and returns the average elevation recorded across all users.
-     * @throws RuntimeException If no routes have been recorded yet.
-     */
+    // getAverageElevation: Similarly to getAverageDistance
     public double getAverageElevation()
     {
         if (routesRecorded == 0)
@@ -422,10 +381,7 @@ public class Statistics implements Serializable
         return totalElevation / routesRecorded;
     }
 
-    /**
-     * Calculates and returns the average Activity Time recorded across all users.
-     * @throws RuntimeException If no routes have been recorded yet.
-     */
+    // getAverageDistance: Similarly to getAverageDistance
     public double getAverageActivityTime()
     {
         if (routesRecorded == 0)
@@ -436,13 +392,7 @@ public class Statistics implements Serializable
     }
 
 
-    /**
-     * Calculates the average distance for a specific user by dividing their total distance by the number of routes they have
-     * recorded.
-     * @param user the user for whom to calculate the average distance
-     * @return the average distance for the user
-     * @throws RuntimeException if the user has not recorded any routes
-     */
+    // getAverageDistanceForUser: Calculates the average distance for a user by dividing their total distance with the # of routes they have recorded.
     public double getAverageDistanceForUser(String user)
     {
         if (!userStats.containsKey(user))
@@ -453,13 +403,7 @@ public class Statistics implements Serializable
         return userStats.get(user).getAverageDistance();
     }
 
-    /**
-     * Calculates the average elevation for a specific user by dividing their total distance by the number of routes they have
-     * recorded.
-     * @param user the user for whom to calculate the average distance
-     * @return the average distance for the user
-     * @throws RuntimeException if the user has not recorded any routes
-     */
+    // getAverageElevationForUser: Similarly to getAverageDistanceForUser
     public double getAverageElevationForUser(String user)
     {
         if (!userStats.containsKey(user))
@@ -470,13 +414,7 @@ public class Statistics implements Serializable
         return userStats.get(user).getAverageElevation();
     }
 
-    /**
-     * Calculates the average activity time for a specific user by dividing their total distance by the number of routes they have
-     * recorded.
-     * @param user the user for whom to calculate the average distance
-     * @return the average distance for the user
-     * @throws RuntimeException if the user has not recorded any routes
-     */
+    // getAverageActivityTimeForUser: Similarly to getAverageDistanceForUser
     public double getAverageActivityTimeForUser(String user)
     {
         if (!userStats.containsKey(user))
@@ -487,21 +425,11 @@ public class Statistics implements Serializable
         return userStats.get(user).getAverageActivityTime();
     }
 
-    /**
-     * @return Returns a string representation of the global statistics.
-     */
     @Override
     public String toString()
     {
-        return "+---------------------------------------------+\n" +
-                "|       Statistics across all users            |\n" +
-                "+---------------------------------------------+\n" +
-                String.format("| %-17s | %20.2f km |\n", "Average Distance", getAverageDistance()) +
-                String.format("| %-17s | %20.2f m  |\n", "Average Elevation", getAverageElevation()) +
-                String.format("| %-17s | %19.2f min |\n", "Avg Workout Time", getAverageActivityTime()) +
-                "+---------------------------------------------+\n";
+        return String.format("Statistics across all users:\nAverage Distance: %.2f km\nAverage Elevation: %.2f m\nAverage Work Out Time: %.2f minutes",
+                getAverageDistance(), getAverageElevation(), getAverageActivityTime());
     }
-
-
 
 }
