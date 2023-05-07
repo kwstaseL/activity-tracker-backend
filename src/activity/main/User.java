@@ -202,7 +202,7 @@ public class User
 
             // Print the received statistics
             System.out.println();
-            System.out.println("Statistics for your route:" );
+            System.out.println("Statistics for your route (" + selectedGPX.getName() + "): " );
             System.out.println(routeStats + "\n");
             System.out.println("Your overall performance:");
             System.out.println(userStats + "\n");
