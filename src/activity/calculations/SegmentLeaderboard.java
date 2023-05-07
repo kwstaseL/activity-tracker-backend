@@ -3,8 +3,11 @@ package activity.calculations;
 import java.io.Serializable;
 import java.util.TreeSet;
 
-// SegmentLeaderboard: A class that represents a leaderboard for a specific segment
-// It contains a TreeSet of UserSegmentStatistics, which is sorted by the UserSegmentStatistics' time
+/**
+ * SegmentLeaderboard: A class that represents a leaderboard for a specific segment
+ * It contains a TreeSet of UserSegmentStatistics, which is sorted by the UserSegmentStatistics' time
+ */
+
 public class SegmentLeaderboard implements Serializable
 {
     // statistics: A TreeSet of UserSegmentStatistics, sorted by the UserSegmentStatistics' time
