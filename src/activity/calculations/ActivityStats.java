@@ -144,15 +144,16 @@ public class ActivityStats implements Serializable {
     @Override
     public String toString()
     {
-        return "+-------------------+--------------+\n" +
-                "| Metric            |      Value   |\n" +
-                "+-------------------+--------------+\n" +
-                String.format("| Total Distance    |  %9.2f km |\n", distance) +
-                String.format("| Average Speed     |  %9.2f km/h |\n", speed) +
-                String.format("| Total Elevation   |  %9.2f m |\n", elevation) +
-                String.format("| Total Time        |  %9.2f min |\n", time) +
-                "+-------------------+--------------+\n";
+        return "+--------------------------+-----------+\n" +
+                "| Metric                   |   Value   |\n" +
+                "+--------------------------+-----------+\n" +
+                String.format("| Total Distance (km)      | %9.2f |\n", distance) +
+                String.format("| Average Speed (km/h)     | %9.2f |\n", speed) +
+                String.format("| Total Elevation (m)      | %9.2f |\n", elevation) +
+                String.format("| Total Time (min)         | %9.2f |\n", time) +
+                "+--------------------------+-----------+\n";
     }
+
 
 
 

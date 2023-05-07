@@ -9,8 +9,8 @@ import java.util.ArrayList;
  * the index of the chunk being currently processed amongst the total chunks
  *
  * */
-
-public class Chunk implements Serializable {
+public class Chunk implements Serializable
+{
 
     // route represents the original route this chunk is a part of
     private final Route route;
@@ -30,6 +30,12 @@ public class Chunk implements Serializable {
 
     private final ArrayList<Integer> segmentEndingIndices;
 
+    /**
+     * Constructor for the Chunk class
+     * @param waypoints the waypoints the chunk is supposed to contain
+     * @param route the route this chunk is a part of
+     * @param totalChunks the total number of chunks the route was split into
+     */
     public Chunk(ArrayList<Waypoint> waypoints, Route route, int totalChunks)
     {
         this.route = route;
@@ -82,7 +88,7 @@ public class Chunk implements Serializable {
     {
         if (waypoint == null)
         {
-            throw new IllegalArgumentException("Waypoint cannot be null");
+            throw new IllegalArgumentException("Received a null waypoint");
         }
         return segmentStartingIndices.contains(waypoints.indexOf(waypoint));
     }
@@ -158,7 +164,6 @@ public class Chunk implements Serializable {
         }
         return waypointSegments;
     }
-
 
     /**
      * Called by this chunk's route class, adds all the segments

@@ -63,19 +63,23 @@ public class SegmentLeaderboard implements Serializable
         StringBuilder sb = new StringBuilder();
         sb.append("Found a segment inside the route you registered!\n");
         sb.append("Here is the leaderboard for this segment:\n");
-        sb.append("+-----------------------------+\n");
-        sb.append("|         Leaderboard         |\n");
-        sb.append("+-----------------------------+\n");
-        sb.append("| # | User  |  Time (minutes) |\n");
-        sb.append("+-----------------------------+\n");
+        sb.append("+---------------------------------+\n");
+        sb.append("|             Leaderboard         |\n");
+        sb.append("+------+---------+----------------+\n");
+        sb.append("| Rank |   User  | Time (minutes) |\n");
+        sb.append("+------+---------+----------------+\n");
         int rank = 1;
         for (UserSegmentStatistics stats : statistics)
         {
-            sb.append(String.format("| %-2d| %-6s| %15.2f |\n", rank++, stats.getUsername(), stats.getTime()));
+            sb.append(String.format("| %4d | %-8s|%15.2f |\n", rank++, stats.getUsername(), stats.getTime()));
         }
-        sb.append("+-----------------------------+\n");
+        sb.append("+------+---------+----------------+\n");
         return sb.toString();
     }
+
+
+
+
 
 
 

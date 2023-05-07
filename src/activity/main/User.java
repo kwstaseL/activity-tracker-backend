@@ -200,7 +200,6 @@ public class User
             Object allUsersStats = in.readObject();
             Object leaderboardObject = in.readObject();
 
-            // TODO: Create a better looking output for the statistics
             // Print the received statistics
             System.out.println();
             System.out.println("Statistics for your route:" );
