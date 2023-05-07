@@ -142,8 +142,18 @@ public class ActivityStats implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return String.format("Total Distance: %.2f km, Average Speed: %.2f km/h, Total Elevation: %.2f m and Total Time: %.2f minutes",
-                distance, speed, elevation, time);
+    public String toString()
+    {
+        return "+-------------------+--------------+\n" +
+                "| Metric            |      Value   |\n" +
+                "+-------------------+--------------+\n" +
+                String.format("| Total Distance    |  %9.2f km |\n", distance) +
+                String.format("| Average Speed     |  %9.2f km/h |\n", speed) +
+                String.format("| Total Elevation   |  %9.2f m |\n", elevation) +
+                String.format("| Total Time        |  %9.2f min |\n", time) +
+                "+-------------------+--------------+\n";
     }
+
+
+
 }
