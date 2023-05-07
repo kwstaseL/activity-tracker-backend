@@ -497,11 +497,11 @@ public class Statistics implements Serializable
     {
         return "+---------------------------------------------+\n" +
                 "|       Statistics across all users           |\n" +
-                "+---------------------------------------------+\n" +
+                "+-------------------+-------------------------+\n" +
                 String.format("| %-17s | %20.2f km |\n", "Average Distance", getAverageDistance()) +
                 String.format("| %-17s | %20.2f m  |\n", "Average Elevation", getAverageElevation()) +
                 String.format("| %-17s | %19.2f min |\n", "Avg Workout Time", getAverageActivityTime()) +
-                "+---------------------------------------------+\n";
+                "+-------------------+-------------------------+\n";
     }
 
 
