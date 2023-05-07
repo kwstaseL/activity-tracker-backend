@@ -61,7 +61,7 @@ public class SegmentLeaderboard implements Serializable
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("We found users who have completed this segment with you!\n");
+        sb.append("Found a segment inside the route you registered!\n");
         sb.append("Here is the leaderboard for this segment:\n");
         sb.append("+-----------------------------+\n");
         sb.append("|         Leaderboard         |\n");
