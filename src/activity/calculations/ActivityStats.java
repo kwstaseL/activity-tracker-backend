@@ -20,8 +20,16 @@ public class ActivityStats implements Serializable
     private final ArrayList<SegmentStats> segmentStatsList;
     // uniqueID: represents the unique ID of the route
     private final int routeID;
-
-    // Constructor used for the map/reduce phase for the final results
+    /**
+     * Constructor used for the map/reduce phase for the final results.
+     *
+     * @param routeID           the unique ID of the route
+     * @param distance          the total distance of the route
+     * @param speed             the average speed of the route
+     * @param elevation         the total elevation of the route
+     * @param time              the total time of the route
+     * @param segmentStatsList  the statistics for each segment of the route
+     */
     public ActivityStats(int routeID, double distance, double speed, double elevation,
                          double time, ArrayList<SegmentStats> segmentStatsList)
     {
@@ -33,13 +41,21 @@ public class ActivityStats implements Serializable
         this.segmentStatsList = new ArrayList<>(segmentStatsList);
     }
 
-    // This constructor is used for calculating and saving the results of the calculations
+    /**
+     * Constructor used for calculating and saving the results of the calculations.
+     *
+     * @param routeID  the unique ID of the route
+     */
     public ActivityStats(int routeID)
     {
         this(routeID, 0, 0, 0, 0, new ArrayList<>());
     }
 
-    // Used the first time we find a waypoint that is a start of a segment, we create a new segmentStats object
+    /**
+     * Registers the segments statistics for the route
+     *
+     * @param segments  the segments to register
+     */
     public void registerSegments(ArrayList<Segment> segments)
     {
         for (Segment segment : segments)
@@ -47,21 +63,32 @@ public class ActivityStats implements Serializable
             this.segmentStatsList.add(new SegmentStats(segment.getSegmentID(), segment.getFileName()));
         }
     }
-    // Used in the mapping phase to update the stats of the route
+    /**
+     * Updates the stats of the activity with the given waypoints.
+     *
+     * @param w1  the first waypoint
+     * @param w2  the second waypoint
+     */
     public void updateStats(Waypoint w1, Waypoint w2)
     {
         this.distance += ActivityCalculator.calculateDistanceInKilometers(w1, w2);
         this.time += ActivityCalculator.calculateTime(w1, w2);
         this.elevation += ActivityCalculator.calculateElevation(w1, w2);
     }
-    // Used in the mapping phase to update the stats of the segments , segments is the list of
-    // segments that contain the waypoint w1 and w2
+    /**
+     * Updates the stats of the segments that contain the given waypoints.
+     *
+     * @param w1  the first waypoint
+     * @param w2  the second waypoint
+     * @param segments  the segments to update
+     */
     public void updateSegmentStats(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
     {
         for (Segment segment : segments)
         {
             int segmentID = segment.getSegmentID();
-            // finds the index of the segmentStats object that has the same segmentID as the segment we are currently looking at
+            // finds the index of the segmentStats object that has the same segmentID as the segment we
+            // are currently looking at
             int segmentStatsIndex = segmentStatsList.indexOf(new SegmentStats(segmentID, segment.getFileName()));
             // if we just found the segmentStats object for the first time we create a new one and continue
             if (segmentStatsIndex == -1)
@@ -75,6 +102,9 @@ public class ActivityStats implements Serializable
         }
     }
 
+    /**
+     * Finalises the stats of the activity by calculating the average speed.
+     */
     public void finaliseStats()
     {
         this.speed = (time > 0) ? distance / (time / 60.0) : 0.0;
@@ -110,7 +140,11 @@ public class ActivityStats implements Serializable
         return this.segmentStatsList;
     }
 
-    // Returns an arraylist of all the hash codes of the file names of the segments we have calculated the stats for
+    /**
+     * Returns the segmentIDs of the segments that the route contains.
+     *
+     * @return  the segmentIDs of the segments that the route contains
+     */
     public ArrayList<Integer> getSegmentHashes()
     {
         ArrayList<Integer> segmentIDs = new ArrayList<>();
