@@ -496,7 +496,7 @@ public class Statistics implements Serializable
     public String toString()
     {
         return "+---------------------------------------------+\n" +
-                "|       Statistics across all users            |\n" +
+                "|       Statistics across all users           |\n" +
                 "+---------------------------------------------+\n" +
                 String.format("| %-17s | %20.2f km |\n", "Average Distance", getAverageDistance()) +
                 String.format("| %-17s | %20.2f m  |\n", "Average Elevation", getAverageElevation()) +
