@@ -4,6 +4,9 @@ import activity.calculations.ActivityCalculator;
 
 import java.io.Serializable;
 
+/**
+ * A class representing a geographic location, including latitude, longitude, elevation, and timestamp.
+ */
 public class Waypoint implements Serializable
 {
     final private double latitude;
@@ -11,6 +14,9 @@ public class Waypoint implements Serializable
     final private double elevation;
     final private String timestamp;
 
+    /**
+     * Constructs a new Waypoint with the given latitude, longitude, elevation, and timestamp.
+     */
     public Waypoint(double latitude, double longitude,
                     double elevation, String timestamp)
     {
@@ -41,6 +47,9 @@ public class Waypoint implements Serializable
     }
 
 
+    /**
+     * Returns a string representation of this Waypoint, including latitude, longitude, elevation, and timestamp.
+     */
     public String toString()
     {
         return "Latitude: " + latitude + " Longitude: "
@@ -52,11 +61,12 @@ public class Waypoint implements Serializable
     @Override
     public boolean equals(Object o)
     {
-        final double gpsError = 10;
+        final double GPS_ERROR = 10;
         if (this == o) return true;
         if (!(o instanceof Waypoint)) return false;
 
         // Calculates the distance between two waypoints. If the distance is less than 10 metres, the 2 waypoints are considered equal.
-        return ActivityCalculator.calculateDistanceInMeters(this,(Waypoint) o) <= gpsError;
+        return ActivityCalculator.calculateDistanceInMeters(this,(Waypoint) o) <= GPS_ERROR;
     }
+
 }
