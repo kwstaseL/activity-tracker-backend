@@ -43,12 +43,6 @@ public class ClientHandler implements Runnable
     private final Object writeLock = new Object();
     private static final Statistics statistics = new Statistics();
 
-    /**
-     * Constructor for the ClientHandler
-     * @param clientSocket the socket that the client is connected to
-     * @param routeQueue the queue that the routes will be added to and the worker dispatcher will take from
-     * @param segments a queue containing all the segments to be checked for intersections with the routes of users.
-     */
     public ClientHandler(Socket clientSocket, Queue<Route> routeQueue, Queue<Segment> segments)
     {
         this.clientSocket = clientSocket;
@@ -68,9 +62,7 @@ public class ClientHandler implements Runnable
         }
     }
 
-    /**
-     * Method used to start the threads that will handle messages from the client and the worker handlers
-     */
+    // This is where the client will be handled
     public void run()
     {
         Thread readFromClient = new Thread(this::readFromClient);
@@ -80,12 +72,8 @@ public class ClientHandler implements Runnable
         readFromWorkerHandler.start();
     }
 
-    /**
-     * This method is used to receive back all the chunks from the file we dispatched to the worker.
-     * In order to start the reduce phase for that route (and thus, the client).
-     *
-     * @throws RuntimeException if the chunks received are more than expected
-     */
+    // This method is used to receive back all the chunks from the file we dispatched to the worker
+    // In order to start the reduce phase for that route (and thus, the client)
     private void readFromWorkerHandler()
     {
         synchronized (statsQueue)
@@ -103,7 +91,6 @@ public class ClientHandler implements Runnable
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
-                // We get the chunk and the activity stats from the queue
                 Pair<Chunk, ActivityStats> stats = statsQueue.poll();
                 Chunk chunk = stats.getKey();
                 int routeID = chunk.getRoute().getRouteID();
@@ -127,16 +114,14 @@ public class ClientHandler implements Runnable
                     }
                     else
                     {
-                        // If the route is not in the hashmap, create a new list for it
                         activityList = new ArrayList<>();
                     }
                     activityList.add(stats);
                     routeHashmap.put(routeID, activityList);
 
-                    // If we have received all the chunks for this route
                     if (activityList.size() == (chunk.getTotalChunks() - 1) || (activityList.size() == 1 && chunk.getTotalChunks() == 1))
                     {
-                        // we start the reducing phase
+                        // and then we start the reducing phase
                         processChunks(chunk, activityList);
                     }
                 }
@@ -144,10 +129,8 @@ public class ClientHandler implements Runnable
         }
     }
 
-    /**
-     * This method is used to get the file from the client
-     * And to send it to the work-dispatcher that will dispatch it to the workers.
-     */
+    // This method is used to get the file from the client
+    // And to send it to the work-dispatcher that will dispatch it to the workers.
     private void readFromClient()
     {
         try
@@ -171,23 +154,25 @@ public class ClientHandler implements Runnable
                 clientUsername = username;
             }
             // Receive the file object from the client
+
             while (!clientSocket.isClosed())
             {
                 System.out.println("ClientHandler: Waiting for file from client");
+
                 Object obj = in.readObject();
 
                 if (obj instanceof GPXData)
                 {
                     GPXData gpxData = (GPXData) obj;
-                    // Create a new input stream from the file content
                     ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
                     // Parse the file
+                    // Create a new thread to handle the parsing of the file
                     Route route = GPXParser.parseRoute(gpxContent,segments);
                     route.setClientID(clientID);
                     // Add the route to the queue
                     synchronized (routeQueue)
                     {
-                        // Add the route to the queue and notify the dispatcher that will dispatch it to the workers
+                        // Add the route to the queue and notify the dispatcher
                         routeQueue.add(route);
                         routeQueue.notify();
                     }
@@ -205,89 +190,62 @@ public class ClientHandler implements Runnable
         }
     }
 
-    /**
-     * Process the given chunk by collecting all the intermediate statistics and
-     * starting a new thread to handle the reducing phase.
-     *
-     * @param chunk The chunk to process
-     * @param activityList The list of pairs of chunks and their activity statistics
-     */
     private void processChunks(Chunk chunk, ArrayList<Pair<Chunk, ActivityStats>> activityList)
     {
-        int routeId = chunk.getRoute().getRouteID();
-
-        // Collect all the activity statistics for this specific route
+        int routeID = chunk.getRoute().getRouteID();
+        // fetching a list of all the stats we gathered for this specific route
         ArrayList<ActivityStats> statsArrayList = new ArrayList<>();
         for (Pair<Chunk, ActivityStats> pair : activityList)
         {
             statsArrayList.add(pair.getValue());
         }
-
-        // TODO: Check whats going on here
-        // Start a new thread to handle the reducing phase
-        new Thread(() -> handleReducing(new Pair<>(routeId, statsArrayList), chunk.getRoute().getUser())).start();
+        // Creating a new thread to handle the reducing phase
+        new Thread(() -> handleReducing(new Pair<>(routeID, statsArrayList), chunk.getRoute().getUser())).start();
     }
 
-    /**
-     * Handle the reducing phase for the given intermediate results and send the
-     * final result back to the client.
-     *
-     * @param intermediateResults The pair of route ID and intermediate activity statistics
-     * @param user The user associated with the route
-     */
+    // This is the method that will handle the reducing phase and send the result back to the client
+    // Parameters: The integer of the pair represents the id of the route, and the arraylist of activity stats represents all the intermediary chunks
     private void handleReducing(Pair<Integer, ArrayList<ActivityStats>> intermediateResults, String user)
     {
-        // Reduce the intermediate activity statistics to get the final result
+        // finalResults: The reduce process returns the final ActivityStats associated with a specific route.
         ActivityStats finalResults = Reduce.reduce(intermediateResults);
-
         try
         {
+            // Send the result back to the client
             synchronized (writeLock)
             {
-                // Register the route with the final activity statistics
                 statistics.registerRoute(user, finalResults);
-
-                // Send the final activity statistics to the client
                 out.writeObject(finalResults);
                 out.flush();
-
-                // Send the user statistics to the client
                 out.writeObject(statistics.getUserStats(user));
                 out.flush();
-
-                // Send the global statistics to the client
                 out.writeObject(statistics.getGlobalStats());
                 out.flush();
 
-                // Get the segment leaderboards for each segment in the route
                 ArrayList<Integer> segmentsInRoute = finalResults.getSegmentHashes();
                 ArrayList<SegmentLeaderboard> segmentLeaderboards = new ArrayList<>();
 
-                for (int segmentHashID : segmentsInRoute)
+                for (int segmentHash : segmentsInRoute)
                 {
-                    segmentLeaderboards.add(statistics.getLeaderboard(segmentHashID));
+                    segmentLeaderboards.add(statistics.getLeaderboard(segmentHash));
                 }
 
-                // Send the segment leaderboards to the client
                 out.writeObject(segmentLeaderboards);
                 out.flush();
 
-                // Reset the output stream to make sure all changes are sent
+                // Here we reset the output stream to make sure
+                // that the object is sent with all the changes we made
                 out.reset();
             }
-
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
-            // Log any errors that occur during sending of data to the client
-            System.out.println("Error sending data to the client: " + e.getMessage());
+            System.out.println("Could not send object to the client");
+            System.out.println(e.getMessage());
         }
     }
 
-
-    /**
-     * Called by the worker handler  to add a pair of chunk and activity statistics to the queue
-     * @param stats The pair of chunk and activity statistics to add to the queue
-     */
+    // addStats: Adds the stats to the queue to be processed by the readFromWorkerHandler method
     public void addStats(Pair<Chunk, ActivityStats> stats)
     {
         synchronized (statsQueue)
@@ -297,11 +255,8 @@ public class ClientHandler implements Runnable
         }
     }
 
-    /**
-     * Method that will be called when the client disconnects.
-     * It will close all the streams and the socket,
-     * and it will also save the statistics for the client.
-     */
+    // This method will close the connection to the client
+    // and clean up the resources
     private void shutdown()
     {
         if (clientUsername != null)

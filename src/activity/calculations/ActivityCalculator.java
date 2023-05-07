@@ -6,11 +6,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/** Class used for the mapping phase
-* It will calculate the distance, time and elevation differences between two waypoints.
- * */
-public class ActivityCalculator
-{
+/**
+ * Class used for the mapping phase.
+ * It will calculate the distance, time and elevation differences between two waypoints.
+ */
+public class ActivityCalculator {
     /**
      * Calculates the time between two waypoints.
      *
@@ -19,8 +19,7 @@ public class ActivityCalculator
      * @return the time in hours between the two waypoints.
      * @throws NullPointerException if either w1 or w2 is null.
      */
-    protected static double calculateTime(Waypoint w1, Waypoint w2)
-    {
+    protected static double calculateTime(Waypoint w1, Waypoint w2) {
         assert w1 != null && w2 != null;
         final String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
@@ -39,8 +38,7 @@ public class ActivityCalculator
      * @return the distance in meters between the two waypoints.
      * @throws NullPointerException if either w1 or w2 is null.
      */
-    public static double calculateDistanceInMeters(Waypoint w1, Waypoint w2)
-    {
+    public static double calculateDistanceInMeters(Waypoint w1, Waypoint w2) {
         assert w1 != null && w2 != null;
         final double RADIUS_OF_EARTH_METERS = 6378100;
 
@@ -80,11 +78,10 @@ public class ActivityCalculator
      * @return the distance in kilometers between the two waypoints.
      * @throws NullPointerException if either w1 or w2 is null.
      */
-    public static double calculateDistanceInKilometers(Waypoint w1, Waypoint w2)
-    {
+    public static double calculateDistanceInKilometers(Waypoint w1, Waypoint w2) {
         assert w1 != null && w2 != null;
         // Converting to Kilometers
-        return calculateDistanceInMeters(w1, w2)/ 1000;
+        return calculateDistanceInMeters(w1, w2) / 1000;
     }
 
     /**
@@ -96,8 +93,7 @@ public class ActivityCalculator
      * @throws NullPointerException if either w1 or w2 is null.
      */
     // Calculating the elevation between two waypoints
-    protected static double calculateElevation(Waypoint w1, Waypoint w2)
-    {
+    protected static double calculateElevation(Waypoint w1, Waypoint w2) {
         assert w1 != null && w2 != null;
         // if the elevation of w2 is greater than w1, return the difference between the two elevations
         double elevation1 = w1.getElevation();

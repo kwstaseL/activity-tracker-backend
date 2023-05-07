@@ -7,10 +7,8 @@ import activity.parser.Route;
 import java.util.ArrayList;
 import java.util.Queue;
 
-/**
- * The WorkDispatcher class is responsible for taking in a route and splitting it into chunks, then sending the chunks to
- * the workers using round-robin.
- */
+// This class is responsible for taking in a route and splitting it into chunks, then sending the chunks to the workers
+// using round-robin
 public class WorkDispatcher implements Runnable
 {
     // This is the queue that contains all the workers
@@ -21,21 +19,12 @@ public class WorkDispatcher implements Runnable
     private final Object writeLock = new Object();
     private final Object readLock = new Object();
 
-    /**
-     * Constructs a WorkDispatcher object with a list of workers and routes to process.
-     *
-     * @param workers list of workers to process routes
-     * @param filesToWorker list of routes to be processed
-     */
     public WorkDispatcher(Queue<WorkerHandler> workers, Queue<Route> filesToWorker)
     {
         this.workers = workers;
         this.filesToWorker = filesToWorker;
     }
 
-    /**
-     * The run() method handles the processing of routes.
-     */
     public void run()
     {
         synchronized (filesToWorker)
@@ -64,11 +53,7 @@ public class WorkDispatcher implements Runnable
         }
     }
 
-    /**
-     * Splits a route into chunks of waypoints and sends each chunk to a worker.
-     *
-     * @param route the route to be split into chunks
-     */
+    // Takes in a route and splits it into chunks, then sends the chunks to the workers using round-robin
     private void handleRoute(Route route)
     {
         ArrayList<Waypoint> waypoints = route.getWaypoints();
@@ -123,15 +108,9 @@ public class WorkDispatcher implements Runnable
         }
     }
 
-    /**
-     * Calculates the chunk size based on the number of waypoints and the number of workers.
-     *
-     * @param waypointsSize the number of waypoints in the route
-     * @return the chunk size
-     */
     private int calculateChunkSize(int waypointsSize)
     {
-        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size
+        // if there's more waypoints than workers provided, make n equal to waypoints.size / workers.size * 2.0
         synchronized (readLock)
         {
             if (waypointsSize >= workers.size())
@@ -147,25 +126,12 @@ public class WorkDispatcher implements Runnable
         }
     }
 
-    /**
-     * Calculates the expected number of chunks based on the number of waypoints and the chunk size.
-     *
-     * @param waypointsSize the number of waypoints in the route
-     * @param n the size of each chunk
-     * @return the expected number of chunks
-     */
     private int calculateExpectedChunks(int waypointsSize, int n)
     {
         return (int) Math.ceil(waypointsSize / (double) n);
     }
 
-    /**
-     * Creates the chunk and sends it to a worker to process.
-     * @param route the route that the chunk belongs to
-     * @param chunkWaypoints the waypoints that belong to the chunk
-     * @param expectedChunks the expected number of chunks
-     * @Condition: worker != null
-     */
+    // Creates the chunk and sends it to a worker
     private void createChunk(Route route, ArrayList<Waypoint> chunkWaypoints, int expectedChunks)
     {
         WorkerHandler worker = workers.poll();
