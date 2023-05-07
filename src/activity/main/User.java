@@ -204,7 +204,9 @@ public class User
             System.out.println();
             System.out.println("Statistics for your route:" );
             System.out.println(routeStats + "\n");
+            System.out.println("Your overall performance:");
             System.out.println(userStats + "\n");
+            System.out.println("Average overall performance for all users:");
             System.out.println(allUsersStats + "\n");
             ArrayList<SegmentLeaderboard> leaderboards = (ArrayList<SegmentLeaderboard>) leaderboardObject;
             for (SegmentLeaderboard leaderboard : leaderboards)
@@ -312,7 +314,7 @@ public class User
 
 
     /**
-     * Method used to shutdown the connection with the master and close the input and output streams
+     * Method used to shut down the connection with the master and close the input and output streams
      */
     private void shutdown()
     {

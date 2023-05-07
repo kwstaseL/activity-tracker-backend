@@ -230,7 +230,6 @@ public class ClientHandler implements Runnable
             statsArrayList.add(pair.getValue());
         }
 
-        // TODO: Check whats going on here
         // Start a new thread to handle the reducing phase
         new Thread(() -> handleReducing(new Pair<>(routeId, statsArrayList), chunk.getRoute().getUser())).start();
     }
@@ -269,7 +268,6 @@ public class ClientHandler implements Runnable
                 // Get the segment leaderboards for each segment in the route
                 ArrayList<Integer> segmentsInRoute = finalResults.getSegmentHashes();
                 ArrayList<SegmentLeaderboard> segmentLeaderboards = new ArrayList<>();
-
                 for (int segmentHashID : segmentsInRoute)
                 {
                     segmentLeaderboards.add(statistics.getLeaderboard(segmentHashID));
