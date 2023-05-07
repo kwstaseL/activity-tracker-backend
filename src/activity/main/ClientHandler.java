@@ -191,6 +191,7 @@ public class ClientHandler implements Runnable
                     Route route = GPXParser.parseRoute(gpxContent,segments);
                     route.setClientID(clientID);
                     // Add the route to the queue
+                    //noinspection SynchronizeOnNonFinalField
                     synchronized (routeQueue)
                     {
                         // Add the route to the queue and notify the dispatcher that will dispatch it to the workers
