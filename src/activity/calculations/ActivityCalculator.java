@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/** Class used for the mapping phase
+/** Class used for the mapping phase.
 * It will calculate the distance, time and elevation differences between two waypoints.
  * */
 public class ActivityCalculator
