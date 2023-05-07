@@ -2,6 +2,14 @@
   <profile version="1.0">
     <option name="myName" value="Project Default" />
     <inspection_tool class="ClassCanBeRecord" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="56" name="Java" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="JavadocDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ADDITIONAL_TAGS" value="pre" />
+    </inspection_tool>
     <inspection_tool class="PatternVariableCanBeUsed" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES" />
     <inspection_tool class="RedundantClassCall" enabled="false" level="WARNING" enabled_by_default="false" />
   </profile>
