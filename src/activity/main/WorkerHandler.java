@@ -10,7 +10,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 
-// This class will handle the worker connection
+/**
+ * This class is responsible to handle the connection to a worker node.
+ */
 public class WorkerHandler implements Runnable
 {
     // These are the input and output streams for the worker
@@ -38,16 +40,20 @@ public class WorkerHandler implements Runnable
         }
     }
 
-    // This is where the worker will be handled
-    // A thread will be created to listen for messages from the worker
-    // and a thread will be created to handle the results from the worker
+    /**
+     * Starts the thread to listen for messages from the worker.
+     */
+    @Override
     public void run()
     {
         Thread listenToWorker = new Thread(this::listenToWorker);
         listenToWorker.start();
     }
-    // This method will listen for messages from the worker
-    // and add the intermediate results to the appropriate client-handler that send them
+
+    /**
+     * Listens for messages from the worker and adds the intermediate results
+     * to the appropriate client handler.
+     */
     @SuppressWarnings("unchecked")
     private void listenToWorker()
     {
@@ -80,7 +86,10 @@ public class WorkerHandler implements Runnable
             shutdown();
         }
     }
-    // This method will send a chunk to the worker to be mapped
+
+    /**
+     * Sends a chunk to the worker to be processed.
+     */
     public void processJob(Chunk chunk)
     {
         assert chunk != null;
@@ -95,8 +104,9 @@ public class WorkerHandler implements Runnable
             System.out.println("WorkerHandler: Could not send route to worker because the connection is lost");
         }
     }
-    // This method will close the connection to the worker
-    // and clean up the resources
+    /**
+     * Closes the connection to the worker and cleans up resources.
+     */
     private void shutdown()
     {
         try

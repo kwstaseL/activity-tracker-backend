@@ -12,7 +12,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Properties;
 
-// Worker class responsible for handling the mapping of the data
+/**
+ * The worker class is responsible for handling the mapping of the data.
+ */
 public class Worker
 {
     // This is the socket that the worker is connected to
@@ -24,6 +26,9 @@ public class Worker
     // This is the lock that will be used to ensure that only one thread can write to the output stream at a time
     private final Object writeLock = new Object();
 
+    /**
+     * Initializes a new instance of the Worker class.
+     */
     public Worker()
     {
         try
@@ -48,15 +53,20 @@ public class Worker
 
     }
 
-    // This method will start the worker and start listening for jobs from the master
+    /**
+     * Starts the worker and begins listening for jobs from the master.
+     */
     private void start()
     {
         Thread readData = new Thread(this::readForData);
         readData.start();
     }
 
-    // This method will read data from master and handle the mapping of the data.
-    // For each chunk that is received, a new thread will be created to handle the mapping of the data
+    /**
+     * Reads data from the master and handles the mapping of the data.
+     * For each chunk that is received, a new thread will be created to handle the mapping of the data.
+     * @throws RuntimeException if the received object is not a chunk.
+     */
     private void readForData()
     {
         while (!connection.isClosed())
@@ -87,8 +97,13 @@ public class Worker
         }
     }
 
-    // This method will handle the mapping of the data
-    // It will call the map method from the Map class and send the result back to the master
+    /**
+     * Handles the mapping of the data.
+     * Calls the map method from the Map class and sends the result back to the master.
+     *
+     * @param chunk The chunk of data to be mapped.
+     * @assert chunk != null
+     */
     private void handleMapping(Chunk chunk)
     {
         assert chunk != null;
@@ -111,7 +126,9 @@ public class Worker
         }
     }
 
-    // This method will close the connection to the master and close the input and output streams
+    /**
+     * Closes the connection to the master and closes the input and output streams.
+     */
     private void shutdown()
     {
         try
