@@ -25,7 +25,9 @@ To use the Activity-Tracker app, follow these steps:
 - Start the workers and specify the maximum number of workers in the configuration file.
     
 - Start the user client to send and start processing GPX files and segments.
-## Authors
+
+
+## Collaborators
 
 - [hvlkk](https://www.github.com/hvlkk)
 - [kwstaseL](https://www.github.com/kwstaseL)
