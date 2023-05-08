@@ -12,8 +12,8 @@ It is a simple system for analyzing activity tracking data using the MapReduce f
 
 Before running the app, there are a few configuration steps you need to take:
 
-    > Configure the master's IP address in the configuration file. By default, the app will run on localhost.
-    > Ensure that the "available_gpx" and "registered_segments" folders exist and contain the user's GPX files and segments, respectively.
+    - Configure the master's IP address in the configuration file. By default, the app will run on localhost.
+    - Ensure that the "available_gpx" and "registered_segments" folders exist and contain the user's GPX files and segments, respectively.    
 
 
 ## Usage
