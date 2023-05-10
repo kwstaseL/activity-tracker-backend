@@ -88,6 +88,69 @@ public class ClientHandler implements Runnable
     }
 
     /**
+     * This method is used to get the file from the client
+     * And to send it to the work-dispatcher that will dispatch it to the workers.
+     *
+     * @throws RuntimeException if the user is already connected
+     */
+    private void readFromClient()
+    {
+        try
+        {
+            // Get the clients username
+            String username = (String) in.readObject();
+            // Check if the user is already connected
+            if (connectedClients.contains(username))
+            {
+                // If the user is already connected, we send a message to the client and close the connection
+                System.out.println("ClientHandler: User already connected!");
+                out.writeObject("User already connected!");
+                out.flush();
+                throw new RuntimeException("User already connected!");
+            }
+            else
+            {
+                System.out.println("ClientHandler: User " + username + " connected!");
+                out.writeObject("OK");
+                connectedClients.add(username);
+                clientUsername = username;
+            }
+            // Receive the file object from the client
+
+            while (!clientSocket.isClosed())
+            {
+                System.out.println("ClientHandler: Waiting for file from client");
+
+                Object obj = in.readObject();
+
+                if (obj instanceof GPXData gpxData)
+                {
+                    ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
+                    // Parse the file
+                    // Create a new thread to handle the parsing of the file
+                    Route route = GPXParser.parseRoute(gpxContent,segments);
+                    route.setClientID(clientID);
+                    // Add the route to the queue
+                    synchronized (routeQueue)
+                    {
+                        // Add the route to the queue and notify the dispatcher
+                        routeQueue.add(route);
+                        routeQueue.notify();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("ClientHandler: Connection to client lost");
+        }
+        finally
+        {
+            shutdown();
+        }
+    }
+
+    /**
      * This method is used to receive back all the chunks from the file we dispatched to the worker.
      * In order to start the reduce phase for that route (and thus, the client).
      *
@@ -152,69 +215,6 @@ public class ClientHandler implements Runnable
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * This method is used to get the file from the client
-     * And to send it to the work-dispatcher that will dispatch it to the workers.
-     *
-     * @throws RuntimeException if the user is already connected
-     */
-    private void readFromClient()
-    {
-        try
-        {
-            // Get the clients username
-            String username = (String) in.readObject();
-            // Check if the user is already connected
-            if (connectedClients.contains(username))
-            {
-                // If the user is already connected, we send a message to the client and close the connection
-                System.out.println("ClientHandler: User already connected!");
-                out.writeObject("User already connected!");
-                out.flush();
-                throw new RuntimeException("User already connected!");
-            }
-            else
-            {
-                System.out.println("ClientHandler: User " + username + " connected!");
-                out.writeObject("OK");
-                connectedClients.add(username);
-                clientUsername = username;
-            }
-            // Receive the file object from the client
-
-            while (!clientSocket.isClosed())
-            {
-                System.out.println("ClientHandler: Waiting for file from client");
-
-                Object obj = in.readObject();
-
-                if (obj instanceof GPXData gpxData)
-                {
-                    ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
-                    // Parse the file
-                    // Create a new thread to handle the parsing of the file
-                    Route route = GPXParser.parseRoute(gpxContent,segments);
-                    route.setClientID(clientID);
-                    // Add the route to the queue
-                    synchronized (routeQueue)
-                    {
-                        // Add the route to the queue and notify the dispatcher
-                        routeQueue.add(route);
-                        routeQueue.notify();
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println("ClientHandler: Connection to client lost");
-        }
-        finally
-        {
-            shutdown();
         }
     }
 

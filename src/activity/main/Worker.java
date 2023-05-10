@@ -37,9 +37,9 @@ public class Worker
             config.load(new FileInputStream("config.properties"));
 
             final String masterIP = config.getProperty("master_ip");
-            final int WORKER_PORT = Integer.parseInt(config.getProperty("worker_port"));
+            final int workerPort = Integer.parseInt(config.getProperty("worker_port"));
             // Creating a socket that will connect to the master and creating the input and output streams
-            connection = new Socket(masterIP, WORKER_PORT);
+            connection = new Socket(masterIP, workerPort);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
             System.out.println("Worker: Connection to master established");
@@ -118,8 +118,8 @@ public class Worker
                 out.writeObject(intermediate_result);
                 out.flush();
             }
-
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             System.out.println("Could not send object to the worker handler");
             throw new RuntimeException(e);

@@ -47,8 +47,8 @@ public class User
             connection = new Socket(masterIP, clientPort);
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             System.out.println("Could not connect to master");
             shutdown();

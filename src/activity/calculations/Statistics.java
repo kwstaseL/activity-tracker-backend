@@ -79,18 +79,18 @@ public class Statistics implements Serializable
         ++routesRecorded;
 
         // Extracting all the segment stats this user has done, and updating the segment statistics
-        ArrayList<SegmentStats> segmentStatsList = activityStats.getSegmentStatsList();
-        for (SegmentStats segment : segmentStatsList)
+        ArrayList<SegmentActivityStats> segmentStatsList = activityStats.getSegmentStatsList();
+        for (SegmentActivityStats segment : segmentStatsList)
         {
-            int segmentHash = segment.getFileName().hashCode();
-            if (!this.segmentStatistics.containsKey(segmentHash))
+            int segmentHashID = segment.getFileName().hashCode();
+            if (!this.segmentStatistics.containsKey(segmentHashID))
             {
                 // Creating a new SegmentLeaderBoard for that specific segment if it does not exist
-                segmentStatistics.put(segmentHash, new SegmentLeaderboard(segment.getFileName()));
+                segmentStatistics.put(segmentHashID, new SegmentLeaderboard(segment.getFileName()));
             }
             // If the leaderboard for that segment already exists, we register the segment statistics for that user
-            SegmentLeaderboard leaderboard = segmentStatistics.get(segmentHash);
-            leaderboard.registerSegmentStatistics(new UserSegmentStatistics(segmentHash, user, segment.getTime()));
+            SegmentLeaderboard leaderboard = segmentStatistics.get(segmentHashID);
+            leaderboard.registerSegmentStatistics(new UserSegmentStatistics(segmentHashID, user, segment.getTime()));
         }
     }
 
