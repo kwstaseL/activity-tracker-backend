@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * This class is used to store the statistics of a segment for a user
  */
-public class SegmentStats implements Serializable
+public class SegmentActivityStats implements Serializable
 {
     // represents the id of the segment this SegmentStats was created for
     private final int segmentID;
@@ -15,13 +15,13 @@ public class SegmentStats implements Serializable
     private double time;
 
     /**
-     * Creates a new instance of SegmentStats.
+     * Creates a new instance of SegmentActivityStats.
      *
      * @param segmentID the id of the segment
      * @param fileName the name of the segment file
      * @throws IllegalArgumentException if segmentID is negative or fileName is null or empty
      */
-    public SegmentStats(int segmentID, String fileName)
+    public SegmentActivityStats(int segmentID, String fileName)
     {
         if (segmentID < 0)
         {
@@ -37,11 +37,11 @@ public class SegmentStats implements Serializable
     }
 
     /**
-     * Used in the mapping phase to update the time it took for the user to complete the segment.
+     * Used in the mapping and reducing phases, to update the time it took the user to complete the segment accordingly.
      *
      * @param time the time to update
      */
-    public void timeUpdate(double time)
+    public void updateTime(double time)
     {
         this.time += time;
     }
@@ -67,7 +67,7 @@ public class SegmentStats implements Serializable
     }
 
     /**
-     *  Custom equals function that compares two SegmentStats objects based on their segmentID.
+     *  Custom equals function that compares two SegmentActivityStats objects based on their segmentID.
      * @param o the object to compare to
      * @return true if the objects are equal, false otherwise
      */
@@ -75,8 +75,8 @@ public class SegmentStats implements Serializable
     public boolean equals(Object o)
     {
         if (this == o) return true;
-        if (!(o instanceof SegmentStats)) return false;
-        SegmentStats that = (SegmentStats) o;
+        if (!(o instanceof SegmentActivityStats)) return false;
+        SegmentActivityStats that = (SegmentActivityStats) o;
         return segmentID == that.segmentID;
     }
 }
