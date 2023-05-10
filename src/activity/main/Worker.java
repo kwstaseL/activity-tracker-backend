@@ -26,7 +26,7 @@ public class Worker
     // This is the lock that will be used to ensure that only one thread can write to the output stream at a time
     private final Object writeLock = new Object();
 
-    /**
+    /*
      * Initializes a new instance of the Worker class.
      */
     public Worker()

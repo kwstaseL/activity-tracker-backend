@@ -47,6 +47,7 @@ public class ClientHandler implements Runnable
     // connectedClients: A list of all the connected clients
     private static final ArrayList<String> connectedClients = new ArrayList<>();
     private final Object writeLock = new Object();
+    private static final Object routeHashmapLock = new Object();
     private static final Statistics statistics = new Statistics();
 
     /**
@@ -109,11 +110,12 @@ public class ClientHandler implements Runnable
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
+
                 Pair<Chunk, ActivityStats> stats = statsQueue.poll();
                 Chunk chunk = stats.getKey();
                 int routeID = chunk.getRoute().getRouteID();
 
-                synchronized (routeHashmap)
+                synchronized (routeHashmapLock)
                 {
                     // If the route already exists in the hashmap, we add the chunk to the list of chunks
                     if (routeHashmap.containsKey(routeID))
@@ -140,7 +142,6 @@ public class ClientHandler implements Runnable
                             activityList.add(stats);
                             routeHashmap.put(routeID, activityList);
                         }
-
                         // Else if the route does not exist in the hashmap, we create a new list and add the chunk to it
                     }
                     else
@@ -157,6 +158,8 @@ public class ClientHandler implements Runnable
     /**
      * This method is used to get the file from the client
      * And to send it to the work-dispatcher that will dispatch it to the workers.
+     *
+     * @throws RuntimeException if the user is already connected
      */
     private void readFromClient()
     {
@@ -204,7 +207,6 @@ public class ClientHandler implements Runnable
                     }
                 }
             }
-
         }
         catch (Exception e)
         {
