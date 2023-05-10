@@ -29,6 +29,7 @@ public class Master
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
     private int maxWorkers;
+    private static Master instance = null;
 
     public Master()
     {
@@ -64,10 +65,10 @@ public class Master
      */
     private void start()
     {
-        /**
-         * Thread that will accept client connections and create a new thread to handle the client
-         * by creating a new ClientHandler object.
-         * We also pass shared resources to the ClientHandler for processing reasons.
+        /*
+          Thread that will accept client connections and create a new thread to handle the client
+          by creating a new ClientHandler object.
+          We also pass shared resources to the ClientHandler for processing reasons.
          */
         Thread handleClient = new Thread(() ->
         {
@@ -105,11 +106,11 @@ public class Master
             }
         });
 
-        /**
-         *  Thread that will accept worker connections and create a new thread to handle the worker
-         *  by creating a new WorkerHandler object.
-         *  We also pass the clientMap to the WorkerHandler so that the worker can send the results back to the corresponding
-         *  component that handles the client.
+        /*
+           Thread that will accept worker connections and create a new thread to handle the worker
+           by creating a new WorkerHandler object.
+           We also pass the clientMap to the WorkerHandler so that the worker can send the results back to the corresponding
+           component that handles the client.
          */
         Thread handleWorker = new Thread(() ->
         {
@@ -148,11 +149,11 @@ public class Master
             }
         });
 
-        /**
-         * Thread that will start dispatching work to the workers.
-         * We are passing the worker handler so that the work dispatcher can send work to the workers.
-         * We are also passing the routes, which is a shared memory between the client handler and the work dispatcher.
-         * The client-handler will upload the routes to the work dispatcher and the work dispatcher will send the routes to the workers.
+        /*
+          Thread that will start dispatching work to the workers.
+          We are passing the worker handler so that the work dispatcher can send work to the workers.
+          We are also passing the routes, which is a shared memory between the client handler and the work dispatcher.
+          The client-handler will upload the routes to the work dispatcher and the work dispatcher will send the routes to the workers.
          */
         Thread dispatchWork = new Thread(() ->
         {
@@ -161,8 +162,8 @@ public class Master
             workDispatcherThread.start();
         });
 
-        /**
-         * Thread that will create the segments from the files in the directory of the master.
+        /*
+          Thread that will create the segments from the files in the directory of the master.
          */
         Thread createSegments = new Thread(() ->
         {
@@ -203,11 +204,17 @@ public class Master
         handleClient.start();
         dispatchWork.start();
     }
-
+    public synchronized static Master getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new Master();
+        }
+        return instance;
+    }
     public static void main(String[] args)
     {
-        Master master = new Master();
+        Master master = Master.getInstance();
         master.start();
     }
-
 }
