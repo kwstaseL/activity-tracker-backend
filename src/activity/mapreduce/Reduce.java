@@ -1,7 +1,7 @@
 package activity.mapreduce;
 
 import activity.calculations.ActivityStats;
-import activity.calculations.SegmentStats;
+import activity.calculations.SegmentActivityStats;
 import activity.misc.Pair;
 
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ public class Reduce
         double distance = 0;
         double totalSpeed = 0;
 
-        int routeID = activityStatsList.get(0).getRouteID();
+        int routeID = intermediateResults.getKey();
         // finalSegmentStats: contains the statistics for each segment the route contains
-        ArrayList<SegmentStats> finalSegmentStats = new ArrayList<>();
+        ArrayList<SegmentActivityStats> finalSegmentStats = new ArrayList<>();
 
         // iterating over the stats returned by each chunk of our route
         for (ActivityStats stats : activityStatsList)
@@ -40,10 +40,10 @@ public class Reduce
             totalSpeed += stats.getSpeed();
 
             // get the list of segment stats that this chunk contained
-            ArrayList<SegmentStats> chunkSegmentStats = stats.getSegmentStatsList();
+            ArrayList<SegmentActivityStats> chunkSegmentStats = stats.getSegmentStatsList();
 
             // for each segment stats in the list above:
-            for (SegmentStats segmentStats : chunkSegmentStats)
+            for (SegmentActivityStats segmentStats : chunkSegmentStats)
             {
                 // check if these segment stats are already included in our final stats (by comparing their segmentID)
                 int segmentStatsIndex = finalSegmentStats.indexOf(segmentStats);
@@ -55,8 +55,8 @@ public class Reduce
                     continue;
                 }
                 // else (meaning we have already found other stats about this segment), update the total time
-                SegmentStats currentSegmentStats = finalSegmentStats.get(segmentStatsIndex);
-                currentSegmentStats.timeUpdate(segmentStats.getTime());
+                SegmentActivityStats currentSegmentStats = finalSegmentStats.get(segmentStatsIndex);
+                currentSegmentStats.updateTime(segmentStats.getTime());
             }
         }
         return new ActivityStats(routeID, distance, totalSpeed / activityStatsList.size(), elevation, time, finalSegmentStats);
