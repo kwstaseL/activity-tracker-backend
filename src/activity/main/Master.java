@@ -29,9 +29,11 @@ public class Master
     // Lookup table that will map the client id to the appropriate client handler
     private HashMap<Integer,ClientHandler> clientMap;
     private int maxWorkers;
+
+    // Master will be a singleton class, with instance marking the only Master instantiation we will be allowing.
     private static Master instance = null;
 
-    public Master()
+    private Master()
     {
         try
         {
@@ -204,6 +206,11 @@ public class Master
         handleClient.start();
         dispatchWork.start();
     }
+
+    /**
+     * getInstance: The method used to get the only Master instance that will be running in our app.
+     * @return The singleton Master instance.
+     */
     public synchronized static Master getInstance()
     {
         if (instance == null)
@@ -212,6 +219,7 @@ public class Master
         }
         return instance;
     }
+
     public static void main(String[] args)
     {
         Master master = Master.getInstance();
