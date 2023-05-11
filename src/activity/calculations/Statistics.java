@@ -99,7 +99,7 @@ public class Statistics implements Serializable
      *
      * @param userStatistics The user statistics to register.
      */
-    public void registerStatistics(UserStatistics userStatistics)
+    private void registerStatistics(UserStatistics userStatistics)
     {
         this.routesRecorded += userStatistics.getRoutesRecorded();
         this.totalDistance += userStatistics.getTotalDistance();
@@ -167,7 +167,7 @@ public class Statistics implements Serializable
      *  Called upon Statistics initialisation, loads data into both the userStats hashmap and the segmentStatistics hashmap
      *  for the statistics xml file and for each segment xml file for all users.
      */
-    public void loadStats()
+    private void loadStats()
     {
         try
         {
