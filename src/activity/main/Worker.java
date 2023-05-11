@@ -102,7 +102,6 @@ public class Worker
      * Calls the map method from the Map class and sends the result back to the master.
      *
      * @param chunk The chunk of data to be mapped.
-     * @assert chunk != null
      */
     private void handleMapping(Chunk chunk)
     {

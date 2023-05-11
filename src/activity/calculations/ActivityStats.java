@@ -10,7 +10,7 @@ import java.util.ArrayList;
 // during the map/reduce phase
 public class ActivityStats implements Serializable {
     // segmentStatsList: contains the statistics for each segment the route contains
-    private final ArrayList<SegmentStats> segmentStatsList;
+    private final ArrayList<SegmentActivityStats> segmentStatsList;
     // uniqueID: represents the unique ID of the route
     private final int routeID;
     // Represents the total distance, average speed,
@@ -19,7 +19,6 @@ public class ActivityStats implements Serializable {
     private double speed;
     private double elevation;
     private double time;
-
 
     /**
      * Constructor used for the map/reduce phase for the final results.
@@ -32,7 +31,7 @@ public class ActivityStats implements Serializable {
      * @param segmentStatsList the statistics for each segment of the route
      */
     public ActivityStats(int routeID, double distance, double speed, double elevation,
-                         double time, ArrayList<SegmentStats> segmentStatsList) {
+                         double time, ArrayList<SegmentActivityStats> segmentStatsList) {
         this.routeID = routeID;
         this.distance = distance;
         this.speed = speed;
@@ -46,7 +45,8 @@ public class ActivityStats implements Serializable {
      *
      * @param routeID the unique ID of the route
      */
-    public ActivityStats(int routeID) {
+    public ActivityStats(int routeID)
+    {
         this(routeID, 0, 0, 0, 0, new ArrayList<>());
     }
 
@@ -57,7 +57,7 @@ public class ActivityStats implements Serializable {
      */
     public void registerSegments(ArrayList<Segment> segments) {
         for (Segment segment : segments) {
-            this.segmentStatsList.add(new SegmentStats(segment.getSegmentID(), segment.getFileName()));
+            this.segmentStatsList.add(new SegmentActivityStats(segment.getSegmentID(), segment.getFileName()));
         }
     }
 
@@ -85,15 +85,15 @@ public class ActivityStats implements Serializable {
             int segmentID = segment.getSegmentID();
             // finds the index of the segmentStats object that has the same segmentID as the segment we
             // are currently looking at
-            int segmentStatsIndex = segmentStatsList.indexOf(new SegmentStats(segmentID, segment.getFileName()));
+            int segmentStatsIndex = segmentStatsList.indexOf(new SegmentActivityStats(segmentID, segment.getFileName()));
             // if we just found the segmentStats object for the first time we create a new one and continue
             if (segmentStatsIndex == -1) {
                 continue;
             }
             // if we found the segmentStats object that corresponds to the same segmentID as the segment we are
             // currently looking at we calculate the time and update the segmentStats object
-            SegmentStats segmentStats = segmentStatsList.get(segmentStatsIndex);
-            segmentStats.timeUpdate(ActivityCalculator.calculateTime(w1, w2));
+            SegmentActivityStats segmentStats = segmentStatsList.get(segmentStatsIndex);
+            segmentStats.updateTime(ActivityCalculator.calculateTime(w1, w2));
         }
     }
 
@@ -124,7 +124,7 @@ public class ActivityStats implements Serializable {
         return routeID;
     }
 
-    public ArrayList<SegmentStats> getSegmentStatsList() {
+    public ArrayList<SegmentActivityStats> getSegmentStatsList() {
         return this.segmentStatsList;
     }
 
@@ -133,9 +133,11 @@ public class ActivityStats implements Serializable {
      *
      * @return the segmentIDs of the segments that the route contains
      */
-    public ArrayList<Integer> getSegmentHashes() {
+    public ArrayList<Integer> getSegmentHashes()
+    {
         ArrayList<Integer> segmentIDs = new ArrayList<>();
-        for (SegmentStats segmentStats : segmentStatsList) {
+        for (SegmentActivityStats segmentStats : segmentStatsList)
+        {
             segmentIDs.add(segmentStats.getFileName().hashCode());
         }
         return segmentIDs;

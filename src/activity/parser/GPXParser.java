@@ -87,7 +87,7 @@ public class GPXParser
     public static Segment parseSegment(File segmentFile)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<>();
-        Segment segment = null;
+        Segment segments = null;
         try {
             // Parsing the GPX file
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -120,12 +120,12 @@ public class GPXParser
             {
                 throw new RuntimeException("Could not parse the file successfully.");
             }
-            segment = new Segment(waypoints, fileName);
+            segments = new Segment(waypoints, fileName);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return segment;
+        return segments;
     }
 }

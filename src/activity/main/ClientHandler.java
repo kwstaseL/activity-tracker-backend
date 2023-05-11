@@ -49,7 +49,6 @@ public class ClientHandler implements Runnable
     private final Object writeLock = new Object();
     private static final Object routeHashmapLock = new Object();
     private static final Statistics statistics = new Statistics();
-
     /**
      * Constructor for the ClientHandler
      * @param clientSocket the socket that the client is connected to

@@ -89,7 +89,8 @@ public class WorkDispatcher implements Runnable
             waypointChunk.add(currentWaypoint);
 
             // First condition: Turns true when the first chunk is full.
-            if (waypointChunk.size() == n && chunks == 0) {
+            if (waypointChunk.size() == n && chunks == 0)
+            {
                 chunks++;
                 createChunk(route, waypointChunk, expectedChunks);
 
@@ -167,6 +168,7 @@ public class WorkDispatcher implements Runnable
      * @param route the route that the chunk belongs to
      * @param chunkWaypoints the waypoints that belong to the chunk
      * @param expectedChunks the expected number of chunks
+     *
      */
     private void createChunk(Route route, ArrayList<Waypoint> chunkWaypoints, int expectedChunks)
     {
@@ -175,6 +177,7 @@ public class WorkDispatcher implements Runnable
         synchronized (writeLock)
         {
             WorkerHandler worker = workers.poll();
+            assert worker != null;
             worker.processJob(chunk);
             // adding the worker to the end of the queue
             workers.add(worker);
