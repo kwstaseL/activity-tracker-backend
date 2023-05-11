@@ -72,7 +72,8 @@ public class Route implements Serializable
             throw new IllegalArgumentException("Index cannot be negative.");
         }
 
-        if (!segments.contains(segment)) {
+        if (!segments.contains(segment))
+        {
             segments.add(segment);
             segmentStartingIndices.add(index);
         }
@@ -110,7 +111,7 @@ public class Route implements Serializable
     {
         assert chunk != null;
         int index = Collections.indexOfSubList(waypoints, chunk.getWaypoints());
-        if(index == -1)
+        if (index == -1)
         {
             throw new RuntimeException("Chunk is not a part of the route");
         }
@@ -124,7 +125,7 @@ public class Route implements Serializable
      * @throws RuntimeException if the chunk does not belong to the route
      * @throws IllegalArgumentException if the segment is null
      */
-    protected void segmentsInChunk(Chunk chunk)
+    protected void registerSegmentsInChunk(Chunk chunk)
     {
         if (chunk == null)
         {

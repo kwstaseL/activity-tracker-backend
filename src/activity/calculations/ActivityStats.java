@@ -56,7 +56,8 @@ public class ActivityStats implements Serializable {
      * @param segments the segments to register
      */
     public void registerSegments(ArrayList<Segment> segments) {
-        for (Segment segment : segments) {
+        for (Segment segment : segments)
+        {
             this.segmentStatsList.add(new SegmentActivityStats(segment.getSegmentID(), segment.getFileName()));
         }
     }
@@ -67,7 +68,8 @@ public class ActivityStats implements Serializable {
      * @param w1 the first waypoint
      * @param w2 the second waypoint
      */
-    public void updateStats(Waypoint w1, Waypoint w2) {
+    public void updateStats(Waypoint w1, Waypoint w2)
+    {
         this.distance += ActivityCalculator.calculateDistanceInKilometers(w1, w2);
         this.time += ActivityCalculator.calculateTime(w1, w2);
         this.elevation += ActivityCalculator.calculateElevation(w1, w2);
@@ -80,14 +82,17 @@ public class ActivityStats implements Serializable {
      * @param w2       the second waypoint
      * @param segments the segments to update
      */
-    public void updateSegmentStats(Waypoint w1, Waypoint w2, ArrayList<Segment> segments) {
-        for (Segment segment : segments) {
+    public void updateSegmentStats(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
+    {
+        for (Segment segment : segments)
+        {
             int segmentID = segment.getSegmentID();
             // finds the index of the segmentStats object that has the same segmentID as the segment we
             // are currently looking at
             int segmentStatsIndex = segmentStatsList.indexOf(new SegmentActivityStats(segmentID, segment.getFileName()));
             // if we just found the segmentStats object for the first time we create a new one and continue
-            if (segmentStatsIndex == -1) {
+            if (segmentStatsIndex == -1)
+            {
                 continue;
             }
             // if we found the segmentStats object that corresponds to the same segmentID as the segment we are

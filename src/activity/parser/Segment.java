@@ -22,7 +22,7 @@ public class Segment implements Serializable
     public Segment(ArrayList<Waypoint> waypoints, String fileName)
     {
         this.waypoints = waypoints;
-        segmentID = segmentIDGenerator++;
+        this.segmentID = segmentIDGenerator++;
         this.fileName = fileName;
     }
 

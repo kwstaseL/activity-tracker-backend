@@ -71,7 +71,7 @@ public class Chunk implements Serializable
     {
         try
         {
-            route.segmentsInChunk(this);
+            route.registerSegmentsInChunk(this);
         }
         catch (Exception e)
         {

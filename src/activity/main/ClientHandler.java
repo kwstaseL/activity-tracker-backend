@@ -46,7 +46,7 @@ public class ClientHandler implements Runnable
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
     // connectedClients: A list of all the connected clients
     private static final ArrayList<String> connectedClients = new ArrayList<>();
-    private static final Object writeLock = new Object();
+    private final Object writeLock = new Object();
     private static final Object routeHashmapLock = new Object();
     private static final Statistics statistics = new Statistics();
     /**
