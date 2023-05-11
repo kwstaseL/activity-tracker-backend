@@ -92,6 +92,7 @@ public class ClientHandler implements Runnable
      * In order to start the reduce phase for that route (and thus, the client).
      *
      * @throws RuntimeException if the chunks received are more than expected
+     * @throws RuntimeException if received something that is not a chunk
      */
     private void readFromWorkerHandler()
     {
@@ -110,7 +111,10 @@ public class ClientHandler implements Runnable
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
-
+                if (!(statsQueue.peek() instanceof Pair<?,?>))
+                {
+                    throw new RuntimeException("Received something that is not a pair!");
+                }
                 Pair<Chunk, ActivityStats> stats = statsQueue.poll();
                 Chunk chunk = stats.getKey();
                 int routeID = chunk.getRoute().getRouteID();
@@ -184,15 +188,15 @@ public class ClientHandler implements Runnable
                 clientUsername = username;
             }
             // Receive the file object from the client
-
             while (!clientSocket.isClosed())
             {
                 System.out.println("ClientHandler: Waiting for file from client");
 
                 Object obj = in.readObject();
 
-                if (obj instanceof GPXData gpxData)
+                if (obj instanceof GPXData)
                 {
+                    GPXData gpxData = (GPXData) obj;
                     ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
                     // Parse the file
                     // Create a new thread to handle the parsing of the file

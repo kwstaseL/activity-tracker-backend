@@ -8,10 +8,11 @@ import java.util.ArrayList;
 
 // Contains the results of the calculations for the activities
 // during the map/reduce phase
-public class ActivityStats implements Serializable {
+public class ActivityStats implements Serializable
+{
     // segmentStatsList: contains the statistics for each segment the route contains
     private final ArrayList<SegmentStats> segmentStatsList;
-    // uniqueID: represents the unique ID of the route
+    // uniqueID: represents the unique ID of the route that this statistics belong to
     private final int routeID;
     // Represents the total distance, average speed,
     // total elevation and total time of the activity of a route that the user has uploaded
@@ -19,7 +20,6 @@ public class ActivityStats implements Serializable {
     private double speed;
     private double elevation;
     private double time;
-
 
     /**
      * Constructor used for the map/reduce phase for the final results.
@@ -32,7 +32,8 @@ public class ActivityStats implements Serializable {
      * @param segmentStatsList the statistics for each segment of the route
      */
     public ActivityStats(int routeID, double distance, double speed, double elevation,
-                         double time, ArrayList<SegmentStats> segmentStatsList) {
+                         double time, ArrayList<SegmentStats> segmentStatsList)
+    {
         this.routeID = routeID;
         this.distance = distance;
         this.speed = speed;
@@ -51,12 +52,16 @@ public class ActivityStats implements Serializable {
     }
 
     /**
-     * Registers the segments statistics for the route
+     * Creates all the segments statistics for the chunk.
+     * Called when we first find out that a chunk of waypoints contains a segment.
      *
      * @param segments the segments to register
      */
-    public void registerSegments(ArrayList<Segment> segments) {
-        for (Segment segment : segments) {
+    public void registerSegments(ArrayList<Segment> segments)
+    {
+        assert segments != null;
+        for (Segment segment : segments)
+        {
             this.segmentStatsList.add(new SegmentStats(segment.getSegmentID(), segment.getFileName()));
         }
     }
@@ -67,27 +72,32 @@ public class ActivityStats implements Serializable {
      * @param w1 the first waypoint
      * @param w2 the second waypoint
      */
-    public void updateStats(Waypoint w1, Waypoint w2) {
+    public void updateStats(Waypoint w1, Waypoint w2)
+    {
         this.distance += ActivityCalculator.calculateDistanceInKilometers(w1, w2);
         this.time += ActivityCalculator.calculateTime(w1, w2);
         this.elevation += ActivityCalculator.calculateElevation(w1, w2);
     }
 
     /**
-     * Updates the stats of the segments that contain the given waypoints.
+     * Updates the stats of the segments that we already have registered
+     * that contain the given waypoints.
      *
      * @param w1       the first waypoint
      * @param w2       the second waypoint
      * @param segments the segments to update
      */
-    public void updateSegmentStats(Waypoint w1, Waypoint w2, ArrayList<Segment> segments) {
-        for (Segment segment : segments) {
+    public void updateSegmentStats(Waypoint w1, Waypoint w2, ArrayList<Segment> segments)
+    {
+        for (Segment segment : segments)
+        {
             int segmentID = segment.getSegmentID();
             // finds the index of the segmentStats object that has the same segmentID as the segment we
             // are currently looking at
             int segmentStatsIndex = segmentStatsList.indexOf(new SegmentStats(segmentID, segment.getFileName()));
             // if we just found the segmentStats object for the first time we create a new one and continue
-            if (segmentStatsIndex == -1) {
+            if (segmentStatsIndex == -1)
+            {
                 continue;
             }
             // if we found the segmentStats object that corresponds to the same segmentID as the segment we are
@@ -133,7 +143,8 @@ public class ActivityStats implements Serializable {
      *
      * @return the segmentIDs of the segments that the route contains
      */
-    public ArrayList<Integer> getSegmentHashes() {
+    public ArrayList<Integer> getSegmentHashes()
+    {
         ArrayList<Integer> segmentIDs = new ArrayList<>();
         for (SegmentStats segmentStats : segmentStatsList) {
             segmentIDs.add(segmentStats.getFileName().hashCode());

@@ -93,20 +93,23 @@ public class WorkDispatcher implements Runnable
                 chunks++;
                 createChunk(route, waypointChunk, expectedChunks);
 
-                if (i != waypoints.size() - 1) {
+                if (i != waypoints.size() - 1)
+                {
                     // clear the chunk for the next set of waypoints
                     waypointChunk = new ArrayList<>();
                     // adding the last waypoint from the previous chunk, so we do not miss the connection between i and i+1
                     waypointChunk.add(waypoints.get(i));
                 }
 
-            } // Second condition: Turns true when we reach the end of the waypoints to be processed, at which point we assign the chunk as is to a worker to process
+            } // Second condition: Turns true when we reach the end of the waypoints to be processed, at which point we
+            // assign the chunk as is to a worker to process
             else if (i == waypoints.size() - 1)
             {
                 chunks++;
                 createChunk(route, waypointChunk, expectedChunks);
 
-            } // Third condition: Turns true when a chunk after the first is full. Size limit is n+1, since it needs to hold the last waypoint of the previous chunk
+            } // Third condition: Turns true when a chunk after the first is full. Size limit is n+1, since it needs
+            // to hold the last waypoint of the previous chunk
             else if (waypointChunk.size() == n + 1 && chunks != 0)
             {
                 chunks++;
@@ -164,16 +167,14 @@ public class WorkDispatcher implements Runnable
      * @param route the route that the chunk belongs to
      * @param chunkWaypoints the waypoints that belong to the chunk
      * @param expectedChunks the expected number of chunks
-     * @Condition: worker != null
      */
     private void createChunk(Route route, ArrayList<Waypoint> chunkWaypoints, int expectedChunks)
     {
-        WorkerHandler worker = workers.poll();
-        assert worker != null;
         Chunk chunk = new Chunk(chunkWaypoints, route, expectedChunks);
 
         synchronized (writeLock)
         {
+            WorkerHandler worker = workers.poll();
             worker.processJob(chunk);
             // adding the worker to the end of the queue
             workers.add(worker);

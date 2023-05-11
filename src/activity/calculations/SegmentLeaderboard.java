@@ -7,7 +7,6 @@ import java.util.TreeSet;
  * SegmentLeaderboard: A class that represents a leaderboard for a specific segment
  * It contains a TreeSet of UserSegmentStatistics, which is sorted by the UserSegmentStatistics' time
  */
-
 public class SegmentLeaderboard implements Serializable
 {
     // statistics: A TreeSet of UserSegmentStatistics, sorted by the UserSegmentStatistics' time
@@ -38,7 +37,6 @@ public class SegmentLeaderboard implements Serializable
 
     /**
      * Returns the leaderboard as a TreeSet of UserSegmentStatistics objects.
-     *
      * @return the leaderboard as a TreeSet of UserSegmentStatistics objects
      */
     public TreeSet<UserSegmentStatistics> getLeaderboard()
