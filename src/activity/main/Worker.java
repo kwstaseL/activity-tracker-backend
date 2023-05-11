@@ -74,6 +74,7 @@ public class Worker
             try
             {
                 Object receivedObject = in.readObject();
+                System.out.println("Worker: Received object from master");
                 Chunk chunk;
 
                 // If the received object is a chunk, a new thread will be created to handle the mapping of the data

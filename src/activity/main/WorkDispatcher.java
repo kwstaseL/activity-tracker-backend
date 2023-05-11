@@ -17,7 +17,6 @@ public class WorkDispatcher implements Runnable
     private final Queue<WorkerHandler> workers;
     // This is the queue that contains all the routes that need to be handled
     private final Queue<Route> filesToWorker;
-
     private final Object writeLock = new Object();
     private final Object readLock = new Object();
 
