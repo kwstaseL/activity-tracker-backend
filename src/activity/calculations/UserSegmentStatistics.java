@@ -3,7 +3,7 @@ package activity.calculations;
 import java.io.Serializable;
 import java.util.Objects;
 
-// UserSegmentStatistics: A class that represents the statistics for a specific segment for a specific user
+// UserSegmentStatistics: A class that represents the statistics of a specific user, for a specific segment
 public class UserSegmentStatistics implements Comparable<UserSegmentStatistics>, Serializable
 {
     // segmentID: The ID of the segment this UserSegmentStatistics is for

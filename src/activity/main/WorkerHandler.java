@@ -22,7 +22,7 @@ public class WorkerHandler implements Runnable
     private final Socket workerSocket;
     private HashMap<Integer,ClientHandler> clients;
 
-    public WorkerHandler(Socket workerSocket,HashMap<Integer,ClientHandler> clients)
+    public WorkerHandler(Socket workerSocket, HashMap<Integer, ClientHandler> clients)
     {
         this.workerSocket = workerSocket;
         // Add the worker to the queue
@@ -97,7 +97,11 @@ public class WorkerHandler implements Runnable
      */
     public void processJob(Chunk chunk)
     {
-        assert chunk != null;
+        if (chunk == null)
+        {
+            throw new RuntimeException("The chunk appears null.");
+        }
+
         try
         {
             // Send the chunk to the worker to be mapped

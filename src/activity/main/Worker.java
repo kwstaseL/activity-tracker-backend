@@ -106,16 +106,20 @@ public class Worker
      */
     private void handleMapping(Chunk chunk)
     {
-        assert chunk != null;
-        // intermediate_result: the mapping process returns a key-value pair,
+        if (chunk == null)
+        {
+            throw new RuntimeException("The chunk appears null.");
+        }
+
+        // intermediateResult: the mapping process returns a key-value pair,
         // where key is the client id, and the value is another pair of chunk, activityStats
-        Pair<Integer, Pair<Chunk, ActivityStats>> intermediate_result = Map.map(chunk.getRoute().getClientID(), chunk);
+        Pair<Integer, Pair<Chunk, ActivityStats>> intermediateResult = Map.map(chunk.getRoute().getClientID(), chunk);
         try
         {
             // Send the result back to the worker-handler
             synchronized (writeLock)
             {
-                out.writeObject(intermediate_result);
+                out.writeObject(intermediateResult);
                 out.flush();
             }
         }

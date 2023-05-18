@@ -49,11 +49,12 @@ public class ClientHandler implements Runnable
     private static final Object writeLock = new Object();
     private static final Object routeHashmapLock = new Object();
     private static final Statistics statistics = new Statistics();
+
     /**
      * Constructor for the ClientHandler
      * @param clientSocket the socket that the client is connected to
-     * @param routeQueue the queue that the routes will be added to and the worker dispatcher will take from
-     * @param segments a queue containing all the segments to be checked for intersections with the routes of users.
+     * @param routeQueue the queue that the routes will be added to and that the work dispatcher will take from
+     * @param segments the queue containing all the segments Master holds, to check for intersections with users' routes.
      */
     public ClientHandler(Socket clientSocket, Queue<Route> routeQueue, Queue<Segment> segments)
     {
@@ -84,6 +85,69 @@ public class ClientHandler implements Runnable
 
         readFromClient.start();
         readFromWorkerHandler.start();
+    }
+
+    /**
+     * This method is used to get the file from the client
+     * And to send it to the work-dispatcher that will dispatch it to the workers.
+     *
+     * @throws RuntimeException if the user is already connected
+     */
+    private void readFromClient()
+    {
+        try
+        {
+            // Get the client's username
+            String username = (String) in.readObject();
+            // Check if the user is already connected
+            if (connectedClients.contains(username))
+            {
+                // If the user is already connected, we send a message to the client and close the connection
+                System.out.println("ClientHandler: User already connected!");
+                out.writeObject("User already connected!");
+                out.flush();
+                throw new RuntimeException("User already connected!");
+            }
+            else
+            {
+                System.out.println("ClientHandler: User " + username + " connected!");
+                out.writeObject("OK");
+                connectedClients.add(username);
+                clientUsername = username;
+            }
+            // Receive the file object from the client
+
+            while (!clientSocket.isClosed())
+            {
+                System.out.println("ClientHandler: Waiting for file from client");
+
+                Object obj = in.readObject();
+
+                if (obj instanceof GPXData gpxData)
+                {
+                    ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
+                    // Parse the file
+                    // Create a new thread to handle the parsing of the file
+                    Route route = GPXParser.parseRoute(gpxContent, segments);
+                    route.setClientID(clientID);
+                    // Add the route to the queue
+                    synchronized (routeQueue)
+                    {
+                        // Add the route to the queue and notify the dispatcher
+                        routeQueue.add(route);
+                        routeQueue.notify();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("ClientHandler: Connection to client lost");
+        }
+        finally
+        {
+            shutdown();
+        }
     }
 
     /**
@@ -155,69 +219,6 @@ public class ClientHandler implements Runnable
     }
 
     /**
-     * This method is used to get the file from the client
-     * And to send it to the work-dispatcher that will dispatch it to the workers.
-     *
-     * @throws RuntimeException if the user is already connected
-     */
-    private void readFromClient()
-    {
-        try
-        {
-            // Get the clients username
-            String username = (String) in.readObject();
-            // Check if the user is already connected
-            if (connectedClients.contains(username))
-            {
-                // If the user is already connected, we send a message to the client and close the connection
-                System.out.println("ClientHandler: User already connected!");
-                out.writeObject("User already connected!");
-                out.flush();
-                throw new RuntimeException("User already connected!");
-            }
-            else
-            {
-                System.out.println("ClientHandler: User " + username + " connected!");
-                out.writeObject("OK");
-                connectedClients.add(username);
-                clientUsername = username;
-            }
-            // Receive the file object from the client
-
-            while (!clientSocket.isClosed())
-            {
-                System.out.println("ClientHandler: Waiting for file from client");
-
-                Object obj = in.readObject();
-
-                if (obj instanceof GPXData gpxData)
-                {
-                    ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
-                    // Parse the file
-                    // Create a new thread to handle the parsing of the file
-                    Route route = GPXParser.parseRoute(gpxContent,segments);
-                    route.setClientID(clientID);
-                    // Add the route to the queue
-                    synchronized (routeQueue)
-                    {
-                        // Add the route to the queue and notify the dispatcher
-                        routeQueue.add(route);
-                        routeQueue.notify();
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println("ClientHandler: Connection to client lost");
-        }
-        finally
-        {
-            shutdown();
-        }
-    }
-
-    /**
      * Process the given chunk by collecting all the intermediate statistics and
      * starting a new thread to handle the reducing phase.
      *
@@ -285,7 +286,7 @@ public class ClientHandler implements Runnable
     }
 
     /**
-     * Called by the worker handler  to add a pair of chunk and activity statistics to the queue
+     * Called by the worker handler. Adds a pair of chunk and activity statistics to the queue
      * @param stats The pair of chunk and activity statistics to add to the queue
      */
     public void addStats(Pair<Chunk, ActivityStats> stats)

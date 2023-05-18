@@ -98,8 +98,8 @@ public class Master
                     try
                     {
                         clientSocket.close();
-
-                    } catch (IOException ex)
+                    }
+                    catch (IOException ex)
                     {
                         throw new RuntimeException(ex);
                     }
@@ -124,9 +124,10 @@ public class Master
                     // Accept a worker connection
                     Socket worker = workerSocket.accept();
                     System.out.println("MASTER: Worker connected");
-                    // Create a new thread to handle the worker also passing the client map
+
+                    // Create a new thread to handle the worker. Also, passing the client map
                     // so that the worker can send the results to the appropriate client
-                    WorkerHandler workerHandler = new WorkerHandler(worker,clientMap);
+                    WorkerHandler workerHandler = new WorkerHandler(worker, clientMap);
                     workerHandlers.add(workerHandler);
                     Thread workerThread = new Thread(workerHandler);
                     workerThread.start();
@@ -185,7 +186,11 @@ public class Master
             File directory = new File(segmentDirectory);
             File[] files = directory.listFiles();
 
-            assert files != null;
+            if (files == null)
+            {
+                throw new RuntimeException("Could not find the directory.");
+            }
+
             for (File file : files)
             {
                 Segment segment = GPXParser.parseSegment(file);

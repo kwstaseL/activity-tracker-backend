@@ -17,8 +17,17 @@ public class Reduce
      */
     public static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediateResults)
     {
-        assert intermediateResults.getValue() != null && !intermediateResults.getValue().isEmpty();
-        // The intermediate results are the results of the calculations for each chunk of the route
+        if (intermediateResults == null || intermediateResults.getValue() == null)
+        {
+            throw new IllegalArgumentException("The pair passed as argument to reduce has an invalid value.");
+        }
+
+        if (intermediateResults.getValue().isEmpty())
+        {
+            throw new RuntimeException("The list of stats passed to reduce appears empty.");
+        }
+
+        // activityStatsList: The value of the pair. Represents the results for each chunk of the route.
         ArrayList<ActivityStats> activityStatsList = intermediateResults.getValue();
 
         double elevation = 0;

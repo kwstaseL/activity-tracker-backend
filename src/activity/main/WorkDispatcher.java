@@ -16,7 +16,7 @@ public class WorkDispatcher implements Runnable
     // This is the queue that contains all the workers
     private final Queue<WorkerHandler> workers;
     // This is the queue that contains all the routes that need to be handled
-    private final Queue<Route> filesToWorker;
+    private final Queue<Route> routeQueue;
     private final Object writeLock = new Object();
     private final Object readLock = new Object();
 
@@ -24,12 +24,12 @@ public class WorkDispatcher implements Runnable
      * Constructs a WorkDispatcher object with a list of workers and routes to process.
      *
      * @param workers list of workers to process routes
-     * @param filesToWorker list of routes to be processed
+     * @param routeQueue list of routes to be processed
      */
-    public WorkDispatcher(Queue<WorkerHandler> workers, Queue<Route> filesToWorker)
+    public WorkDispatcher(Queue<WorkerHandler> workers, Queue<Route> routeQueue)
     {
         this.workers = workers;
-        this.filesToWorker = filesToWorker;
+        this.routeQueue = routeQueue;
     }
 
     /**
@@ -37,22 +37,22 @@ public class WorkDispatcher implements Runnable
      */
     public void run()
     {
-        synchronized (filesToWorker)
+        synchronized (routeQueue)
         {
             while (true)
             {
-                while (filesToWorker.isEmpty())
+                while (routeQueue.isEmpty())
                 {
                     try
                     {
-                        filesToWorker.wait();
+                        routeQueue.wait();
                     }
                     catch (InterruptedException e)
                     {
                         System.out.println("Error: " + e.getMessage());
                     }
                 }
-                Route route = filesToWorker.poll();
+                Route route = routeQueue.poll();
                 // Create a new thread to handle the route
                 // We create a new thread for each route, so that we can handle multiple routes at the same time
                 // and because if one route takes a long time to process, we can still process other routes
@@ -176,7 +176,12 @@ public class WorkDispatcher implements Runnable
         synchronized (writeLock)
         {
             WorkerHandler worker = workers.poll();
-            assert worker != null;
+
+            if (worker == null)
+            {
+                throw new RuntimeException("Tried to poll from an empty worker queue.");
+            }
+
             worker.processJob(chunk);
             // adding the worker to the end of the queue
             workers.add(worker);
