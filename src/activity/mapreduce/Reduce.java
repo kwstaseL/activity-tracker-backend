@@ -13,7 +13,6 @@ public class Reduce
      * Reduces all the intermediate results received from the workers into a single result that will be sent to the client.
      * @param intermediateResults the intermediate results to reduce
      * @return the reduced activity statistics
-     * @throws Exception if the intermediate results are empty or null
      */
     public static ActivityStats reduce(Pair<Integer, ArrayList<ActivityStats>> intermediateResults)
     {

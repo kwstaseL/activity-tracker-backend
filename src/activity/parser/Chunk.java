@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- *  Chunk: Wrapper class, which contains the ArrayList of Waypoints the chunk is supposed to contain,
+ * Chunk: Wrapper class, which contains the ArrayList of Waypoints the chunk is supposed to contain,
  * a variable indicating how many chunks in total the route was split into, and a variable indicating
  * the index of the chunk being currently processed amongst the total chunks
- *
  * */
 public class Chunk implements Serializable
 {

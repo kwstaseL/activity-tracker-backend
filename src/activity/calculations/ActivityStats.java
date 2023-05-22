@@ -103,33 +103,41 @@ public class ActivityStats implements Serializable {
     }
 
     /**
-     * Finalises the stats of the activity by calculating the average speed.
+     * Called when registering the last waypoint associated with a chunk; calculates the speed for the respective chunk.
      */
-    public void finaliseStats() {
+    public void finaliseStats()
+    {
         this.speed = (time > 0) ? distance / (time / 60.0) : 0.0;
     }
 
-    public double getDistance() {
+    public double getDistance()
+    {
         return distance;
     }
 
-    public double getSpeed() {
+    public double getSpeed()
+    {
         return speed;
     }
 
-    public double getElevation() {
+    public double getElevation()
+    {
         return elevation;
     }
 
-    public double getTime() {
+    public double getTime()
+    {
         return time;
     }
 
-    public int getRouteID() {
+    @Deprecated
+    public int getRouteID()
+    {
         return routeID;
     }
 
-    public ArrayList<SegmentActivityStats> getSegmentStatsList() {
+    public ArrayList<SegmentActivityStats> getSegmentStatsList()
+    {
         return this.segmentStatsList;
     }
 

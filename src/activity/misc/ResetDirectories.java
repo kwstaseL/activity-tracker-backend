@@ -17,13 +17,8 @@ public class ResetDirectories
             config.load(new FileInputStream("config.properties"));
             File unprocessedDirectory = new File(config.getProperty("unprocessed_directory"));
             File processedDirectory = new File(config.getProperty("completed_directory"));
-            File[] processedDirectoryContents = processedDirectory.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file)
-                {
-                    return file.isFile();   // file.isFile(): returns false if the file is a directory (like segments)
-                }
-            });
+            // file.isFile(): returns false if the file is a directory (like segments)
+            File[] processedDirectoryContents = processedDirectory.listFiles(File::isFile);
 
             if (processedDirectoryContents == null)
             {

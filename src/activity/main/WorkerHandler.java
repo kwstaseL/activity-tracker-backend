@@ -53,7 +53,6 @@ public class WorkerHandler implements Runnable
     /**
      * Listens for messages from the worker and adds the intermediate results
      * to the appropriate client handler.
-     * @throws ClassNotFoundException Thrown if the received object is not of type Pair
      */
     @SuppressWarnings("unchecked")
     private void listenToWorker()

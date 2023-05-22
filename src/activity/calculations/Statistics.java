@@ -445,6 +445,7 @@ public class Statistics implements Serializable
      * @return the average distance for the user
      * @throws RuntimeException if the user has not recorded any routes
      */
+    @Deprecated
     public double getAverageDistanceForUser(String user)
     {
         if (!userStats.containsKey(user))
@@ -462,6 +463,7 @@ public class Statistics implements Serializable
      * @return the average distance for the user
      * @throws RuntimeException if the user has not recorded any routes
      */
+    @Deprecated
     public double getAverageElevationForUser(String user)
     {
         if (!userStats.containsKey(user))
@@ -479,6 +481,7 @@ public class Statistics implements Serializable
      * @return the average distance for the user
      * @throws RuntimeException if the user has not recorded any routes
      */
+    @Deprecated
     public double getAverageActivityTimeForUser(String user)
     {
         if (!userStats.containsKey(user))

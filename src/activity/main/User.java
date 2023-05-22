@@ -165,7 +165,6 @@ public class User
                     if (choice < 0 || choice >= filteredFiles.length)
                     {
                         System.out.println("Invalid input. Please enter a valid file index.");
-                        choice = null;
                         continue;
                     }
 
@@ -185,11 +184,13 @@ public class User
         }
     }
 
+
     /**
      * Listens for messages from the master and prints them to the console
      * This messages will contain the statistics for the route, the statistics for the user and the statistics for all the users
      * @param selectedGPX the file that was sent to the master
      */
+    @SuppressWarnings("unchecked")
     private void listenForMessages(File selectedGPX)
     {
         try {
@@ -208,6 +209,7 @@ public class User
             System.out.println(userStats + "\n");
             System.out.println("Average overall performance for all users:");
             System.out.println(allUsersStats + "\n");
+
             ArrayList<SegmentLeaderboard> leaderboards = (ArrayList<SegmentLeaderboard>) leaderboardObject;
             for (SegmentLeaderboard leaderboard : leaderboards)
             {
