@@ -76,7 +76,7 @@ public class User
             }
 
             masterIP = config.getProperty("master_ip");
-            clientPort = Integer.parseInt(config.getProperty("client_port"));
+            clientPort = Integer.parseInt(config.getProperty("user_port"));
         }
         catch (IOException e)
         {
