@@ -1,8 +1,8 @@
-package activity.main;
+package com.activity_tracker.backend.main;
 
-import activity.calculations.ActivityStats;
-import activity.misc.Pair;
-import activity.parser.Chunk;
+import com.activity_tracker.backend.calculations.ActivityStats;
+import com.activity_tracker.backend.misc.Pair;
+import com.activity_tracker.backend.parser.Chunk;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -1,4 +1,4 @@
-package activity.parser;
+package com.activity_tracker.backend.parser;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
-package activity.main;
+package com.activity_tracker.backend.main;
 
-import activity.parser.Chunk;
-import activity.parser.Route;
-import activity.parser.Waypoint;
+import com.activity_tracker.backend.parser.Chunk;
+import com.activity_tracker.backend.parser.Route;
+import com.activity_tracker.backend.parser.Waypoint;
 
 import java.util.ArrayList;
 import java.util.Queue;

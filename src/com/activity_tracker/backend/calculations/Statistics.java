@@ -1,4 +1,4 @@
-package activity.calculations;
+package com.activity_tracker.backend.calculations;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

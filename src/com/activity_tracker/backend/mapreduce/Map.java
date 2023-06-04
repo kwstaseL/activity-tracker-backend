@@ -1,9 +1,9 @@
-package activity.mapreduce;
+package com.activity_tracker.backend.mapreduce;
 
-import activity.calculations.ActivityStats;
-import activity.misc.Pair;
-import activity.parser.Chunk;
-import activity.parser.Waypoint;
+import com.activity_tracker.backend.calculations.ActivityStats;
+import com.activity_tracker.backend.misc.Pair;
+import com.activity_tracker.backend.parser.Chunk;
+import com.activity_tracker.backend.parser.Waypoint;
 
 import java.util.ArrayList;
 

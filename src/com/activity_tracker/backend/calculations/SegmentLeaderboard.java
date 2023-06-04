@@ -1,4 +1,4 @@
-package activity.calculations;
+package com.activity_tracker.backend.calculations;
 
 import java.io.Serializable;
 import java.util.TreeSet;

@@ -1,4 +1,4 @@
-package activity.parser;
+package com.activity_tracker.backend.parser;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

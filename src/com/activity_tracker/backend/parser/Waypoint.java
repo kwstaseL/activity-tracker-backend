@@ -1,6 +1,8 @@
-package activity.parser;
+package com.activity_tracker.backend.parser;
 
-import activity.calculations.ActivityCalculator;
+
+
+import com.activity_tracker.backend.calculations.ActivityCalculator;
 
 import java.io.Serializable;
 

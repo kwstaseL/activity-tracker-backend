@@ -1,7 +1,9 @@
-package activity.calculations;
+package com.activity_tracker.backend.calculations;
 
-import activity.parser.Segment;
-import activity.parser.Waypoint;
+
+
+import com.activity_tracker.backend.parser.Segment;
+import com.activity_tracker.backend.parser.Waypoint;
 
 import java.io.Serializable;
 import java.util.ArrayList;

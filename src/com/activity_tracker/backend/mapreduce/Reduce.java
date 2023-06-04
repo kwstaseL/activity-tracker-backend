@@ -1,8 +1,8 @@
-package activity.mapreduce;
+package com.activity_tracker.backend.mapreduce;
 
-import activity.calculations.ActivityStats;
-import activity.calculations.SegmentActivityStats;
-import activity.misc.Pair;
+import com.activity_tracker.backend.calculations.ActivityStats;
+import com.activity_tracker.backend.calculations.SegmentActivityStats;
+import com.activity_tracker.backend.misc.Pair;
 
 import java.util.ArrayList;
 

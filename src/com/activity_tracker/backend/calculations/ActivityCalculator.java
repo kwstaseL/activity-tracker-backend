@@ -1,6 +1,8 @@
-package activity.calculations;
+package com.activity_tracker.backend.calculations;
 
-import activity.parser.Waypoint;
+
+
+import com.activity_tracker.backend.parser.Waypoint;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

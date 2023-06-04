@@ -1,7 +1,7 @@
-package activity.main;
+package com.activity_tracker.backend.main;
 
-import activity.calculations.SegmentLeaderboard;
-import activity.misc.GPXData;
+import com.activity_tracker.backend.calculations.SegmentLeaderboard;
+import com.activity_tracker.backend.misc.GPXData;
 
 import java.io.*;
 import java.net.Socket;

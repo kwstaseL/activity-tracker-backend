@@ -1,9 +1,11 @@
-package activity.main;
+package com.activity_tracker.backend.main;
 
-import activity.calculations.ActivityStats;
-import activity.mapreduce.Map;
-import activity.misc.Pair;
-import activity.parser.Chunk;
+
+
+import com.activity_tracker.backend.calculations.ActivityStats;
+import com.activity_tracker.backend.mapreduce.Map;
+import com.activity_tracker.backend.misc.Pair;
+import com.activity_tracker.backend.parser.Chunk;
 
 import java.io.FileInputStream;
 import java.io.IOException;

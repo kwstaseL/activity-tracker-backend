@@ -1,4 +1,4 @@
-package activity.misc;
+package com.activity_tracker.backend.misc;
 
 import java.io.Serializable;
 

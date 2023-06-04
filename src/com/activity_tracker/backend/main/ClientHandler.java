@@ -1,15 +1,15 @@
-package activity.main;
+package com.activity_tracker.backend.main;
 
-import activity.calculations.ActivityStats;
-import activity.calculations.SegmentLeaderboard;
-import activity.calculations.Statistics;
-import activity.mapreduce.Reduce;
-import activity.misc.GPXData;
-import activity.misc.Pair;
-import activity.parser.Chunk;
-import activity.parser.GPXParser;
-import activity.parser.Route;
-import activity.parser.Segment;
+import com.activity_tracker.backend.calculations.ActivityStats;
+import com.activity_tracker.backend.calculations.SegmentLeaderboard;
+import com.activity_tracker.backend.calculations.Statistics;
+import com.activity_tracker.backend.mapreduce.Reduce;
+import com.activity_tracker.backend.misc.GPXData;
+import com.activity_tracker.backend.misc.Pair;
+import com.activity_tracker.backend.parser.Chunk;
+import com.activity_tracker.backend.parser.GPXParser;
+import com.activity_tracker.backend.parser.Route;
+import com.activity_tracker.backend.parser.Segment;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -93,60 +93,55 @@ public class ClientHandler implements Runnable
      *
      * @throws RuntimeException if the user is already connected
      */
-    private void readFromClient()
-    {
-        try
-        {
-            // Get the client's username
-            String username = (String) in.readObject();
-            // Check if the user is already connected
-            if (connectedClients.contains(username))
-            {
-                // If the user is already connected, we send a message to the client and close the connection
-                System.out.println("ClientHandler: User already connected!");
-                out.writeObject("User already connected!");
-                out.flush();
-                throw new RuntimeException("User already connected!");
-            }
-            else
-            {
-                System.out.println("ClientHandler: User " + username + " connected!");
-                out.writeObject("OK");
-                connectedClients.add(username);
-                clientUsername = username;
-            }
-            // Receive the file object from the client
+    private void readFromClient(){
+        try{
+            String username = (String) in.readObject(); // Receive the username from the client
 
             while (!clientSocket.isClosed())
             {
-                System.out.println("ClientHandler: Waiting for file from client");
+                Object object = in.readObject(); // Receive the service from the client
 
-                Object obj = in.readObject();
-
-                if (obj instanceof GPXData gpxData)
+                if (object instanceof GPXData)
                 {
+                    GPXData gpxData = (GPXData) object;
                     ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
-                    // Parse the file
-                    // Create a new thread to handle the parsing of the file
                     Route route = GPXParser.parseRoute(gpxContent, segments);
                     route.setClientID(clientID);
-                    // Add the route to the queue
                     synchronized (routeQueue)
                     {
-                        // Add the route to the queue and notify the dispatcher
                         routeQueue.add(route);
                         routeQueue.notify();
                     }
                 }
+                else if (object instanceof String)
+                {
+                    String service = (String) object;
+
+                    if (service.equalsIgnoreCase("LEADERBOARD"))
+                    {
+                        // Handle the leaderboard request
+                    }
+                    else if (service.equalsIgnoreCase("STATISTICS"))
+                    {
+                        // Handle the statistics request
+                        out.writeObject(statistics.getUserStats(username));
+                        out.flush();
+
+                    }
+                    else
+                    {
+
+                    }
+                }
             }
         }
-        catch (Exception e)
+        catch (ClassNotFoundException e)
         {
-            System.out.println("ClientHandler: Connection to client lost");
+            throw new RuntimeException(e);
         }
-        finally
+        catch (IOException e)
         {
-            shutdown();
+            System.out.println("Client disconnected");
         }
     }
 
