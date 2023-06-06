@@ -493,6 +493,24 @@ public class Statistics implements Serializable
     }
 
     /**
+     * getSegmentLeaderboardsForUser: Used to get all the segment leaderboards associated with a user.
+     * @param user: The user for whom to fetch the leaderboards.
+     * @return An arraylist of leaderboards.
+     */
+    public ArrayList<SegmentLeaderboard> getSegmentLeaderboardsForUser(String user)
+    {
+        ArrayList<SegmentLeaderboard> leaderboards = new ArrayList<>();
+        for (SegmentLeaderboard leaderboard : segmentStatistics.values())
+        {
+            if (leaderboard.containsUser(user))
+            {
+                leaderboards.add(leaderboard);
+            }
+        }
+        return leaderboards;
+    }
+
+    /**
      * @return Returns a string representation of the global statistics.
      */
     @Override
