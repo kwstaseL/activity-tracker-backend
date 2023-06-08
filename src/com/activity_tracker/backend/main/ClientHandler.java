@@ -120,6 +120,18 @@ public class ClientHandler implements Runnable
                     if (service.equalsIgnoreCase("LEADERBOARD"))
                     {
                         // Handle the leaderboard request
+                        ArrayList<SegmentLeaderboard> leaderboards = statistics.getSegmentLeaderboardsForUser(username);
+                        if (leaderboards == null)
+                        {
+                            out.writeObject("NO LEADERBOARDS");
+                            out.flush();
+                        }
+                        else
+                        {
+                            out.writeObject(leaderboards);
+                            out.flush();
+                        }
+
                     }
                     else if (service.equalsIgnoreCase("STATISTICS"))
                     {
