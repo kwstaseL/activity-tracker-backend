@@ -113,7 +113,8 @@ public class ClientHandler implements Runnable
                         routeQueue.notify();
                     }
                 }
-                else if (object instanceof String)
+
+                if (object instanceof String)
                 {
                     String service = (String) object;
 
@@ -121,17 +122,8 @@ public class ClientHandler implements Runnable
                     {
                         // Handle the leaderboard request
                         ArrayList<SegmentLeaderboard> leaderboards = statistics.getSegmentLeaderboardsForUser(username);
-                        if (leaderboards == null)
-                        {
-                            out.writeObject("NO LEADERBOARDS");
-                            out.flush();
-                        }
-                        else
-                        {
-                            out.writeObject(leaderboards);
-                            out.flush();
-                        }
-
+                        out.writeObject(leaderboards);
+                        out.flush();
                     }
                     else if (service.equalsIgnoreCase("STATISTICS"))
                     {
