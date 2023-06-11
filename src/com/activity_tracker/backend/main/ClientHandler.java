@@ -93,7 +93,8 @@ public class ClientHandler implements Runnable
      *
      * @throws RuntimeException if the user is already connected
      */
-    private void readFromClient(){
+    private void readFromClient()
+    {
         try{
             String username = (String) in.readObject(); // Receive the username from the client
 
@@ -117,27 +118,32 @@ public class ClientHandler implements Runnable
                 {
                     String service = (String) object;
 
-                    if (service.equalsIgnoreCase("LEADERBOARD"))
+                    if (service.equals("LEADERBOARD"))
                     {
                         // Handle the leaderboard request
                         ArrayList<SegmentLeaderboard> leaderboards = statistics.getSegmentLeaderboardsForUser(username);
-                        if (leaderboards == null)
+                        if (leaderboards.isEmpty())
                         {
                             out.writeObject("NO LEADERBOARDS");
                             out.flush();
+                            System.err.println("Leaderboard for user " + username + "is empty");
                         }
                         else
                         {
+                            System.err.println(leaderboards.get(0).toString());
                             out.writeObject(leaderboards);
                             out.flush();
+                            System.err.println("Leaderboard sent!");
                         }
 
                     }
                     else if (service.equalsIgnoreCase("STATISTICS"))
                     {
                         // Handle the statistics request
-                        out.writeObject(statistics.getUserStats(username));
+                        out.writeObject(new Statistics(statistics));
                         out.flush();
+                        System.err.println("File sent");
+
 
                     }
                     else
