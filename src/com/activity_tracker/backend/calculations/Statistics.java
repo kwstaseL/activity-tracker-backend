@@ -30,7 +30,7 @@ public class Statistics implements Serializable
     private double totalActivityTime;
 
     // userStats: A hashmap matching each user to their respective statistics.
-    private final HashMap<String, UserStatistics> userStats;
+    private final HashMap<String, UserStatistics> userStats = new HashMap<>();
 
     // segmentStatistics: Matches the hashcode (integer) of a segment name, to a leaderboard of user stats for that segment
     private HashMap<Integer, SegmentLeaderboard> segmentStatistics = new HashMap<>();
@@ -40,7 +40,6 @@ public class Statistics implements Serializable
      */
     public Statistics()
     {
-        this.userStats = new HashMap<>();
         this.routesRecorded = 0;
         this.totalDistance = 0;
         this.totalElevation = 0;
@@ -287,8 +286,8 @@ public class Statistics implements Serializable
     }
 
     /**
-     * Called when closing the connection with the user, creates the statistics file and writes the statistics for all users to it.
-     * also for each segment, creates a new xml file and writes the statistics for that segment to it of the users who have completed it.
+     * Called when master closes the connection with the user. Creates the statistics file and writes the statistics for
+     * all users to it. Also, creates a new xml file for each segment and writes the statistics for that segment to it.
      */
     public void createFile()
     {
