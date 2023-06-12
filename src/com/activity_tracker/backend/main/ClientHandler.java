@@ -95,9 +95,9 @@ public class ClientHandler implements Runnable
      */
     private void readFromClient()
     {
-        try{
+        try
+        {
             String username = (String) in.readObject(); // Receive the username from the client
-
             while (!clientSocket.isClosed())
             {
                 Object object = in.readObject(); // Receive the service from the client
@@ -118,37 +118,34 @@ public class ClientHandler implements Runnable
                 {
                     String service = (String) object;
 
-                    if (service.equals("LEADERBOARD"))
+                    if (service.equalsIgnoreCase("LEADERBOARD"))
                     {
                         // Handle the leaderboard request
                         ArrayList<SegmentLeaderboard> leaderboards = statistics.getSegmentLeaderboardsForUser(username);
                         if (leaderboards.isEmpty())
                         {
+                            // Informing the front-end that there are no leaderboards for this user.
+                            // The front-end will then display a message to the user.
                             out.writeObject("NO LEADERBOARDS");
                             out.flush();
-                            System.err.println("Leaderboard for user " + username + "is empty");
                         }
                         else
                         {
-                            System.err.println(leaderboards.get(0).toString());
+                            // Sends all the leaderboards to the front-end that involve the user.
                             out.writeObject(leaderboards);
                             out.flush();
-                            System.err.println("Leaderboard sent!");
                         }
-
                     }
                     else if (service.equalsIgnoreCase("STATISTICS"))
                     {
                         // Handle the statistics request
-                        out.writeObject(new Statistics(statistics));
+                        // Creating a new statistics object to send to the front-end.
+                        out.writeObject(new Statistics(statistics.getGlobalStats()));
                         out.flush();
-                        System.err.println("File sent");
-
-
                     }
                     else
                     {
-
+                        throw new RuntimeException("Invalid service");
                     }
                 }
             }
@@ -270,22 +267,6 @@ public class ClientHandler implements Runnable
                 statistics.registerRoute(user, finalResults);
                 out.writeObject(finalResults);
                 out.flush();
-                out.writeObject(statistics.getUserStats(user));
-                out.flush();
-                out.writeObject(statistics.getGlobalStats());
-                out.flush();
-
-                ArrayList<Integer> segmentsInRoute = finalResults.getSegmentHashes();
-                ArrayList<SegmentLeaderboard> segmentLeaderboards = new ArrayList<>();
-
-                for (int segmentHash : segmentsInRoute)
-                {
-                    segmentLeaderboards.add(statistics.getLeaderboard(segmentHash));
-                }
-
-                out.writeObject(segmentLeaderboards);
-                out.flush();
-
                 // Here we reset the output stream to make sure
                 // that the object is sent with all the changes we made
                 out.reset();

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 public class Map
 {
-
     /**
      * Maps a chunk to a pair of client ID and activity stats.
      *

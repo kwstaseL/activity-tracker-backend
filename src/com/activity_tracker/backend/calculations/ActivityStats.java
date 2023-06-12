@@ -10,7 +10,8 @@ import java.util.ArrayList;
 
 // Contains the results of the calculations for the activities
 // during the map/reduce phase
-public class ActivityStats implements Serializable {
+public class ActivityStats implements Serializable
+{
     // segmentStatsList: contains the statistics for each segment the route contains
     private final ArrayList<SegmentActivityStats> segmentStatsList;
     // uniqueID: represents the unique ID of the route

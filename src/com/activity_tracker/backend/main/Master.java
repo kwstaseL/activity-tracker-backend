@@ -33,6 +33,7 @@ public class Master
     // Master will be a singleton class, with instance marking the only Master instantiation we will be allowing.
     private static Master instance = null;
 
+    // Creates a new instance of Master, and loads the configuration file
     private Master()
     {
         try
