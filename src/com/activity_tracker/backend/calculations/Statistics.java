@@ -125,21 +125,6 @@ public class Statistics implements Serializable
     }
 
     /**
-     * Retrieves the leaderboard for a specific segment.
-     *
-     * @param segmentHash The hash of the segment.
-     * @return The leaderboard for the segment.
-     */
-    public SegmentLeaderboard getLeaderboard(int segmentHash)
-    {
-        if (!segmentStatistics.containsKey(segmentHash))
-        {
-            throw new RuntimeException("Could not find the segment.");
-        }
-        return segmentStatistics.get(segmentHash);
-    }
-
-    /**
      * Checks if the statistics file exists.
      *
      * @return Returns true if the statistics file exists, false otherwise.
