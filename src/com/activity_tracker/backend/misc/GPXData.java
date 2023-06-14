@@ -9,13 +9,21 @@ public class GPXData implements Serializable
 {
     // fileContent: represents the content of the GPX file
     private final byte[] fileContent;
-    public GPXData(byte[] fileContent)
+    private final String fileName;
+
+    public GPXData(String fileName, byte[] fileContent)
     {
+        this.fileName = fileName;
         this.fileContent = fileContent;
     }
 
     public byte[] getFileContent()
     {
         return fileContent;
+    }
+
+    public String getFileName()
+    {
+        return fileName;
     }
 }
