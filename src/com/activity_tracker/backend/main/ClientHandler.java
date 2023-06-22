@@ -98,6 +98,7 @@ public class ClientHandler implements Runnable
         try
         {
             String username = (String) in.readObject(); // Receive the username from the client
+
             while (!clientSocket.isClosed())
             {
                 Object object = in.readObject(); // Receive the service from the client
@@ -107,6 +108,15 @@ public class ClientHandler implements Runnable
                     GPXData gpxData = (GPXData) object;
                     ByteArrayInputStream gpxContent = new ByteArrayInputStream(gpxData.getFileContent());
                     Route route = GPXParser.parseRoute(gpxContent, segments);
+
+                    // if the user who sent the GPX is not the same as the one who registered the GPX, send an error message to frontend
+                    if (!username.equals(route.getUser()))
+                    {
+                        out.writeObject("INVALID");
+                        out.flush();
+                        return;
+                    }
+
                     route.setClientID(clientID);
                     synchronized (routeQueue)
                     {
@@ -118,23 +128,14 @@ public class ClientHandler implements Runnable
                 {
                     String service = (String) object;
 
-                    if (service.equalsIgnoreCase("LEADERBOARD"))
+                    if (service.equals("LEADERBOARDS"))
                     {
                         // Handle the leaderboard request
                         ArrayList<SegmentLeaderboard> leaderboards = statistics.getSegmentLeaderboardsForUser(username);
-                        if (leaderboards.isEmpty())
-                        {
-                            // Informing the front-end that there are no leaderboards for this user.
-                            // The front-end will then display a message to the user.
-                            out.writeObject("NO LEADERBOARDS");
-                            out.flush();
-                        }
-                        else
-                        {
-                            // Sends all the leaderboards to the front-end that involve the user.
-                            out.writeObject(leaderboards);
-                            out.flush();
-                        }
+                        out.writeObject(leaderboards);
+                        out.flush();
+                        System.err.println("Leaderboard sent!");
+
                     }
                     else if (service.equalsIgnoreCase("STATISTICS"))
                     {
@@ -156,6 +157,7 @@ public class ClientHandler implements Runnable
         }
         catch (IOException e)
         {
+            shutdown();
             System.out.println("Client disconnected");
         }
     }
@@ -299,15 +301,10 @@ public class ClientHandler implements Runnable
      */
     private void shutdown()
     {
-        if (clientUsername != null)
+        System.out.println("ClientHandler: Saving statistics for user " + clientUsername);
+        synchronized (statistics)
         {
-            System.out.println("ClientHandler: Saving statistics for user " + clientUsername);
-            synchronized (statistics)
-            {
-                statistics.createFile();
-            }
-            // Remove the client from the list of connected clients
-            connectedClients.remove(clientUsername);
+            statistics.createFile();
         }
         try
         {
@@ -340,5 +337,4 @@ public class ClientHandler implements Runnable
     {
         return clientID;
     }
-
 }

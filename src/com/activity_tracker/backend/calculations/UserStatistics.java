@@ -88,21 +88,25 @@ public class UserStatistics implements Serializable
 
     /**
      * @return Returns the average distance of all the routes a user has registered.
-     * @pre routesRecorded >= 1
      */
     public double getAverageDistance()
     {
-        assert routesRecorded >= 1;
+        if (routesRecorded == 0)
+        {
+            return 0.0f;
+        }
         return totalDistance / routesRecorded;
     }
 
     /**
      * @return Returns the average elevation of all the routes a user has registered.
-     * @pre routesRecorded >= 1
      */
     public double getAverageElevation()
     {
-        assert routesRecorded >= 1;
+        if (routesRecorded == 0)
+        {
+            return 0.0f;
+        }
         return totalElevation / routesRecorded;
     }
 
@@ -112,7 +116,10 @@ public class UserStatistics implements Serializable
      */
     public double getAverageActivityTime()
     {
-        assert routesRecorded >= 1;
+        if (routesRecorded == 0)
+        {
+            return 0.0f;
+        }
         return totalActivityTime / routesRecorded;
     }
 

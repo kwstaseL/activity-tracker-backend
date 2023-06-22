@@ -18,6 +18,7 @@ import java.util.Scanner;
  * Represents the user of the application.
  * He will be able to send files to the master and receive the results of his statistics back.
  */
+@Deprecated
 public class User
 {
     // This is the socket that the user is connected to with the master
@@ -34,6 +35,8 @@ public class User
     private String completedDirectory;
     private static String masterIP;
     private static int clientPort;
+
+    // TODO: Adjust to match the frontend approach
 
     /**
      * Constructs a new User by initialising the attributes and connecting to the master.
@@ -76,7 +79,7 @@ public class User
             }
 
             masterIP = config.getProperty("master_ip");
-            clientPort = Integer.parseInt(config.getProperty("user_port"));
+            clientPort = Integer.parseInt(config.getProperty("client_port"));
         }
         catch (IOException e)
         {
@@ -253,9 +256,8 @@ public class User
             // The read() method will read the contents of the file into the buffer
             int bytesRead = fileInputStream.read(buffer);
 
-            // Creating a GPXData object with the name of the file and the contents of the file
-            // and sending it to the master
-            GPXData gpx = new GPXData(buffer);
+            // Creating a GPXData object with the name of the file and the contents of the file and sending it to master
+            GPXData gpx = new GPXData(selectedGPX.getName(), buffer);
             out.writeObject(gpx);
             out.flush();
 
