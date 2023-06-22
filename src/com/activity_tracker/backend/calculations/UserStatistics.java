@@ -93,7 +93,7 @@ public class UserStatistics implements Serializable
     {
         if (routesRecorded == 0)
         {
-            return 0.0f;
+            return 0.0;
         }
         return totalDistance / routesRecorded;
     }
@@ -105,7 +105,7 @@ public class UserStatistics implements Serializable
     {
         if (routesRecorded == 0)
         {
-            return 0.0f;
+            return 0.0;
         }
         return totalElevation / routesRecorded;
     }
@@ -118,7 +118,7 @@ public class UserStatistics implements Serializable
     {
         if (routesRecorded == 0)
         {
-            return 0.0f;
+            return 0.0;
         }
         return totalActivityTime / routesRecorded;
     }

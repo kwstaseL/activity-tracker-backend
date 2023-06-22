@@ -44,8 +44,6 @@ public class ClientHandler implements Runnable
     private final Queue<Pair<Chunk, ActivityStats>> statsQueue = new LinkedList<>();
     // routeHashmap: Matches the route IDs with the list of the chunks they contain
     private static final HashMap<Integer, ArrayList<Pair<Chunk, ActivityStats>>> routeHashmap = new HashMap<>();
-    // connectedClients: A list of all the connected clients
-    private static final ArrayList<String> connectedClients = new ArrayList<>();
     private static final Object writeLock = new Object();
     private static final Object routeHashmapLock = new Object();
     private static final Statistics statistics = new Statistics();
@@ -97,7 +95,7 @@ public class ClientHandler implements Runnable
     {
         try
         {
-            String username = (String) in.readObject(); // Receive the username from the client
+            this.clientUsername = (String) in.readObject(); // Receive the username from the client
 
             while (!clientSocket.isClosed())
             {
@@ -110,7 +108,7 @@ public class ClientHandler implements Runnable
                     Route route = GPXParser.parseRoute(gpxContent, segments);
 
                     // if the user who sent the GPX is not the same as the one who registered the GPX, send an error message to frontend
-                    if (!username.equals(route.getUser()))
+                    if (!clientUsername.equals(route.getUser()))
                     {
                         out.writeObject("INVALID");
                         out.flush();
@@ -131,7 +129,7 @@ public class ClientHandler implements Runnable
                     if (service.equals("LEADERBOARDS"))
                     {
                         // Handle the leaderboard request
-                        ArrayList<SegmentLeaderboard> leaderboards = statistics.getSegmentLeaderboardsForUser(username);
+                        ArrayList<SegmentLeaderboard> leaderboards = statistics.getSegmentLeaderboardsForUser(clientUsername);
                         out.writeObject(leaderboards);
                         out.flush();
                         System.err.println("Leaderboard sent!");
@@ -304,7 +302,7 @@ public class ClientHandler implements Runnable
         System.out.println("ClientHandler: Saving statistics for user " + clientUsername);
         synchronized (statistics)
         {
-            statistics.createFile();
+            statistics.writeToFile();
         }
         try
         {

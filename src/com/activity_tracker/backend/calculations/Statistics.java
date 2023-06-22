@@ -276,7 +276,7 @@ public class Statistics implements Serializable
      * Called when master closes the connection with the user. Creates the statistics file and writes the statistics for
      * all users to it. Also, creates a new xml file for each segment and writes the statistics for that segment to it.
      */
-    public void createFile()
+    public void writeToFile()
     {
         try
         {
