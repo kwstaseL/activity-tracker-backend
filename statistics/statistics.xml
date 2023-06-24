@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <User_Statistics>
-    <User Routes_Recorded="4" Total_Activity_Time="74.23333333333332" Total_Distance="15.916441555489364" Total_Elevation="128.46000000000004" Username="user1"/>
-    <User Routes_Recorded="3" Total_Activity_Time="30.683333333333334" Total_Distance="5.637557972416156" Total_Elevation="45.199999999999996" Username="user2"/>
+    <User Routes_Recorded="4" Total_Activity_Time="74.23333333333333" Total_Distance="15.916441555489362" Total_Elevation="128.46000000000004" Username="user1"/>
+    <User Routes_Recorded="7" Total_Activity_Time="729.5166666666668" Total_Distance="294.09999013979507" Total_Elevation="326.83000000000004" Username="gpxgenerator.com"/>
+    <User Routes_Recorded="2" Total_Activity_Time="23.46666666666667" Total_Distance="3.920595545234862" Total_Elevation="38.22" Username="user2"/>
+    <User Routes_Recorded="2" Total_Activity_Time="41.86666666666667" Total_Distance="10.3366257181357" Total_Elevation="112.06000000000006" Username="user3"/>
 </User_Statistics>

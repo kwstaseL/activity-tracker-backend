@@ -112,7 +112,6 @@ public class UserStatistics implements Serializable
 
     /**
      * @return Returns the average activity time of all the routes a user has registered.
-     * @pre routesRecorded >= 1
      */
     public double getAverageActivityTime()
     {
@@ -141,8 +140,5 @@ public class UserStatistics implements Serializable
                 String.format("| Workout Time (min)  | %8.2f | %8.2f  |\n", totalActivityTime, getAverageActivityTime()) +
                 "+---------------------+----------+-----------+\n";
     }
-
-
-
 
 }
