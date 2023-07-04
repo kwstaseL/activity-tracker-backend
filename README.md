@@ -26,7 +26,9 @@ It then displays the rankings and statistics for each segment, enabling users to
 1. Clone the project
 2. Open Intellij IDEA.
 3. Configure the configuration file:
+
     • Locate the configuration file in the backend project directory.
+
     • Open the configuration file and update the value of the master_ip property to the appropriate IP address where the master             server will be running.
 4. Run the master server to begin accepting connections.
 5. Run the worker(s) to make them available for processing tasks.
