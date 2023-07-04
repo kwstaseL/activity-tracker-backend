@@ -1,11 +1,26 @@
 
-# Activity Tracker
+# Activity Tracker (Backend)
 
 # Overview
 
-This project is a distributed app for the course Distributed Systems at AUEB. 
+This project is a distributed app developed for the course Distributed Systems at AUEB. It provides users with a comprehensive tool for analyzing their activity tracking data. 
 
-It is a simple system for analyzing activity tracking data using the [MapReduce](https://en.wikipedia.org/wiki/MapReduce) framework. The system consists of a mobile frontend application for recording activity and a backend system which handles the analysis of the data. The system allows users to maintain a personal profile, where they can add their activities, which can then be analyzed through the application and compared with other users in similar activities. Users can also see their overall statistics, such as the number of activities, total distance, total exercise time, etc.
+The system consists of a mobile [frontend](https://github.com/kwstaseL/Activity-Tracker) application for the UI and a backend system for data analysis.
+
+# Backend System
+
+The backend system processes the recorded data using the [MapReduce](https://en.wikipedia.org/wiki/MapReduce) framework. 
+
+This allows users to gain insights into their activities and compare them with others who engage in similar activities. Users can maintain a personal profile, add activities, and access statistics such as the number of activities, total distance, and exercise time.
+
+
+## Extra Features
+
+In addition to the core functionality, extra features where implemented such as:
+
+**Segment Detection**: The backend system captures users' segments from their activity routes and generates leaderboards that highlight the performance differences among users. 
+It then displays the rankings and statistics for each segment, enabling users to track their progress.
+
 
 ## Collaborators
 
