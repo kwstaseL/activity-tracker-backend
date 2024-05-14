@@ -27,7 +27,7 @@ public class Master
     // Queue containing all the worker handlers
     private Queue<WorkerHandler> workerHandlers;
     // Lookup table that will map the client id to the appropriate client handler
-    private HashMap<Integer,ClientHandler> clientMap;
+    private HashMap<Integer, ClientHandler> clientMap;
     private int maxWorkers;
 
     // Master will be a singleton class, with instance marking the only Master instantiation we will be allowing.
@@ -140,7 +140,6 @@ public class Master
                     try
                     {
                         workerSocket.close();
-
                     }
                     catch (IOException ex)
                     {
